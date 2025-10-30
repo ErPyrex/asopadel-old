@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Crear Partido{% endblock %}
+
+{% block content %}
+<h2>🎾 Crear Partido</h2>
+<p>Estás a punto de registrar un nuevo encuentro. Cada partido que documentas es parte de la historia deportiva.</p>
+
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Registrar Partido</button>
+</form>
+
+<a href="{% url 'core:admin_torneos_list' %}">← Volver a torneos</a>
+{% endblock %}

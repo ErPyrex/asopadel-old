@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>➕ Crear nuevo torneo</h2>
+<p>Define el desafío. El juego comienza aquí.</p>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn">Crear torneo</button>
+</form>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Jugadores registrados{% endblock %}
+
+{% block content %}
+<h2>🎾 Jugadores registrados</h2>
+<p class="subtitulo">Filtra, analiza y potencia el talento de ASOPADAL.</p>
+
+<!-- 🔍 Buscador -->
+<form method="get" class="busqueda-form">
+  <input type="text" name="q" placeholder="Buscar por nombre..." value="{{ query }}">
+  <button type="submit">🔍 Buscar</button>
+</form>
+
+<!-- 📋 Tabla de jugadores -->
+<table class="tabla-jugadores">
+  <thead>
+    <tr>
+      <th>Cédula</th>
+      <th>Nombre completo</th>
+      <th>Teléfono</th>
+      <th>Categoría</th>
+      <th>Ranking</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for jugador in jugadores %}
+    <tr>
+      <td>{{ jugador.cedula }}</td>
+      <td>{{ jugador.first_name }} {{ jugador.last_name }}</td>
+      <td>{{ jugador.telefono }}</td>
+      <td>{{ jugador.categoria_jugador }}</td>
+      <td>{{ jugador.ranking }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">No hay jugadores registrados aún.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- 📄 Paginación -->
+<div class="paginacion">
+  {% if jugadores.has_previous %}
+    <a href="?q={{ query }}&page={{ jugadores.previous_page_number }}">⬅️ Anterior</a>
+  {% endif %}
+
+  <span>Página {{ jugadores.number }} de {{ jugadores.paginator.num_pages }}</span>
+
+  {% if jugadores.has_next %}
+    <a href="?q={{ query }}&page={{ jugadores.next_page_number }}">Siguiente ➡️</a>
+  {% endif %}
+</div>
+{% endblock %}

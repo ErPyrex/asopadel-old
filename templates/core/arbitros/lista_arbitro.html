@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Lista de Árbitros{% endblock %}
+
+{% block content %}
+<h2>👨‍⚖️ Árbitros registrados</h2>
+<p class="subtitulo">Cada árbitro es un guardián del juego. Su criterio define el ritmo.</p>
+
+<!-- 🔍 Buscador -->
+<form method="get" class="busqueda-form">
+  <input type="text" name="q" placeholder="Buscar por nombre..." value="{{ query }}">
+  <button type="submit">🔍 Buscar</button>
+</form>
+
+<!-- ➕ Crear nuevo -->
+<a href="{% url 'core:admin_create_arbitro' %}" class="btn">➕ Crear árbitro</a>
+
+<!-- 📋 Tabla de árbitros -->
+<table class="tabla-arbitros">
+  <thead>
+    <tr>
+      <th>Cédula</th>
+      <th>Nombre completo</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for arbitro in arbitros %}
+    <tr>
+      <td>{{ arbitro.cedula }}</td>
+      <td>{{ arbitro.first_name }} {{ arbitro.last_name }}</td>
+      <td>{{ arbitro.email }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">No hay árbitros registrados aún.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- 📄 Paginación -->
+<div class="paginacion">
+  {% if arbitros.has_previous %}
+    <a href="?q={{ query }}&page={{ arbitros.previous_page_number }}">⬅️ Anterior</a>
+  {% endif %}
+
+  <span>Página {{ arbitros.number }} de {{ arbitros.paginator.num_pages }}</span>
+
+  {% if arbitros.has_next %}
+    <a href="?q={{ query }}&page={{ arbitros.next_page_number }}">Siguiente ➡️</a>
+  {% endif %}
+</div>
+{% endblock %}

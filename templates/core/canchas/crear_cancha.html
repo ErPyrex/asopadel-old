@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="titulo-seccion">Registrar nueva cancha</h2>
+
+<form method="POST" enctype="multipart/form-data" class="form-cancha">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn-crear">Crear cancha</button>
+</form>
+{% endblock %}

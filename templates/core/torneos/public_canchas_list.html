@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Canchas disponibles{% endblock %}
+{% block content %}
+<h2>🏟️ Todas las canchas registradas</h2>
+<p>Aquí verás el estado, ubicación y tipo de cada cancha disponible en Barinas.</p>
+
+<div class="grid-canchas">
+    {% for cancha in canchas %}
+        <div class="card-cancha {{ cancha.estado }}">
+            <h4>{{ cancha.nombre }}</h4>
+            <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
+            <p><strong>Tipo:</strong> {{ cancha.tipo }}</p>
+            <p><strong>Estado:</strong>
+                {% if cancha.estado == 'disponible' %}
+                    ✅ Disponible
+                {% elif cancha.estado == 'reservada' %}
+                    🔴 Ocupada
+                {% elif cancha.estado == 'mantenimiento' %}
+                    ⚠️ En mantenimiento
+                {% else %}
+                    ❓ Estado desconocido
+                {% endif %}
+            </p>
+        </div>
+    {% empty %}
+        <p>No hay canchas registradas aún.</p>
+    {% endfor %}
+</div>
+{% endblock %}

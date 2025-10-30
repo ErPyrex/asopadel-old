@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Noticias publicadas{% endblock %}
+
+{% block content %}
+<h2>📰 Noticias publicadas</h2>
+<a href="{% url 'core:admin_create_noticia' %}" class="btn">➕ Crear nueva noticia</a>
+
+<ul class="lista-noticias">
+  {% for noticia in noticias %}
+    <li>
+      <h3>{{ noticia.titulo }}</h3>
+      <p>{{ noticia.cuerpo|truncatewords:30 }}</p>
+      <small>📅 {{ noticia.fecha_publicacion }} | ✍️ {{ noticia.autor.get_full_name }}</small>
+    </li>
+  {% empty %}
+    <li>No hay noticias publicadas aún.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

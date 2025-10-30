@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Panel del Jugador{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">👋 Bienvenido, {{ user.first_name }}</h5>
+                    <form method="POST" action="{% url 'users:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm mt-2">🔓 Cerrar sesión</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="col-md-9">
+            <h2>🏓 Panel del Jugador</h2>
+            <p class="lead">Tu evolución deportiva comienza aquí. Este panel te conecta con tus torneos, reservas y estadísticas.</p>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>🎯 Torneos inscritos</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if torneos %}
+                                <ul class="list-group">
+                                    {% for torneo in torneos %}
+                                        <li class="list-group-item"><strong>{{ torneo.nombre }}</strong> — {{ torneo.categoria }}<br>Del {{ torneo.fecha_inicio }} al {{ torneo.fecha_fin }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No estás inscrito en ningún torneo actualmente.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>📅 Reservar cancha</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Elige fecha, hora y cancha para reservar tu espacio en el juego.</p>
+                            <a href="{% url 'core:player_reserve_court' %}" class="btn btn-success">Reservar ahora</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>🧾 Reservas activas</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if reservas %}
+                                <ul class="list-group">
+                                    {% for reserva in reservas %}
+                                        <li class="list-group-item"><strong>{{ reserva.cancha.nombre }}</strong> — {{ reserva.fecha }}<br>{{ reserva.hora_inicio }} a {{ reserva.hora_fin }} ({{ reserva.estado }})</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>No tienes reservas activas.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h3>📊 Estadísticas personales</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if estadisticas %}
+                                <ul class="list-group">
+                                    <li class="list-group-item">Partidos jugados: {{ estadisticas.partidos_jugados }}</li>
+                                    <li class="list-group-item">Victorias: {{ estadisticas.victorias }}</li>
+                                    <li class="list-group-item">Promedio de victorias: {{ estadisticas.promedio_victorias }}%</li>
+                                </ul>
+                            {% else %}
+                                <p>Aún no tienes estadísticas registradas.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>📅 Historial de Partidos</h3>
+                </div>
+                <div class="card-body">
+                    {% if partidos %}
+                        <ul class="list-group">
+                            {% for partido in partidos %}
+                                <li class="list-group-item"><strong>{{ partido.torneo.nombre }}</strong> — {{ partido.fecha }} {{ partido.hora }}<br>Marcador: {{ partido.marcador }}<br>Cancha: {{ partido.cancha.nombre }}<br>Estado: {{ partido.estado }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Aún no has jugado partidos registrados.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
