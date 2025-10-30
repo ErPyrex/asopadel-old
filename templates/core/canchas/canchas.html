@@ -3,36 +3,37 @@
 {% block title %}Canchas disponibles{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/canchas.css' %}">
-<h2 class="titulo-seccion">🏟️ Canchas disponibles</h2>
-
-<div class="grid-canchas">
-  {% for cancha in canchas %}
-    <div class="card-cancha {{ cancha.estado }}">
-      {% if cancha.imagen %}
-        <img src="{{ cancha.imagen.url }}" alt="Imagen de {{ cancha.nombre }}">
-      {% endif %}
-
-      <h3>{{ cancha.nombre }}</h3>
-      <p>{{ cancha.tipo }} | {{ cancha.ubicacion }}</p>
-      <span class="estado">{{ cancha.estado|title }}</span>
-
-      {% if cancha.estado == 'disponible' %}
-        <button class="btn-reservar">Reservar</button>
-      {% elif cancha.estado == 'mantenimiento' %}
-        <span class="alerta">⚠️ En mantenimiento</span>
-      <div class="acciones">
-        <a href="{% url 'core:admin_edit_court' cancha.id %}" class="btn btn-editar">✏️ Editar</a>
-        <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST" class="inline-form">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-eliminar" onclick="return confirm('¿Eliminar esta cancha?')">🗑️ Eliminar</button>
-        </form>
-      </div>
-        </form>
-      </div>
+<div class="container">
+    <h2 class="text-center mb-4">Canchas Disponibles</h2>
+    <div class="row">
+        {% for cancha in canchas %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if cancha.imagen %}
+                <img src="{{ cancha.imagen.url }}" class="card-img-top" alt="Imagen de {{ cancha.nombre }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ cancha.nombre }}</h5>
+                    <p class="card-text">{{ cancha.tipo }} | {{ cancha.ubicacion }}</p>
+                    <p class="card-text"><strong>Estado:</strong> <span class="badge bg-{{ cancha.estado|lower }}">{{ cancha.estado|title }}</span></p>
+                    {% if cancha.estado == 'disponible' %}
+                    <a href="#" class="btn btn-primary">Reservar</a>
+                    {% elif cancha.estado == 'mantenimiento' %}
+                    <p class="text-warning">En mantenimiento</p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'core:admin_edit_court' cancha.id %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar esta cancha?')">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No hay canchas registradas aún.</p>
+        {% endfor %}
     </div>
-  {% empty %}
-    <p>No hay canchas registradas aún.</p>
-  {% endfor %}
 </div>
 {% endblock %}
