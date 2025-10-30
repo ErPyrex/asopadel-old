@@ -2,18 +2,27 @@
 {% block title %}Noticias publicadas{% endblock %}
 
 {% block content %}
-<h2>📰 Noticias publicadas</h2>
-<a href="{% url 'core:admin_create_noticia' %}" class="btn">➕ Crear nueva noticia</a>
-
-<ul class="lista-noticias">
-  {% for noticia in noticias %}
-    <li>
-      <h3>{{ noticia.titulo }}</h3>
-      <p>{{ noticia.cuerpo|truncatewords:30 }}</p>
-      <small>📅 {{ noticia.fecha_publicacion }} | ✍️ {{ noticia.autor.get_full_name }}</small>
-    </li>
-  {% empty %}
-    <li>No hay noticias publicadas aún.</li>
-  {% endfor %}
-</ul>
+<div class="container">
+    <h2 class="text-center mb-4">Noticias Publicadas</h2>
+    <div class="text-center mb-4">
+        <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">Crear Nueva Noticia</a>
+    </div>
+    <div class="row">
+        {% for noticia in noticias %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{{ noticia.titulo }}</h5>
+                    <p class="card-text">{{ noticia.cuerpo|truncatewords:30 }}</p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">{{ noticia.fecha_publicacion }} | {{ noticia.autor.get_full_name }}</small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No hay noticias publicadas aún.</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
