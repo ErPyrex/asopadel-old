@@ -4,53 +4,38 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
             <div class="position-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'core:admin_dashboard' %}">
-                            📊 Dashboard
-                        </a>
+                        <a class="nav-link active" href="{% url 'core:admin_dashboard' %}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:admin_noticias_list' %}">
-                            📰 Noticias
-                        </a>
+                        <a class="nav-link" href="{% url 'core:admin_noticias_list' %}">Noticias</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:admin_canchas_list' %}">
-                            🏟️ Canchas
-                        </a>
+                        <a class="nav-link" href="{% url 'core:admin_canchas_list' %}">Canchas</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:admin_torneos_list' %}">
-                            🏆 Torneos
-                        </a>
+                        <a class="nav-link" href="{% url 'core:admin_torneos_list' %}">Torneos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:admin_player_list' %}">
-                            🎾 Jugadores
-                        </a>
+                        <a class="nav-link" href="{% url 'core:admin_player_list' %}">Jugadores</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:admin_arbitros_list' %}">
-                            👨‍⚖️ Árbitros
-                        </a>
+                        <a class="nav-link" href="{% url 'core:admin_arbitros_list' %}">Árbitros</a>
                     </li>
                 </ul>
-
                 <hr>
-
                 <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                        <strong>👋 Bienvenido, {{ user.first_name }}</strong>
+                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                        <strong>Bienvenido, {{ user.first_name }}</strong>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                    <ul class="dropdown-menu">
                         <li>
                             <form method="POST" action="{% url 'users:logout' %}">
                                 {% csrf_token %}
-                                <button type="submit" class="dropdown-item">🔓 Cerrar sesión</button>
+                                <button type="submit" class="dropdown-item">Cerrar sesión</button>
                             </form>
                         </li>
                     </ul>
@@ -58,45 +43,41 @@
             </div>
         </nav>
 
-        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">🛠️ Panel del Administrador</h1>
+                <h1 class="h2">Panel del Administrador</h1>
             </div>
 
-            <p class="lead">Tu visión define el juego. Cada ajuste es una decisión narrativa.</p>
-
-            <!-- Métricas -->
             <div class="row">
                 <div class="col-md-3">
                     <div class="card text-white bg-primary mb-3">
-                        <div class="card-header">🎾 Jugadores</div>
                         <div class="card-body">
-                            <h5 class="card-title">{{ total_jugadores }}</h5>
+                            <h5 class="card-title">Jugadores</h5>
+                            <p class="card-text">{{ total_jugadores }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card text-white bg-success mb-3">
-                        <div class="card-header">👨‍⚖️ Árbitros</div>
                         <div class="card-body">
-                            <h5 class="card-title">{{ total_arbitros }}</h5>
+                            <h5 class="card-title">Árbitros</h5>
+                            <p class="card-text">{{ total_arbitros }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card text-white bg-info mb-3">
-                        <div class="card-header">🏟️ Canchas</div>
                         <div class="card-body">
-                            <h5 class="card-title">{{ total_canchas }}</h5>
+                            <h5 class="card-title">Canchas</h5>
+                            <p class="card-text">{{ total_canchas }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="card text-white bg-warning mb-3">
-                        <div class="card-header">🏆 Torneos</div>
                         <div class="card-body">
-                            <h5 class="card-title">{{ total_torneos }}</h5>
+                            <h5 class="card-title">Torneos</h5>
+                            <p class="card-text">{{ total_torneos }}</p>
                         </div>
                     </div>
                 </div>
@@ -104,70 +85,47 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <!-- Hero -->
                     <div class="card mb-4">
-                        <div class="card-header">
-                            <h3>🎨 Hero del Home</h3>
-                        </div>
                         <div class="card-body">
-                            <p>Edita el mensaje principal que aparece en la página de inicio.</p>
-                            <a href="{% url 'core:admin_edit_hero' %}" class="btn btn-primary">🖋️ Editar Hero</a>
+                            <h5 class="card-title">Hero del Home</h5>
+                            <p>Edita el mensaje principal de la página de inicio.</p>
+                            <a href="{% url 'core:admin_edit_hero' %}" class="btn btn-primary">Editar Hero</a>
                         </div>
                     </div>
-
-                    <!-- Noticias -->
                     <div class="card mb-4">
-                        <div class="card-header">
-                            <h3>📰 Noticias y comunicados</h3>
-                        </div>
                         <div class="card-body">
-                            <p>Publica novedades, eventos o mensajes para la comunidad.</p>
-                            <a href="{% url 'core:admin_noticias_list' %}" class="btn btn-primary">📚 Ver noticias</a>
-                            <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">➕ Crear noticia</a>
+                            <h5 class="card-title">Noticias y comunicados</h5>
+                            <p>Publica novedades para la comunidad.</p>
+                            <a href="{% url 'core:admin_noticias_list' %}" class="btn btn-primary">Ver noticias</a>
+                            <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">Crear noticia</a>
                         </div>
                     </div>
                 </div>
-
                 <div class="col-md-6">
-                    <!-- Árbitros -->
                     <div class="card mb-4">
-                        <div class="card-header">
-                            <h3>👨‍⚖️ Gestión de árbitros</h3>
-                        </div>
                         <div class="card-body">
+                            <h5 class="card-title">Gestión de árbitros</h5>
                             <a href="{% url 'core:admin_arbitros_list' %}" class="btn btn-primary">Ver árbitros</a>
                             <a href="{% url 'core:admin_create_arbitro' %}" class="btn btn-success">Crear árbitro</a>
                         </div>
                     </div>
-
-                    <!-- Torneos -->
                     <div class="card mb-4">
-                        <div class="card-header">
-                            <h3>🏆 Gestión de torneos</h3>
-                        </div>
                         <div class="card-body">
+                            <h5 class="card-title">Gestión de torneos</h5>
                             <a href="{% url 'core:admin_torneos_list' %}" class="btn btn-primary">Ver torneos</a>
                             <a href="{% url 'core:admin_create_tournament' %}" class="btn btn-success">Crear torneo</a>
                         </div>
                     </div>
-
-                    <!-- Canchas -->
                     <div class="card mb-4">
-                        <div class="card-header">
-                            <h3>🏟️ Gestión de canchas</h3>
-                        </div>
                         <div class="card-body">
+                            <h5 class="card-title">Gestión de canchas</h5>
                             <a href="{% url 'core:admin_canchas_list' %}" class="btn btn-primary">Ver canchas</a>
                             <a href="{% url 'core:admin_create_court' %}" class="btn btn-success">Registrar cancha</a>
                         </div>
                     </div>
-
-                    <!-- Jugadores -->
                     <div class="card mb-4">
-                        <div class="card-header">
-                            <h3>🎾 Gestión de jugadores</h3>
-                        </div>
                         <div class="card-body">
+                            <h5 class="card-title">Gestión de jugadores</h5>
                             <a href="{% url 'core:admin_player_list' %}" class="btn btn-primary">Ver jugadores</a>
                             <a href="{% url 'core:admin_create_player' %}" class="btn btn-success">Crear jugador</a>
                         </div>

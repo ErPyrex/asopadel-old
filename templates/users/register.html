@@ -3,35 +3,29 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <div class="col-md-8">
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title text-center">📝 Registro de Usuario</h2>
-      </div>
-      <div class="card-body">
+  <div class="col-lg-8">
+    <div class="card shadow-lg">
+      <div class="card-body p-5">
+        <h2 class="card-title text-center mb-4">Registro de Usuario</h2>
         <form method="POST" action="{% url 'users:register' %}">
           {% csrf_token %}
-          
           {{ form.as_p }}
-
           <div class="d-grid">
             <button type="submit" class="btn btn-primary">Registrarse</button>
           </div>
         </form>
       </div>
-      <div class="card-footer">
+      <div class="card-footer text-center py-3">
         {% if form.errors %}
-          <div class="alert alert-danger mt-3">
-            <ul class="mb-0">
-              {% for field in form %}
-                {% for error in field.errors %}
-                  <li>{{ error }}</li>
-                {% endfor %}
+          <div class="alert alert-danger">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <p class="mb-0">{{ error }}</p>
               {% endfor %}
-              {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <p class="mb-0">{{ error }}</p>
+            {% endfor %}
           </div>
         {% endif %}
       </div>
