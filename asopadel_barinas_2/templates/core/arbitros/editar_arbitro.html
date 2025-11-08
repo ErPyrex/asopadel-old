@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Editar Árbitro{% endblock %}
+
+{% block content %}
+<h2>✏️ Editar Árbitro</h2>
+<p>Actualiza los datos del árbitro asignado. La justicia también se afina.</p>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn">💾 Guardar cambios</button>
+  <a href="{% url 'core:admin_referee_list' %}" class="btn-cancelar">Cancelar</a>
+</form>
+{% endblock %}

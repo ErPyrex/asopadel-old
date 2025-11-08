@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% block title %}Panel del Administrador{% endblock %}
+
+{% block content %}
+<!-- Cargamos Tailwind CSS y configuramos la paleta de colores -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'navy-dark': '#0A1C36', /* Azul Marino */
+                    'sky-padel': '#00BFFF', /* Celeste Vibrante */
+                    'gray-light': '#F8F9FA', /* Fondo */
+                    'accent-green': '#10B981', /* Verde para crear/acciones positivas */
+                    'accent-red': '#EF4444', /* Rojo para peligro/cerrar sesión */
+                },
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    }
+
+    /* Estilos base para el layout */
+    .admin-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr; /* 280px para sidebar, el resto para main */
+        min-height: 100vh;
+    }
+
+    /* Media query para hacerlo responsivo */
+    @media (max-width: 1024px) {
+        .admin-layout {
+            grid-template-columns: 1fr; /* Pila en móvil */
+        }
+        .sidebar {
+            width: 100%;
+            position: relative;
+            padding-bottom: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    /* Estilo del botón de logout */
+    .btn-rojo {
+        background-color: theme('colors.accent-red');
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        color: white;
+        transition: background-color 0.2s;
+    }
+    .btn-rojo:hover {
+        background-color: #DC2626;
+    }
+</style>
+
+<div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar bg-navy-dark text-white p-6 flex flex-col justify-between">
+        <div>
+            <div class="text-3xl font-extrabold mb-8 tracking-wide">ASO PADÉL</div>
+            <nav class="space-y-3">
+                <!-- Navegación Primaria -->
+                <a href="{% url 'core:admin_dashboard' %}" class="flex items-center p-3 rounded-xl hover:bg-sky-padel hover:text-navy-dark font-medium transition duration-200 bg-sky-padel text-navy-dark">
+                    <span class="mr-3 text-xl">📊</span> Dashboard
+                </a>
+                <a href="{% url 'core:admin_noticias_list' %}" class="flex items-center p-3 rounded-xl hover:bg-gray-700 transition duration-200">
+                    <span class="mr-3 text-xl">📰</span> Noticias
+                </a>
+                <a href="{% url 'core:admin_torneos_list' %}" class="flex items-center p-3 rounded-xl hover:bg-gray-700 transition duration-200">
+                    <span class="mr-3 text-xl">🏆</span> Torneos
+                </a>
+                <a href="{% url 'core:admin_player_list' %}" class="flex items-center p-3 rounded-xl hover:bg-gray-700 transition duration-200">
+                    <span class="mr-3 text-xl">🎾</span> Jugadores
+                </a>
+                <a href="{% url 'core:admin_canchas_list' %}" class="flex items-center p-3 rounded-xl hover:bg-gray-700 transition duration-200">
+                    <span class="mr-3 text-xl">🏟️</span> Canchas
+                </a>
+                <a href="{% url 'core:admin_referee_list' %}" class="flex items-center p-3 rounded-xl hover:bg-gray-700 transition duration-200">
+                    <span class="mr-3 text-xl">👨‍⚖️</span> Árbitros
+                </a>
+            </nav>
+        </div>
+
+        <!-- Usuario y Logout -->
+        <div class="admin-user border-t border-gray-700 pt-6 mt-6">
+            <span class="block text-sm mb-3">👋 Bienvenido, {{ user.first_name }}</span>
+            <form method="POST" action="{% url 'users:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-rojo w-full text-center">
+                    🔓 Cerrar sesión
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="panel-admin p-8 lg:p-10 bg-gray-light">
+        <h1 class="text-3xl lg:text-4xl font-extrabold text-navy-dark mb-2">Dashboard de Administración</h1>
+        <p class="text-gray-500 text-lg mb-8">Gestiona el contenido, usuarios y competencias de ASO PADÉL.</p>
+
+        <!-- Sección 1: Métricas Clave (Siempre visible) -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Métricas Rápidas</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Card Jugadores -->
+                <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-sky-padel">
+                    <p class="text-4xl font-extrabold text-navy-dark">{{ total_jugadores }}</p>
+                    <p class="text-sm text-gray-500 mt-1">🎾 Jugadores</p>
+                </div>
+                <!-- Card Árbitros -->
+                <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-accent-green">
+                    <p class="text-4xl font-extrabold text-navy-dark">{{ total_arbitros }}</p>
+                    <p class="text-sm text-gray-500 mt-1">👨‍⚖️ Árbitros</p>
+                </div>
+                <!-- Card Canchas -->
+                <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-yellow-500">
+                    <p class="text-4xl font-extrabold text-navy-dark">{{ total_canchas }}</p>
+                    <p class="text-sm text-gray-500 mt-1">🏟️ Canchas</p>
+                </div>
+                <!-- Card Torneos -->
+                <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-accent-red">
+                    <p class="text-4xl font-extrabold text-navy-dark">{{ total_torneos }}</p>
+                    <p class="text-sm text-gray-500 mt-1">🏆 Torneos Activos</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 2: Acciones Rápidas (Lo más usado) -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Acciones Prioritarias</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Card Crear Noticia -->
+                <a href="{% url 'core:admin_create_noticia' %}" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border-l-4 border-sky-padel flex flex-col justify-between h-full">
+                    <div>
+                        <p class="text-2xl font-bold text-navy-dark">➕ Crear Noticia</p>
+                        <p class="text-sm text-gray-500 mt-1">Publica comunicados o eventos.</p>
+                    </div>
+                    <span class="mt-4 text-sky-padel group-hover:underline font-semibold text-right">Ir ahora &rarr;</span>
+                </a>
+                
+                <!-- Card Crear Torneo -->
+                <a href="{% url 'core:admin_create_tournament' %}" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border-l-4 border-accent-green flex flex-col justify-between h-full">
+                    <div>
+                        <p class="text-2xl font-bold text-navy-dark">🏆 Nuevo Torneo</p>
+                        <p class="text-sm text-gray-500 mt-1">Configura una nueva competencia.</p>
+                    </div>
+                    <span class="mt-4 text-accent-green group-hover:underline font-semibold text-right">Ir ahora &rarr;</span>
+                </a>
+
+                <!-- Card Registrar Cancha -->
+                <a href="{% url 'core:admin_create_court' %}" class="group bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300 border-l-4 border-navy-dark flex flex-col justify-between h-full">
+                    <div>
+                        <p class="text-2xl font-bold text-navy-dark">🏟️ Registrar Cancha</p>
+                        <p class="text-sm text-gray-500 mt-1">Añade o actualiza una cancha.</p>
+                    </div>
+                    <span class="mt-4 text-navy-dark group-hover:underline font-semibold text-right">Ir ahora &rarr;</span>
+                </a>
+            </div>
+        </section>
+
+
+        <!-- Sección 3: Gestión Detallada (Organización Lógica) -->
+        <section>
+            <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Gestión Detallada</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Bloque 1: Padel (Competencia) -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-padel">
+                    <h3 class="text-2xl font-semibold text-sky-padel mb-4 flex items-center">
+                        <span class="text-3xl mr-3">🎾</span> GESTIÓN DE PADÉL
+                    </h3>
+                    <p class="text-gray-500 mb-4">Administra los torneos, jugadores y árbitros de la asociación.</p>
+                    <div class="space-y-3">
+                        <a href="{% url 'core:admin_torneos_list' %}" class="block bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                            🏆 Torneos (<span class="font-bold">{{ total_torneos }}</span>)
+                        </a>
+                        <a href="{% url 'core:admin_player_list' %}" class="block bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                            🎾 Jugadores (<span class="font-bold">{{ total_jugadores }}</span>)
+                        </a>
+                        <a href="{% url 'core:admin_referee_list' %}" class="block bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                            👨‍⚖️ Árbitros (<span class="font-bold">{{ total_arbitros }}</span>)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Bloque 2: Infraestructura y Contenido -->
+                <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-navy-dark">
+                    <h3 class="text-2xl font-semibold text-navy-dark mb-4 flex items-center">
+                        <span class="text-3xl mr-3">⚙️</span> AJUSTES & CONTENIDO
+                    </h3>
+                    <p class="text-gray-500 mb-4">Edita la información de la página principal y las canchas.</p>
+                    <div class="space-y-3">
+                        <a href="{% url 'core:admin_canchas_list' %}" class="block bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                            🏟️ Canchas (<span class="font-bold">{{ total_canchas }}</span>)
+                        </a>
+                        <a href="{% url 'core:admin_noticias_list' %}" class="block bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                            📰 Listar Noticias
+                        </a>
+                        <a href="{% url 'core:admin_edit_hero' %}" class="block bg-gray-50 p-3 rounded-lg hover:bg-gray-100 transition duration-150">
+                            🖋️ Editar Hero del Home
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+<!-- Sección 4: Estado Operacional de Canchas -->
+<section class="mb-10">
+  <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">🟢 Estado Operacional de Canchas</h2>
+  <div class="bg-white p-6 rounded-xl shadow-lg">
+    <table class="w-full text-sm text-left text-gray-700">
+      <thead class="bg-gray-200 text-gray-800">
+        <tr>
+          <th>#</th>
+          <th>Cancha</th>
+          <th>Tipo</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cancha in canchas %}
+          <tr class="border-b">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ cancha.nombre }}</td>
+            <td>{{ cancha.tipo }}</td>
+            <td>{{ cancha.ubicacion }}</td>
+            <td>{{ cancha.estado }}</td>
+            <td>
+              <a href="{% url 'core:calendario_cancha' cancha.id %}" class="text-blue-600 hover:underline">Ver Calendario</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+        <!-- Mensaje al final del panel -->
+        <div class="mt-12 text-center text-gray-400 text-sm">
+            <p>&copy; 2025 ASO PADÉL. Panel de Administración. Versión 1.0</p>
+        </div>
+    </main>
+</div>
+{% endblock %}

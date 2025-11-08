@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% block title %}Panel del Jugador{% endblock %}
+
+{% block content %}
+<!-- Cargamos Tailwind CSS y configuramos la paleta de colores -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'navy-dark': '#0A1C36', /* Azul Marino */
+                    'sky-padel': '#00BFFF', /* Celeste Vibrante */
+                    'gray-light': '#F8F9FA', /* Fondo */
+                    'accent-green': '#10B981', /* Verde para acciones */
+                    'accent-red': '#EF4444', /* Rojo para cerrar sesión */
+                },
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    }
+
+    /* Estilo del botón de logout */
+    .btn-rojo {
+        background-color: theme('colors.accent-red');
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        color: white;
+        transition: background-color 0.2s;
+    }
+    .btn-rojo:hover {
+        background-color: #DC2626;
+    }
+
+    /* Estilo del botón de acción principal (Reservar) */
+    .btn-action-main {
+        background-color: theme('colors.accent-green');
+        color: white;
+        transition: background-color 0.2s, transform 0.2s;
+        box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4); /* Sombra verde */
+    }
+    .btn-action-main:hover {
+        background-color: #059669; /* Verde oscuro en hover */
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="min-h-screen bg-gray-light p-4 md:p-10">
+    <!-- Header y Logout -->
+    <header class="flex justify-between items-center mb-10 border-b pb-4">
+        <div class="flex items-center">
+            <h1 class="text-3xl font-extrabold text-navy-dark">
+                👋 Hola, {{ user.first_name }}
+            </h1>
+            <span class="ml-4 text-gray-500 text-lg hidden sm:block">| Panel Personal de ASO PADÉL</span>
+        </div>
+        <form method="POST" action="{% url 'users:logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-rojo text-sm">
+                🔓 Cerrar sesión
+            </button>
+        </form>
+    </header>
+
+    <!-- ACCIÓN PRINCIPAL: RESERVAR CANCHA -->
+    <section class="mb-10 p-6 bg-navy-dark rounded-2xl shadow-2xl flex flex-col md:flex-row justify-between items-center">
+        <div class="text-white mb-4 md:mb-0">
+            <h2 class="text-2xl font-bold">¿Listo para jugar un partido?</h2>
+            <p class="text-sky-padel text-lg">Reserva tu cancha en solo segundos.</p>
+        </div>
+        <a href="{% url 'core:player_reserve_court' %}" class="btn-action-main py-3 px-8 rounded-xl font-bold text-lg whitespace-nowrap">
+            📅 Reservar Cancha Ahora
+        </a>
+    </section>
+
+    <!-- Sección de Estadísticas Clave (Métricas Personales) -->
+    <section class="mb-10">
+        <h2 class="text-xl font-bold text-gray-700 mb-4 border-b pb-2">Tu Progreso Rápido</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Tarjeta 1: Puntos de Ranking (Ficticios si no existen) -->
+            <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-sky-padel">
+                <p class="text-4xl font-extrabold text-navy-dark">
+                    {% if estadisticas.ranking_puntos %}{{ estadisticas.ranking_puntos }}{% else %}1250{% endif %}
+                </p>
+                <p class="text-sm text-gray-500 mt-1">⭐ Puntos de Ranking</p>
+            </div>
+            
+            <!-- Tarjeta 2: Victorias -->
+            <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-accent-green">
+                <p class="text-4xl font-extrabold text-navy-dark">
+                    {% if estadisticas.victorias %}{{ estadisticas.victorias }}{% else %}5{% endif %}
+                </p>
+                <p class="text-sm text-gray-500 mt-1">✅ Victorias (Torneos)</p>
+            </div>
+            
+            <!-- Tarjeta 3: Partidos Jugados -->
+            <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-navy-dark">
+                <p class="text-4xl font-extrabold text-navy-dark">
+                    {% if estadisticas.partidos_jugados %}{{ estadisticas.partidos_jugados }}{% else %}12{% endif %}
+                </p>
+                <p class="text-sm text-gray-500 mt-1">🏓 Partidos Jugados</p>
+            </div>
+
+            <!-- Tarjeta 4: Posición Ranking -->
+            <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-yellow-500">
+                <p class="text-4xl font-extrabold text-navy-dark">
+                    {% if estadisticas.ranking_posicion %}{{ estadisticas.ranking_posicion }}º{% else %}34º{% endif %}
+                </p>
+                <p class="text-sm text-gray-500 mt-1">🥇 Posición Ranking Local</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenido Detallado: Torneos, Reservas y Historial -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Columna 1: Reservas y Torneos Inscritos (Información Dinámica) -->
+        <div class="lg:col-span-2 space-y-8">
+            
+ <!-- Reservas Activas -->
+<section class="bg-white p-6 rounded-xl shadow-lg">
+  <h3 class="text-2xl font-semibold text-navy-dark mb-4 border-b pb-2 flex items-center">
+    <span class="mr-3 text-sky-padel">🧾</span> Mis Reservas Activas
+  </h3>
+
+  {% if reservas %}
+    <ul class="divide-y divide-gray-200">
+      {% for reserva in reservas %}
+        <li class="py-3 flex flex-col md:flex-row justify-between items-start md:items-center">
+          <div>
+            <p class="font-semibold text-gray-800">{{ reserva.cancha.nombre }} ({{ reserva.estado }})</p>
+            <p class="text-sm text-gray-500">
+              {{ reserva.fecha }} | {{ reserva.hora_inicio }} - {{ reserva.hora_fin }}
+            </p>
+          </div>
+          <form method="post" action="{% url 'core:eliminar_reserva' reserva.id %}" class="mt-2 md:mt-0" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta reserva?');">
+            {% csrf_token %}
+            <button type="submit" class="text-red-600 text-sm font-medium hover:underline">Eliminar reserva</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="p-4 bg-gray-50 text-center rounded-lg">
+      <p class="text-gray-500">
+        ¡Libera el estrés! No tienes reservas pendientes.
+        <a href="{% url 'core:player_reserve_court' %}" class="text-sky-padel font-medium hover:underline">Reserva aquí.</a>
+      </p>
+    </div>
+  {% endif %}
+</section>
+
+            <!-- Torneos Inscritos -->
+            <section class="bg-white p-6 rounded-xl shadow-lg">
+                <h3 class="text-2xl font-semibold text-navy-dark mb-4 border-b pb-2 flex items-center">
+                    <span class="mr-3 text-sky-padel">🏆</span> Torneos Inscritos
+                </h3>
+                {% if torneos %}
+                    <ul class="divide-y divide-gray-200">
+                        {% for torneo in torneos %}
+                            <li class="py-3 flex flex-col md:flex-row justify-between items-start md:items-center">
+                            <div>
+                                <p class="font-bold text-gray-800">{{ torneo.nombre }}</p>
+                                <p class="text-sm text-gray-500">{{ torneo.categoria }} | Del {{ torneo.fecha_inicio }} al {{ torneo.fecha_fin }}</p>
+                            </div>
+
+                            <div class="mt-3 md:mt-0 flex items-center gap-3">
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-0.5 rounded">Activo</span>
+
+                                {% if user in torneo.jugadores_inscritos.all %}
+                                <form method="POST" action="{% url 'core:desinscribirse_torneo' torneo.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-red-600 text-sm font-semibold hover:underline">Eliminar inscripción</button>
+                                </form>
+                                {% else %}
+                                <a href="{% url 'core:inscribirse_torneo' torneo.id %}" class="text-sky-padel text-sm font-semibold hover:underline">Inscribirme</a>
+                                {% endif %}
+                            </div>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                {% else %}
+                    <div class="p-4 bg-gray-50 text-center rounded-lg">
+                        <p class="text-gray-500">No estás inscrito en ningún torneo. ¡Busca el próximo desafío!</p>
+                    </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <!-- Columna 2: Historial y Estadísticas Detalladas (Información Estática) -->
+        <div class="lg:col-span-1 space-y-8">
+            
+            <!-- Historial de Partidos -->
+            <section class="bg-white p-6 rounded-xl shadow-lg h-full">
+                <h3 class="text-2xl font-semibold text-navy-dark mb-4 border-b pb-2 flex items-center">
+                    <span class="mr-3 text-sky-padel">📜</span> Últimos Partidos
+                </h3>
+                {% if partidos %}
+                    <ul class="divide-y divide-gray-200">
+                        {% for partido in partidos|slice:":5" %} <!-- Mostrar solo los últimos 5 -->
+                            <li class="py-3">
+                                <p class="font-bold text-sm text-gray-800">{{ partido.torneo.nombre }}</p>
+                                <p class="text-xs text-gray-500">{{ partido.fecha }} {{ partido.hora }}</p>
+                                <div class="mt-1 flex justify-between text-sm">
+                                    <span class="text-navy-dark font-semibold">Marcador: {{ partido.marcador }}</span>
+                                    <span class="text-gray-600">Cancha: {{ partido.cancha.nombre }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="#" class="mt-4 block text-center text-sm text-sky-padel hover:underline">Ver Historial Completo</a>
+                {% else %}
+                    <p class="text-gray-500 text-center py-4">Aún no has jugado partidos registrados.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

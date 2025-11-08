@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Panel de Canchas{% endblock %}
+
+{% block content %}
+<h2>🏟️ Canchas registradas</h2>
+<p>Administra el estado y la disponibilidad de cada cancha.</p>
+
+<a href="{% url 'core:admin_create_court' %}" class="btn">➕ Registrar nueva cancha</a>
+
+<div class="grid-canchas">
+  {% for cancha in canchas %}
+    <div class="card-cancha">
+      <h3>{{ cancha.nombre }}</h3>
+      <p>{{ cancha.tipo }} - {{ cancha.ubicacion }}</p>
+      <span class="estado">{{ cancha.estado|title }}</span>
+
+      <a href="{% url 'core:admin_edit_court' cancha.id %}" class="btn">✏️ Editar</a>
+      <form method="POST" action="{% url 'core:admin_delete_court' cancha.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn-danger" onclick="return confirm('¿Eliminar esta cancha?')">🗑️ Eliminar</button>
+      </form>
+    </div>
+  {% empty %}
+    <p>No hay canchas registradas aún.</p>
+  {% endfor %}
+</div>
+{% endblock %}

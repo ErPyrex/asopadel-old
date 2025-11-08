@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Cancelar Reserva{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg mt-10">
+  <h2 class="text-2xl font-bold text-red-600 mb-6">¿Cancelar esta reserva?</h2>
+  <p class="mb-4 text-gray-700">
+    Cancha: <strong>{{ reserva.cancha.nombre }}</strong><br>
+    Fecha: {{ reserva.fecha }}<br>
+    Hora: {{ reserva.hora_inicio }} - {{ reserva.hora_fin }}
+  </p>
+
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn-rojo py-2 px-6 rounded-lg font-semibold">Sí, cancelar</button>
+    <a href="{% url 'core:jugador_dashboard' %}" class="ml-4 text-sm text-gray-500 hover:underline">Volver</a>
+  </form>
+</div>
+{% endblock %}

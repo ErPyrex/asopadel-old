@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block title %}Inicio - ASOPADAL BARINAS{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  {% if hero_activo %}
+  <!-- Hero a pantalla completa con imagen de fondo -->
+  <section class="hero-home" style="background-image: url('{{ hero_activo.imagen.url }}');">
+    <div class="hero-overlay">
+      <h2>{{ hero_activo.titulo }}</h2>
+      <p>{{ hero_activo.subtitulo }}</p>
+    </div>
+  </section>
+  {% endif %}
+
+  <h2 class="text-center section-mt"> Bienvenido a ASOPADAL BARINAS</h2>
+  <p class="subtitulo text-center">Tu comunidad de pádel en Barinas</p>
+
+  <!-- Panel de acceso -->
+  <section class="paneles section-mt">
+    <h3>🔐 Accede a tu panel</h3>
+    {% if user.is_authenticated %}
+      <p>Tu sesión está activa. Accede a tu panel personalizado.</p>
+      <div class="btn-group">
+        <a href="{% url 'core:dashboard_by_role' %}" class="btn">📋 Ir a mi panel</a>
+        <form method="POST" action="{% url 'users:logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger mt-2">🔓 Cerrar sesión</button>
+        </form>
+      </div>
+    {% else %}
+      <p>Inicia sesión para acceder a tu panel personalizado.</p>
+      <a href="{% url 'users:login' %}" class="btn">🔐 Iniciar sesión</a>
+    {% endif %}
+  </section>
+
+  <!-- Torneos -->
+  <section class="torneos section-mt">
+    <h3>📅 Torneos recientes</h3>
+    {% if torneos %}
+      <div class="grid-torneos">
+        {% for torneo in torneos %}
+          <div class="card-torneo">
+            <h4>🎯 {{ torneo.nombre }}</h4>
+            <p><strong>Fecha:</strong> {{ torneo.fecha_inicio }} - {{ torneo.fecha_fin }}</p>
+            <p><strong>Ubicación:</strong> {{ torneo.ubicacion }}</p>
+            <a href="{% url 'core:inscribirse_torneo' torneo.id %}" class="btn-action-main">Inscribirme</a>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No hay torneos registrados aún.</p>
+    {% endif %}
+  </section>
+
+  <!-- Ranking -->
+  <section class="ranking section-mt">
+    <h3>🏆 Top 10 del Ranking</h3>
+    {% if ranking %}
+      <ul class="lista-ranking">
+        {% for jugador in ranking %}
+          <li><strong>{{ jugador.nombre }}</strong> — {{ jugador.puntos }} pts</li>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'core:public_ranking_list' %}" class="btn mt-2">📊 Ver Ranking Completo</a>
+    {% else %}
+      <p>No hay jugadores en el ranking aún.</p>
+    {% endif %}
+  </section>
+
+  <!-- Canchas -->
+  <section class="estado-canchas section-mt">
+    <h3>🏟️ Actualidad de las canchas</h3>
+    <div class="grid-canchas">
+      {% for cancha in canchas %}
+        <div class="card-cancha {{ cancha.estado }}">
+          <h4>{{ cancha.nombre }}</h4>
+          <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
+          <p><strong>Tipo:</strong> {{ cancha.tipo }}</p>
+          <p><strong>Estado:</strong>
+            {% if cancha.estado == 'disponible' %}
+              ✅ Disponible
+            {% elif cancha.estado == 'reservada' %}
+              🔴 Ocupada
+            {% elif cancha.estado == 'mantenimiento' %}
+              ⚠️ En mantenimiento
+            {% else %}
+              ❓ Estado desconocido
+            {% endif %}
+          </p>
+
+          {% if user.is_authenticated %}
+            {% if user.es_jugador %}
+              {% if cancha.estado == 'disponible' %}
+                <form method="get" action="{% url 'core:player_reserve_court' %}">
+                  <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
+                  <button type="submit" class="btn-reservar">🎾 Reservar esta cancha</button>
+                </form>
+              {% else %}
+                <p class="estado-info">⛔ Esta cancha no está disponible para reserva.</p>
+              {% endif %}
+            {% else %}
+              <p class="estado-info">👤 Solo los jugadores pueden reservar canchas.</p>
+            {% endif %}
+          {% else %}
+            <p class="estado-info">🔐 Inicia sesión como jugador para reservar.</p>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p>No hay canchas disponibles o registradas en este momento.</p>
+      {% endfor %}
+    </div>
+    <a href="{% url 'core:public_canchas_list' %}" class="btn mt-3">🔍 Ver todas las canchas</a>
+  </section>
+
+</div>
+
+<!-- Noticias -->
+<section class="seccion-noticias section-mt">
+  <h3>📰 Noticias recientes</h3>
+  {% if noticias %}
+    <div class="grid-noticias">
+      {% for noticia in noticias %}
+        <div class="noticia-cuadro">
+          {% if noticia.imagen %}
+            <img src="{{ noticia.imagen.url }}" alt="Imagen de noticia">
+          {% endif %}
+          <div class="noticia-contenido">
+            <h4>{{ noticia.titulo }}</h4>
+            <p>{{ noticia.cuerpo|truncatewords:20 }}</p>
+            <p><em>Publicado el {{ noticia.fecha_publicacion }}</em></p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No hay noticias publicadas aún.</p>
+  {% endif %}
+</section>
+{% endblock %}

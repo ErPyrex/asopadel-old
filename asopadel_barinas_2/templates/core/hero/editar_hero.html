@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Editar Hero{% endblock %}
+
+{% block content %}
+<h2>🎨 Editar Hero del Home</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn">💾 Guardar cambios</button>
+</form>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Torneos registrados{% endblock %}
+
+{% block content %}
+<h2>🏆 Torneos registrados</h2>
+<p>Cada torneo es una historia en juego. Diseña el desafío.</p>
+
+<!-- 🔍 Filtros por tipo y estado -->
+<form method="get" class="filtros" style="margin-bottom: 20px;">
+  <label for="tipo">Tipo:</label>
+  <select name="tipo" id="tipo">
+    <option value="">Todos</option>
+    <option value="individual" {% if tipo_seleccionado == "individual" %}selected{% endif %}>Individual</option>
+    <option value="dobles" {% if tipo_seleccionado == "dobles" %}selected{% endif %}>Dobles</option>
+    <option value="mixto" {% if tipo_seleccionado == "mixto" %}selected{% endif %}>Mixto</option>
+  </select>
+
+  <label for="estado">Estado:</label>
+  <select name="estado" id="estado">
+    <option value="">Todos</option>
+    <option value="pendiente" {% if estado_seleccionado == "pendiente" %}selected{% endif %}>Pendiente</option>
+    <option value="activo" {% if estado_seleccionado == "activo" %}selected{% endif %}>Activo</option>
+    <option value="finalizado" {% if estado_seleccionado == "finalizado" %}selected{% endif %}>Finalizado</option>
+  </select>
+
+  <button type="submit">Filtrar</button>
+</form>
+
+<!-- ➕ Botón para crear torneo -->
+<a href="{% url 'core:admin_create_tournament' %}" class="btn">➕ Crear nuevo torneo</a>
+
+<!-- 📊 Tabla de torneos -->
+<table class="tabla-torneos" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color: #5e2ca5; color: white;">
+      <th>Nombre</th>
+      <th>Categoría</th>
+      <th>Inicio</th>
+      <th>Fin</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for torneo in torneos %}
+    <tr style="border-bottom: 1px solid #ccc;">
+      <td>{{ torneo.nombre }}</td>
+      <td>{{ torneo.categoria }}</td>
+      <td>{{ torneo.fecha_inicio }}</td>
+      <td>{{ torneo.fecha_fin }}</td>
+      <td>
+        {% if torneo.estado_actual == 'pendiente' %}
+          🟡 Pendiente
+        {% elif torneo.estado_actual == 'activo' %}
+          🟢 Activo
+        {% else %}
+          🔴 Finalizado
+        {% endif %}
+      </td>
+      <td>
+        <a href="{% url 'core:admin_edit_tournament' torneo.id %}" class="btn-editar">✏️ Editar</a>
+        <form action="{% url 'core:admin_delete_tournament' torneo.id %}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este torneo?');">
+          {% csrf_token %}
+          <button type="submit" class="btn-eliminar">🗑️ Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="6">No hay torneos registrados aún.</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

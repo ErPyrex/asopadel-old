@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-10 bg-white p-8 rounded-xl shadow-xl">
+  <h2 class="text-2xl font-bold text-navy-dark mb-4">📝 Registrar Resultado</h2>
+
+  <p class="text-gray-600 mb-6">
+    Partido: <span class="font-semibold">{{ partido.torneo.nombre }}</span> |
+    Fecha: <span class="font-semibold">{{ partido.fecha }}</span> |
+    Hora: <span class="font-semibold">{{ partido.hora }}</span> |
+    Cancha: <span class="font-semibold">{{ partido.cancha.nombre }}</span>
+  </p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="mb-4">
+      <label for="id_marcador" class="block text-sm font-medium text-gray-700">Marcador final</label>
+      {{ form.marcador }}
+      {% if form.marcador.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.marcador.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <div class="mb-6">
+      <label for="id_observaciones" class="block text-sm font-medium text-gray-700">Observaciones</label>
+      {{ form.observaciones }}
+      {% if form.observaciones.errors %}
+        <p class="text-red-600 text-sm mt-1">{{ form.observaciones.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="bg-accent-green hover:bg-green-600 text-white py-2 px-6 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg">
+      ✅ Guardar resultado
+    </button>
+  </form>
+</div>
+{% endblock %}

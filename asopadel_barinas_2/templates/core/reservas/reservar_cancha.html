@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Reservar Cancha - ASOPADAL BARINAS{% endblock %}
+
+{% block content %}
+<h2 class="text-2xl font-bold text-sky-padel mb-2">📅 Reservar cancha</h2>
+<p class="text-gray-700 mb-6">Elige tu momento. La cancha espera tu juego.</p>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 shadow-sm">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if form.errors %}
+  <div class="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-6 shadow-sm">
+    <h4 class="text-lg font-semibold mb-2 flex items-center">
+      <span class="mr-2">⚠️</span> Se encontraron errores en el formulario
+    </h4>
+    <ul class="list-disc list-inside text-sm space-y-1">
+      {% for field in form %}
+        {% for error in field.errors %}
+          <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+      {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<form method="post" class="space-y-6">
+  {% csrf_token %}
+
+  {% if cancha %}
+    <div class="bg-gray-50 p-4 rounded-lg shadow mb-6">
+      <h3 class="text-xl font-semibold text-sky-padel">{{ cancha.nombre }}</h3>
+      <p class="text-sm text-gray-700"><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
+      <p class="text-sm text-gray-700"><strong>Tipo:</strong> {{ cancha.tipo }}</p>
+      <input type="hidden" name="cancha" value="{{ cancha.id }}">
+    </div>
+  {% else %}
+    <div class="mb-4">
+      <label for="cancha" class="block text-sm font-semibold text-gray-800 mb-2">🎾 Cancha disponible</label>
+      <select name="cancha" id="cancha" required class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-padel focus:border-sky-padel">
+        <option value="">-- Selecciona una cancha --</option>
+        {% for cancha_opcion in form.fields.cancha.queryset %}
+          <option value="{{ cancha_opcion.id }}" {% if form.cancha.value == cancha_opcion.id|stringformat:"s" %}selected{% endif %}>
+            {{ cancha_opcion.nombre }} – {{ cancha_opcion.tipo }} ({{ cancha_opcion.ubicacion }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  {% endif %}
+
+  <div class="mb-4">
+    <label for="fecha" class="block text-sm font-medium text-gray-700">📆 Fecha</label>
+    {{ form.fecha }}
+  </div>
+
+  <div class="mb-4">
+    <label for="hora_inicio" class="block text-sm font-medium text-gray-700">🕒 Hora inicio</label>
+    {{ form.hora_inicio }}
+  </div>
+
+  <div class="mb-4">
+    <label for="hora_fin" class="block text-sm font-medium text-gray-700">🕒 Hora fin</label>
+    {{ form.hora_fin }}
+  </div>
+
+  <button type="submit" class="btn bg-sky-padel text-white px-6 py-2 rounded-lg font-semibold hover:bg-sky-600">
+    Confirmar reserva
+  </button>
+</form>
+{% endblock %}
+
+<script>
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const canchaSelect = document.getElementById('cancha');
+    if (canchaSelect && canchaSelect.value === '') {
+      alert('⚠️ Debes seleccionar una cancha antes de confirmar la reserva.');
+      e.preventDefault();
+    }
+  });
+</script>

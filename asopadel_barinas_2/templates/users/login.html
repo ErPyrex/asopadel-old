@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<!-- Cargamos Tailwind CSS y configuramos la paleta de colores -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'navy-dark': '#0A1C36', /* Nuestro Azul Marino */
+                    'sky-padel': '#00BFFF', /* Nuestro Celeste Vibrante */
+                    'sky-hover': '#0099CC',
+                    'gray-light': '#F8F9FA', /* Fondo de la página */
+                }
+            }
+        }
+    }
+
+    /* Clase para el botón: Usamos !important para forzar el color Azul Marino y Blanco */
+    .btn-navy-force {
+        background-color: #0A1C36 !important; /* Azul Marino */
+        color: white !important; /* Texto Blanco */
+        border: none;
+    }
+
+    /* Efecto hover forzado */
+    .btn-navy-force:hover {
+        background-color: #00BFFF !important; /* Celeste Vibrante al pasar el ratón */
+    }
+
+    /* Clase para la sombra azul/celeste que dará vida al contenedor */
+    .glow-shadow {
+        /* Sombra de caja más pronunciada */
+        box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.2);
+        /* Aplicamos el resplandor azul/celeste usando filter para mayor visibilidad */
+        filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.4)) drop-shadow(0 0 5px rgba(0, 191, 255, 0.2));
+    }
+</style>
+
+<div class="min-h-screen flex items-center justify-center p-4 bg-gray-light">
+    <!-- Contenedor principal de la tarjeta con la nueva clase glow-shadow -->
+    <div class="w-full max-w-md bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100 transition duration-300 glow-shadow">
+
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-navy-dark tracking-wide">ASO PADÉL</h1>
+            <p class="text-md text-gray-500 mt-2">Accede a tu cuenta de Barinas</p>
+        </div>
+
+        <h2 class="text-2xl font-semibold text-gray-700 mb-6 flex items-center justify-center border-b pb-4">
+            <!-- Ícono de Candado -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole-open mr-3 text-sky-padel">
+                <path d="M10 10V7a2 2 0 0 1 4 0v3"/>
+                <circle cx="12" cy="18" r="2"/>
+                <path d="M7 16V7a5 5 0 0 1 10 0v9a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2z"/>
+            </svg>
+            Iniciar sesión
+        </h2>
+
+        <form method="POST" action="{% url 'users:login' %}" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Cédula:</label>
+                <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    placeholder="Ej. V-12345678"
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-inner focus:ring-sky-padel focus:border-sky-padel transition duration-200"
+                >
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Contraseña:</label>
+                <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="Ingrese su contraseña"
+                    required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-inner focus:ring-sky-padel focus:border-sky-padel transition duration-200"
+                >
+            </div>
+
+            <!-- Botón principal con la clase de estilo forzado (.btn-navy-force) -->
+            <button
+                type="submit"
+                class="w-full py-3.5 px-4 rounded-xl text-lg font-semibold shadow-xl transform hover:scale-[1.01] transition duration-300 btn-navy-force"
+            >
+                Iniciar Sesión
+            </button>
+
+            <div class="text-center pt-2">
+                <a href="#" class="text-sm font-medium text-sky-padel hover:text-sky-hover transition duration-150">
+                    ¿Olvidó su contraseña?
+                </a>
+            </div>
+        </form>
+
+        <!-- Bloque de Errores -->
+        {% if form.errors %}
+            <div class="mt-8 p-4 bg-red-50 border border-red-300 text-red-700 rounded-xl shadow-inner">
+                <p class="text-sm font-bold mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Error de inicio de sesión:
+                </p>
+                <ul class="list-disc ml-5 text-sm space-y-1">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+<h2>Torneos Asignados</h2>
+<ul>
+  {% for torneo in torneos %}
+    <li>{{ torneo.nombre }} | {{ torneo.categoria }} | {{ torneo.estado_actual }}</li>
+  {% endfor %}
+</ul>

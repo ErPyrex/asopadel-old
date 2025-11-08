@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% block title %}Panel del Árbitro | ASO PADÉL{% endblock %}
+
+{% block content %}
+<!-- Cargamos Tailwind CSS y configuramos la paleta de colores -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'navy-dark': '#0A1C36', /* Azul Marino */
+                    'sky-padel': '#00BFFF', /* Celeste Vibrante */
+                    'gray-light': '#F8F9FA', /* Fondo */
+                    'accent-green': '#10B981', /* Verde para crear/acciones positivas */
+                    'accent-red': '#EF4444', /* Rojo para peligro/cerrar sesión */
+                    'accent-yellow': '#F59E0B', /* Amarillo para advertencias/pendientes */
+                },
+                fontFamily: {
+                    sans: ['Inter', 'sans-serif'],
+                }
+            }
+        }
+    }
+
+    /* Estilo del botón de logout */
+    .btn-rojo {
+        background-color: theme('colors.accent-red');
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        color: white;
+        transition: background-color 0.2s;
+    }
+    .btn-rojo:hover {
+        background-color: #DC2626;
+    }
+
+    /* Estilo de la tabla de datos */
+    .data-table th, .data-table td {
+        padding: 0.75rem 1rem;
+        text-align: left;
+    }
+    .data-table th {
+        background-color: #E5E7EB;
+        font-weight: 600;
+        color: #374151;
+    }
+    .data-table tbody tr:nth-child(even) {
+        background-color: #F9FAFB;
+    }
+</style>
+
+<div class="min-h-screen bg-gray-light p-4 md:p-10">
+    <!-- Header y Logout -->
+    <header class="flex justify-between items-center mb-8 border-b pb-4">
+        <div class="flex items-center">
+            <h1 class="text-3xl font-extrabold text-navy-dark">
+                <span class="text-sky-padel text-4xl mr-2">👨‍⚖️</span> Panel del Árbitro
+            </h1>
+        </div>
+        <form method="POST" action="{% url 'users:logout' %}">
+            {% csrf_token %}
+            <span class="hidden md:inline-block text-gray-600 mr-4">👋 Bienvenido, {{ user.first_name }}</span>
+            <button type="submit" class="btn-rojo text-sm">
+                <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+            </button>
+        </form>
+    </header>
+
+    <p class="text-gray-500 text-lg mb-10">Tu gestión garantiza la integridad de cada partido y torneo.</p>
+
+ {% now "Y-m-d" as today %}
+
+<!-- Sección 1: Acción Prioritaria (Registrar Resultados) -->
+<section class="mb-10">
+  <div class="bg-navy-dark p-6 md:p-8 rounded-2xl shadow-2xl">
+    <h2 class="text-2xl font-bold text-accent-yellow mb-2">📝 Partidos Finalizados sin Resultado</h2>
+    <p class="text-gray-300 text-lg mb-6">Carga los marcadores para actualizar el ranking del torneo.</p>
+
+    {% if partidos_finalizados %}
+      <ul class="space-y-4">
+        {% for partido in partidos_finalizados %}
+          <li class="bg-white p-4 rounded-xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center">
+            <div>
+              <p class="font-bold text-navy-dark">{{ partido.torneo.nombre }} - {{ partido.fase }}</p>
+              <p class="text-sm text-gray-600">
+                {{ partido.fecha }} a las {{ partido.hora }} | Cancha {{ partido.cancha.nombre }}
+              </p>
+            </div>
+            <a href="{% url 'core:registrar_resultado' partido.id %}" class="bg-accent-green hover:bg-green-600 text-white py-2 px-4 rounded-lg font-semibold text-sm transition duration-300 shadow-md hover:shadow-lg mt-3 md:mt-0">
+              📝 Registrar Resultado
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-gray-400 text-center">No hay partidos finalizados pendientes de resultado.</p>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Sección 2: Estado Operacional de Canchas -->
+<section class="mb-10">
+  <div class="bg-white p-6 rounded-xl shadow-lg">
+    <h2 class="text-2xl font-bold text-navy-dark mb-4">🟢 Estado Operacional de Canchas</h2>
+    <table class="w-full text-sm text-left text-gray-700">
+      <thead class="bg-gray-200 text-gray-800">
+        <tr>
+          <th>#</th>
+          <th>Cancha</th>
+          <th>Tipo</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cancha in canchas %}
+          <tr class="border-b">
+            <td>{{ forloop.counter }}</td>
+            <td>{{ cancha.nombre }}</td>
+            <td>{{ cancha.tipo }}</td>
+            <td>{{ cancha.ubicacion }}</td>
+            <td>{{ cancha.estado }}</td>
+            <td>
+              <a href="{% url 'core:calendario_cancha' cancha.id %}" class="text-blue-600 hover:underline">Ver Calendario</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+    <!-- Sección 2: Próximos Partidos y Torneos Asignados (Flujo de trabajo) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+
+        <!-- Columna Izquierda: Próximos Partidos (Lo más urgente) -->
+        <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg border-t-4 border-sky-padel">
+            <h3 class="text-2xl font-semibold text-navy-dark mb-4 border-b pb-2 flex items-center">
+                <span class="mr-3 text-3xl">🗓️</span> Próximos Partidos Asignados
+            </h3>
+            <p class="text-gray-500 mb-4">Tu agenda para los próximos encuentros.</p>
+            
+            {% if partidos_proximos %}
+                <ul class="divide-y divide-gray-200">
+                    {% for partido in partidos_proximos %}
+                        <li class="py-3 flex flex-col md:flex-row justify-between items-start md:items-center">
+                            <div>
+                                <p class="font-bold text-gray-800">
+                                    {{ partido.torneo.nombre }} - {{ partido.fase }}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    <span class="font-semibold text-navy-dark">{{ partido.fecha }}</span> a las <span class="font-semibold text-navy-dark">{{ partido.hora }}</span>
+                                </p>
+                            </div>
+                            <div class="mt-2 md:mt-0 text-right">
+                                <span class="text-xs font-semibold bg-blue-100 text-blue-800 px-3 py-1 rounded-full whitespace-nowrap">
+                                    Cancha {{ partido.cancha.nombre }}
+                                </span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="p-4 bg-gray-50 text-center rounded-lg">
+                    <p class="text-gray-500">No tienes partidos asignados en tu agenda próxima.</p>
+                </div>
+            {% endif %}
+        </section>
+        
+        <!-- Columna Derecha: Torneos Asignados (Vista general) -->
+        <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent-green">
+            <h3 class="text-2xl font-semibold text-navy-dark mb-4 border-b pb-2 flex items-center">
+                <span class="mr-3 text-3xl">🏆</span> Torneos Asignados
+            </h3>
+            <p class="text-gray-500 mb-4">Todos los eventos bajo tu jurisdicción.</p>
+            
+            {% if torneos %}
+                <ul class="space-y-3">
+                    {% for torneo in torneos %}
+                        <li class="p-3 border rounded-lg bg-gray-50 hover:bg-gray-100 transition duration-150">
+                            <p class="font-bold text-sm text-gray-800">{{ torneo.nombre }}</p>
+                            <div class="flex justify-between items-center text-xs mt-1">
+                                <span class="text-gray-500">{{ torneo.categoria }}</span>
+                                <span class="font-semibold text-accent-green">
+                                    Inicio: {{ torneo.fecha_inicio }}
+                                </span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="empty-state text-gray-500 text-center py-4">No tienes torneos asignados actualmente.</p>
+            {% endif %}
+        </section>
+
+    </div>
+
+    <!-- Sección 3: Estado de Canchas (Información de referencia) -->
+    <section class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-accent-yellow">
+        <h3 class="text-2xl font-semibold text-navy-dark mb-4 border-b pb-2 flex items-center">
+            <span class="mr-3 text-3xl">🏟️</span> Estado Operacional de Canchas
+        </h3>
+        <p class="text-gray-500 mb-4">Revisa la disponibilidad de las canchas para posibles reubicaciones de partidos.</p>
+        
+        {% if canchas %}
+            <div class="overflow-x-auto">
+                <table class="data-table min-w-full rounded-lg overflow-hidden">
+                    <thead>
+                        <tr>
+                            <th>Cancha</th>
+                            <th>Tipo</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cancha in canchas %}
+                            <tr>
+                                <td><strong class="text-navy-dark">{{ cancha.nombre }}</strong></td>
+                                <td>{{ cancha.tipo }}</td>
+                                <td>{{ cancha.ubicacion }}</td>
+                                <td>
+                                    {% if cancha.estado == 'Disponible' %}
+                                        <span class="bg-accent-green text-white text-xs font-semibold px-2 py-1 rounded-full">Disponible</span>
+                                    {% elif cancha.estado == 'Mantenimiento' %}
+                                        <span class="bg-accent-red text-white text-xs font-semibold px-2 py-1 rounded-full">Mantenimiento</span>
+                                    {% else %}
+                                        <span class="bg-accent-yellow text-navy-dark text-xs font-semibold px-2 py-1 rounded-full">{{ cancha.estado }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="#" class="text-sky-padel hover:underline text-sm">Ver Calendario</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="empty-state text-gray-500 text-center py-4">No hay información de canchas para mostrar.</p>
+        {% endif %}
+    </section>
+
+    <!-- Mensaje de pie de página -->
+    <div class="mt-12 text-center text-gray-400 text-sm">
+        <p>Tu rol es esencial en ASO PADÉL. Gracias por tu dedicación.</p>
+    </div>
+</div>
+{% endblock %}

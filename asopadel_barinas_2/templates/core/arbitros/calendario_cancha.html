@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Calendario de {{ cancha.nombre }}</h2>
+  <p>Ubicación: {{ cancha.ubicacion }} | Estado: {{ cancha.estado }}</p>
+
+  <table class="table-auto w-full mt-4">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Hora Inicio</th>
+        <th>Hora Fin</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for reserva in reservas %}
+        <tr>
+          <td>{{ reserva.fecha }}</td>
+          <td>{{ reserva.hora_inicio }}</td>
+          <td>{{ reserva.hora_fin }}</td>
+          <td>{{ reserva.estado }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="4" class="text-center text-gray-500">No hay reservas registradas para esta cancha.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

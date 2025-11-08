@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Noticias publicadas{% endblock %}
+
+{% block content %}
+<h2>📰 Noticias publicadas</h2>
+<a href="{% url 'core:admin_create_noticia' %}" class="btn">➕ Crear nueva noticia</a>
+
+<ul class="lista-noticias">
+  {% for noticia in noticias %}
+    <li>
+      <h3>{{ noticia.titulo }}</h3>
+      <p>{{ noticia.cuerpo|truncatewords:30 }}</p>
+      <small>📅 {{ noticia.fecha_publicacion }} | ✍️ {{ noticia.autor.get_full_name }}</small>
+
+      <!-- Botones de acción -->
+      <div class="acciones-noticia">
+        <a href="{% url 'core:admin_edit_noticia' noticia.id %}" class="btn-editar">✏️ Editar</a>
+
+        <!-- Eliminación con confirmación JS -->
+        <form action="{% url 'core:admin_delete_noticia' noticia.id %}" method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta noticia?');">
+          {% csrf_token %}
+          <button type="submit" class="btn-eliminar">🗑️ Eliminar</button>
+        </form>
+      </div>
+    </li>
+  {% empty %}
+    <li>No hay noticias publicadas aún.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
