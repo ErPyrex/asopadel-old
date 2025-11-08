@@ -46,6 +46,10 @@ Sistema para la Asociación de Pádel de Barinas
         * feature/nombre-del-feature
         * bugfix/nombre-del-bugfix
         * release/nombre-del-release
+    - Los commits deben ser nombrados con el siguiente formato:
+        * feat: nombre del feature
+        * fix: nombre del bugfix
+        * refactor: nombre del refactor
     - Las ramas deben ser creadas desde el main.
     - Las ramas deben ser borradas despues de ser fusionadas.
     - Solo seran fusionadas ramas cuando pasen los tests. 
