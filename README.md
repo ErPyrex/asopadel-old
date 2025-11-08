@@ -36,7 +36,11 @@ Sistema para la Asociación de Pádel de Barinas
         ```
         python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
         ```
-    Copia la clave, crea y pega la clave dentro de un archivo llamado .env
+    Copia la clave, crea un archivo .env en la raíz del proyecto con el siguiente contenido:
+    ```
+    SECRET_KEY=tu_clave
+    DEBUG=True
+    ```
 5. Crear la base de datos
     ```
     python manage.py migrate
