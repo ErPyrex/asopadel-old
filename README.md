@@ -32,18 +32,15 @@ Sistema para la Asociación de Pádel de Barinas
         source venv/bin/activate
         pip install -r requirements.txt
         ```
-
 4. Genera tu SECRET_KEY
         ```
         python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
         ```
         Copia la secret key y crea un archivo llamado .env y pega dentro de el la key
-
 5. Ejecuta la migración de la base de datos
         ```
         python manage.py migrate
         ```
-
 6. Ejecutar el servidor
     ```
     python3 manage.py runserver
