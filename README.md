@@ -34,7 +34,7 @@ Sistema para la Asociación de Pádel de Barinas
         ```
 4. Genera tu SECRET_KEY
         ```
-        python manage.py shell -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+        python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
         ```
     Copia la clave, crea un archivo .env en la raíz del proyecto con el siguiente contenido:
     ```
