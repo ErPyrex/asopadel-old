@@ -21,8 +21,10 @@ INSTALLED_APPS = [
     # Apps personalizadas
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
-    # Futuras apps:
-    # 'courts', 'events', 'ranking',
+    'competitions',
+    'facilities',
+    'store',
+    'blog',
 ]
 
 MIDDLEWARE = [

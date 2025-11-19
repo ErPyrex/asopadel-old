@@ -1,0 +1,1047 @@
+[
+{
+  "model": "auth.permission",
+  "pk": 1,
+  "fields": {
+    "name": "Can add log entry",
+    "content_type": 1,
+    "codename": "add_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 2,
+  "fields": {
+    "name": "Can change log entry",
+    "content_type": 1,
+    "codename": "change_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 3,
+  "fields": {
+    "name": "Can delete log entry",
+    "content_type": 1,
+    "codename": "delete_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 4,
+  "fields": {
+    "name": "Can view log entry",
+    "content_type": 1,
+    "codename": "view_logentry"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 5,
+  "fields": {
+    "name": "Can add permission",
+    "content_type": 2,
+    "codename": "add_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 6,
+  "fields": {
+    "name": "Can change permission",
+    "content_type": 2,
+    "codename": "change_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 7,
+  "fields": {
+    "name": "Can delete permission",
+    "content_type": 2,
+    "codename": "delete_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 8,
+  "fields": {
+    "name": "Can view permission",
+    "content_type": 2,
+    "codename": "view_permission"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 9,
+  "fields": {
+    "name": "Can add group",
+    "content_type": 3,
+    "codename": "add_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 10,
+  "fields": {
+    "name": "Can change group",
+    "content_type": 3,
+    "codename": "change_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 11,
+  "fields": {
+    "name": "Can delete group",
+    "content_type": 3,
+    "codename": "delete_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 12,
+  "fields": {
+    "name": "Can view group",
+    "content_type": 3,
+    "codename": "view_group"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 13,
+  "fields": {
+    "name": "Can add content type",
+    "content_type": 4,
+    "codename": "add_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 14,
+  "fields": {
+    "name": "Can change content type",
+    "content_type": 4,
+    "codename": "change_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 15,
+  "fields": {
+    "name": "Can delete content type",
+    "content_type": 4,
+    "codename": "delete_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 16,
+  "fields": {
+    "name": "Can view content type",
+    "content_type": 4,
+    "codename": "view_contenttype"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 17,
+  "fields": {
+    "name": "Can add session",
+    "content_type": 5,
+    "codename": "add_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 18,
+  "fields": {
+    "name": "Can change session",
+    "content_type": 5,
+    "codename": "change_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 19,
+  "fields": {
+    "name": "Can delete session",
+    "content_type": 5,
+    "codename": "delete_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 20,
+  "fields": {
+    "name": "Can view session",
+    "content_type": 5,
+    "codename": "view_session"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 21,
+  "fields": {
+    "name": "Can add user",
+    "content_type": 6,
+    "codename": "add_usuario"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 22,
+  "fields": {
+    "name": "Can change user",
+    "content_type": 6,
+    "codename": "change_usuario"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 23,
+  "fields": {
+    "name": "Can delete user",
+    "content_type": 6,
+    "codename": "delete_usuario"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 24,
+  "fields": {
+    "name": "Can view user",
+    "content_type": 6,
+    "codename": "view_usuario"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 25,
+  "fields": {
+    "name": "Can add producto",
+    "content_type": 7,
+    "codename": "add_producto"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 26,
+  "fields": {
+    "name": "Can change producto",
+    "content_type": 7,
+    "codename": "change_producto"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 27,
+  "fields": {
+    "name": "Can delete producto",
+    "content_type": 7,
+    "codename": "delete_producto"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 28,
+  "fields": {
+    "name": "Can view producto",
+    "content_type": 7,
+    "codename": "view_producto"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 29,
+  "fields": {
+    "name": "Can add torneo",
+    "content_type": 8,
+    "codename": "add_torneo"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 30,
+  "fields": {
+    "name": "Can change torneo",
+    "content_type": 8,
+    "codename": "change_torneo"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 31,
+  "fields": {
+    "name": "Can delete torneo",
+    "content_type": 8,
+    "codename": "delete_torneo"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 32,
+  "fields": {
+    "name": "Can view torneo",
+    "content_type": 8,
+    "codename": "view_torneo"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 33,
+  "fields": {
+    "name": "Can add cancha",
+    "content_type": 9,
+    "codename": "add_cancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 34,
+  "fields": {
+    "name": "Can change cancha",
+    "content_type": 9,
+    "codename": "change_cancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 35,
+  "fields": {
+    "name": "Can delete cancha",
+    "content_type": 9,
+    "codename": "delete_cancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 36,
+  "fields": {
+    "name": "Can view cancha",
+    "content_type": 9,
+    "codename": "view_cancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 37,
+  "fields": {
+    "name": "Can add Estadística de Jugador",
+    "content_type": 10,
+    "codename": "add_estadisticajugador"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 38,
+  "fields": {
+    "name": "Can change Estadística de Jugador",
+    "content_type": 10,
+    "codename": "change_estadisticajugador"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 39,
+  "fields": {
+    "name": "Can delete Estadística de Jugador",
+    "content_type": 10,
+    "codename": "delete_estadisticajugador"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 40,
+  "fields": {
+    "name": "Can view Estadística de Jugador",
+    "content_type": 10,
+    "codename": "view_estadisticajugador"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 41,
+  "fields": {
+    "name": "Can add partido",
+    "content_type": 11,
+    "codename": "add_partido"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 42,
+  "fields": {
+    "name": "Can change partido",
+    "content_type": 11,
+    "codename": "change_partido"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 43,
+  "fields": {
+    "name": "Can delete partido",
+    "content_type": 11,
+    "codename": "delete_partido"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 44,
+  "fields": {
+    "name": "Can view partido",
+    "content_type": 11,
+    "codename": "view_partido"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 45,
+  "fields": {
+    "name": "Can add reserva cancha",
+    "content_type": 12,
+    "codename": "add_reservacancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 46,
+  "fields": {
+    "name": "Can change reserva cancha",
+    "content_type": 12,
+    "codename": "change_reservacancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 47,
+  "fields": {
+    "name": "Can delete reserva cancha",
+    "content_type": 12,
+    "codename": "delete_reservacancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 48,
+  "fields": {
+    "name": "Can view reserva cancha",
+    "content_type": 12,
+    "codename": "view_reservacancha"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 49,
+  "fields": {
+    "name": "Can add hero",
+    "content_type": 13,
+    "codename": "add_hero"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 50,
+  "fields": {
+    "name": "Can change hero",
+    "content_type": 13,
+    "codename": "change_hero"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 51,
+  "fields": {
+    "name": "Can delete hero",
+    "content_type": 13,
+    "codename": "delete_hero"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 52,
+  "fields": {
+    "name": "Can view hero",
+    "content_type": 13,
+    "codename": "view_hero"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 53,
+  "fields": {
+    "name": "Can add noticia",
+    "content_type": 14,
+    "codename": "add_noticia"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 54,
+  "fields": {
+    "name": "Can change noticia",
+    "content_type": 14,
+    "codename": "change_noticia"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 55,
+  "fields": {
+    "name": "Can delete noticia",
+    "content_type": 14,
+    "codename": "delete_noticia"
+  }
+},
+{
+  "model": "auth.permission",
+  "pk": 56,
+  "fields": {
+    "name": "Can view noticia",
+    "content_type": 14,
+    "codename": "view_noticia"
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Jugadores",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "Arbitros",
+    "permissions": []
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 3,
+  "fields": {
+    "name": "Administradores",
+    "permissions": []
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 1,
+  "fields": {
+    "app_label": "admin",
+    "model": "logentry"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 2,
+  "fields": {
+    "app_label": "auth",
+    "model": "permission"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 3,
+  "fields": {
+    "app_label": "auth",
+    "model": "group"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 4,
+  "fields": {
+    "app_label": "contenttypes",
+    "model": "contenttype"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 5,
+  "fields": {
+    "app_label": "sessions",
+    "model": "session"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 6,
+  "fields": {
+    "app_label": "users",
+    "model": "usuario"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 7,
+  "fields": {
+    "app_label": "core",
+    "model": "producto"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 8,
+  "fields": {
+    "app_label": "core",
+    "model": "torneo"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 9,
+  "fields": {
+    "app_label": "core",
+    "model": "cancha"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 10,
+  "fields": {
+    "app_label": "core",
+    "model": "estadisticajugador"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 11,
+  "fields": {
+    "app_label": "core",
+    "model": "partido"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 12,
+  "fields": {
+    "app_label": "core",
+    "model": "reservacancha"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 13,
+  "fields": {
+    "app_label": "core",
+    "model": "hero"
+  }
+},
+{
+  "model": "contenttypes.contenttype",
+  "pk": 14,
+  "fields": {
+    "app_label": "core",
+    "model": "noticia"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "en4v4tl2404nhf9osnz5fpy23q7shnee",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hAcOjB16b5nIMCAVA0kpV0Z765NutDtf-_9l3B-W4vbelrczOIiSJx-t-DjI9Ud8N3XW5Ox1XWZg9wVedAup8bpeT3cv4Pie_nWyuDIiSGncI7ZoEbjAyGRIRsyx6Cz0tEOERUCKCQLMJDigWDkzFa8P-uqN4w:1vHZNL:D10b5PVCjCPHuljFS_iaZ9wCbo-Ff0PJQEUXduO5WsY",
+    "expire_date": "2025-11-22T03:12:27.833Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "iutjmi4hqtez2e72yqp19y4rwdppdcoh",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hAcOjB16b5nIMCAVA0kpV0Z765NutDtf-_9l3B-W4vbelrczOIiSJx-t-DjI9Ud8N3XW5Ox1XWZg9wVedAup8bpeT3cv4Pie_nWyuDIiSGncI7ZoEbjAyGRIRsyx6Cz0tEOERUCKCQLMJDigWDkzFa8P-uqN4w:1vHZUw:dYRnDwQab7Ylq42IGkKbZcX_HBHEPWvR0vJp7ZzY-PI",
+    "expire_date": "2025-11-22T03:20:18.424Z"
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$mDjt1tibaXiTPKx10tYgKS$cqe6/Zt6yUtDUb5JXJZZ3CYdqW5rKQBLVY1j1Q8GAvE=",
+    "last_login": "2025-10-28T21:57:27.423Z",
+    "is_superuser": true,
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-22T01:58:05.918Z",
+    "cedula": "31671945",
+    "first_name": "marlon",
+    "last_name": "gutierrez",
+    "email": "marlon@gmail.com",
+    "es_admin_aso": true,
+    "es_arbitro": false,
+    "es_jugador": false,
+    "telefono": null,
+    "categoria_jugador": null,
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      3
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$vafp0lOLvSxcr53YcBtAtg$0KOousAoTYfmxqR+nRmp7UZCh0uh2++G8mIQP5CG1jc=",
+    "last_login": "2025-10-28T22:02:41.702Z",
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-22T15:58:59.165Z",
+    "cedula": "987654",
+    "first_name": "marcos",
+    "last_name": "ruiz",
+    "email": "marcos@gmail.com",
+    "es_admin_aso": false,
+    "es_arbitro": true,
+    "es_jugador": false,
+    "telefono": null,
+    "categoria_jugador": null,
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      2
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$XEjZ2iHj3vbeYfYstJdGNO$8C+K96b+YjgKN3iUQGJTcpiiCxuvjoE34CUKjf41Vxs=",
+    "last_login": "2025-10-28T22:02:08.017Z",
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-22T16:00:40.292Z",
+    "cedula": "123456",
+    "first_name": "randy",
+    "last_name": "pinto",
+    "email": "randy@gmail.com",
+    "es_admin_aso": false,
+    "es_arbitro": false,
+    "es_jugador": true,
+    "telefono": "04145160030",
+    "categoria_jugador": "adulto",
+    "ranking": 2,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$P3WoauQn1MiU5d6PFW72zy$okyMVPzi0Begi6648r7WHBLe5fME782dVfj8VjsNBLk=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-28T21:49:27.208Z",
+    "cedula": "777777",
+    "first_name": "luis",
+    "last_name": "perez",
+    "email": "perez@gmail.com",
+    "es_admin_aso": false,
+    "es_arbitro": true,
+    "es_jugador": false,
+    "telefono": null,
+    "categoria_jugador": null,
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      2
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$1q4exdmRgpTsWT3ftxBSvr$ykJCbZodHMSKc6UcXtOxIMvxL1k9PWKuebHJD4kpxFU=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-28T21:52:18.247Z",
+    "cedula": "999999",
+    "first_name": "wen",
+    "last_name": "pito",
+    "email": "wen@gmail.com",
+    "es_admin_aso": false,
+    "es_arbitro": false,
+    "es_jugador": true,
+    "telefono": "04145160030",
+    "categoria_jugador": "juvenil",
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$xVw7ZZCydwJ11YMNosRTS6$ebZAfBXdIMFyOl8XYLUq374FiW684EQqb/7l0eOn/CI=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-28T21:59:19.450Z",
+    "cedula": "31045923",
+    "first_name": "darcy",
+    "last_name": "gutierrez",
+    "email": "darcy@gmail.com",
+    "es_admin_aso": false,
+    "es_arbitro": true,
+    "es_jugador": false,
+    "telefono": null,
+    "categoria_jugador": null,
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      2
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$qE2G8Fet1IbLDyABpIz7Zn$rBVuRqUmki4sy7HxNOdio/etOELlP15/swBNc0BneBI=",
+    "last_login": null,
+    "is_superuser": false,
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-10-28T22:01:44.059Z",
+    "cedula": "17290259",
+    "first_name": "juan",
+    "last_name": "lopez",
+    "email": "juan@gmail.com",
+    "es_admin_aso": false,
+    "es_arbitro": false,
+    "es_jugador": true,
+    "telefono": "04145559963",
+    "categoria_jugador": "adulto",
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      1
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.usuario",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$MmKm8MMOzXMfwSdI2RY6in$z9o6aXE2N9f220kOeDuvH4GcBg3k8dNZ9V8TVaiIV8Q=",
+    "last_login": "2025-11-08T03:20:18.417Z",
+    "is_superuser": true,
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-10-29T00:17:09.483Z",
+    "cedula": "28487773",
+    "first_name": "Sergio",
+    "last_name": "Avendaño",
+    "email": "sergioalarcon22986@gmail.com",
+    "es_admin_aso": true,
+    "es_arbitro": false,
+    "es_jugador": false,
+    "telefono": null,
+    "categoria_jugador": null,
+    "ranking": 0,
+    "foto": "",
+    "biografia": null,
+    "groups": [
+      3
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "competitions.torneo",
+  "pk": 1,
+  "fields": {
+    "arbitro": null,
+    "nombre": "revelacion",
+    "descripcion": "para principiantes",
+    "fecha_inicio": "2025-10-28",
+    "fecha_fin": "2025-10-28",
+    "categoria": "Hombre",
+    "premios": "premio 100$",
+    "jugadores_inscritos": []
+  }
+},
+{
+  "model": "competitions.torneo",
+  "pk": 2,
+  "fields": {
+    "arbitro": null,
+    "nombre": "ganadores",
+    "descripcion": "lalall",
+    "fecha_inicio": "2025-10-31",
+    "fecha_fin": "2025-10-31",
+    "categoria": "Mujer",
+    "premios": "adaaada",
+    "jugadores_inscritos": [
+      3
+    ]
+  }
+},
+{
+  "model": "competitions.torneo",
+  "pk": 3,
+  "fields": {
+    "arbitro": 2,
+    "nombre": "dddddd",
+    "descripcion": "adsadadasdas",
+    "fecha_inicio": "2025-11-12",
+    "fecha_fin": "2025-11-12",
+    "categoria": "Mujer",
+    "premios": "adsdadas",
+    "jugadores_inscritos": []
+  }
+},
+{
+  "model": "facilities.cancha",
+  "pk": 2,
+  "fields": {
+    "nombre": "1",
+    "ubicacion": "a",
+    "tipo": "padel",
+    "estado": "disponible",
+    "imagen": ""
+  }
+},
+{
+  "model": "facilities.cancha",
+  "pk": 3,
+  "fields": {
+    "nombre": "2",
+    "ubicacion": "a",
+    "tipo": "padel",
+    "estado": "disponible",
+    "imagen": ""
+  }
+},
+{
+  "model": "facilities.cancha",
+  "pk": 4,
+  "fields": {
+    "nombre": "3",
+    "ubicacion": "b",
+    "tipo": "padel",
+    "estado": "disponible",
+    "imagen": ""
+  }
+},
+{
+  "model": "facilities.cancha",
+  "pk": 5,
+  "fields": {
+    "nombre": "4",
+    "ubicacion": "a",
+    "tipo": "padel",
+    "estado": "disponible",
+    "imagen": ""
+  }
+},
+{
+  "model": "facilities.cancha",
+  "pk": 6,
+  "fields": {
+    "nombre": "5",
+    "ubicacion": "c",
+    "tipo": "padel",
+    "estado": "disponible",
+    "imagen": ""
+  }
+},
+{
+  "model": "facilities.cancha",
+  "pk": 7,
+  "fields": {
+    "nombre": "6",
+    "ubicacion": "c",
+    "tipo": "padel",
+    "estado": "disponible",
+    "imagen": ""
+  }
+},
+{
+  "model": "facilities.reservacancha",
+  "pk": 1,
+  "fields": {
+    "cancha": 2,
+    "jugador": 3,
+    "fecha": "2025-11-12",
+    "hora_inicio": "14:00:00",
+    "hora_fin": "16:00:00",
+    "estado": "pendiente"
+  }
+},
+{
+  "model": "blog.hero",
+  "pk": 1,
+  "fields": {
+    "titulo": "ASOPADEL BARINAS",
+    "subtitulo": "DEPORTE",
+    "imagen": "hero/istockphoto-1363976548-612x612.jpg",
+    "activo": true
+  }
+},
+{
+  "model": "blog.noticia",
+  "pk": 1,
+  "fields": {
+    "titulo": "[adel es bueno",
+    "cuerpo": "deportge",
+    "imagen": "noticias/istockphoto-1473484607-612x612.jpg",
+    "fecha_publicacion": "2025-10-22",
+    "autor": 1
+  }
+},
+{
+  "model": "blog.noticia",
+  "pk": 2,
+  "fields": {
+    "titulo": "deporte",
+    "cuerpo": "adadiojajajdpojdap",
+    "imagen": "noticias/alonso-hover.jpg",
+    "fecha_publicacion": "2025-10-28",
+    "autor": 1
+  }
+},
+{
+  "model": "blog.noticia",
+  "pk": 3,
+  "fields": {
+    "titulo": "akakak",
+    "cuerpo": "afafdsafasfs",
+    "imagen": "noticias/hunt-hover.jpg",
+    "fecha_publicacion": "2025-10-28",
+    "autor": 1
+  }
+}
+]

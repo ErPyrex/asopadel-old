@@ -1,6 +1,9 @@
 from django import forms
 # Importa Usuario porque Torneo, Partido y ReservaCancha referencian a Usuario
-from .models import Usuario, Torneo, Cancha, Partido, ReservaCancha, Hero, Noticia
+from users.models import Usuario
+from competitions.models import Torneo, Partido
+from facilities.models import Cancha, ReservaCancha
+from blog.models import Hero, Noticia
 
 class TorneoForm(forms.ModelForm):
     class Meta:
@@ -69,7 +72,7 @@ class ReservaCanchaForm(forms.ModelForm):
 # core/forms.py  crear formularios de registro para árbitros y jugadores
 
 from django import forms
-from .models import Usuario
+# from .models import Usuario (Removed)
 
 class ArbitroForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Contraseña")

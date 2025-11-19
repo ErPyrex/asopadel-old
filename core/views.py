@@ -3,7 +3,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse_lazy
-from .models import Hero, Noticia, Torneo, Cancha, Usuario, Partido, ReservaCancha
+from blog.models import Hero, Noticia
+from competitions.models import Torneo, Partido
+from facilities.models import Cancha, ReservaCancha
+from users.models import Usuario
 from .forms import HeroForm, NoticiaForm, TorneoForm, CanchaForm, PartidoForm, ReservaCanchaForm
 from users.forms import CustomUsuarioCreationForm, CustomUsuarioChangeForm
 from .forms import JugadorForm, ArbitroForm
@@ -348,7 +351,9 @@ def admin_create_noticia(request):
     return render(request, 'core/noticias/crear_noticia.html', {'form': form})
 
 from django.shortcuts import render
-from .models import Hero, Noticia, Cancha, Torneo
+from blog.models import Hero, Noticia
+from facilities.models import Cancha
+from competitions.models import Torneo
 
 def home(request):
     hero_activo = Hero.objects.filter(activo=True).first()
