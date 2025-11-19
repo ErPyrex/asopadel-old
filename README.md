@@ -5,63 +5,106 @@ Sistema para la Asociación de Pádel de Barinas
 
 ### Requerimientos
 
-* **Python** (usen la ultima versión disponible)
+* **Python** (versión 3.10 o superior recomendada)
 * **Git** (para clonar el repositorio)
 * **Pip** (para instalar las dependencias)
 * **Virtualenv** (para crear un entorno virtual)
+* **PostgreSQL** (para la base de datos)
 
 ### Instalación
 
-1. Clonar el repositorio
+1. **Clonar el repositorio**
+    ```bash
+    git clone [https://github.com/ErPyrex/asopadel.git](https://github.com/ErPyrex/asopadel.git)
     ```
-    git clone https://github.com/ErPyrex/asopadel.git
+
+2. **Entrar al directorio del proyecto**
+    ```bash
+    cd asopadel
     ```
-2. Entrar al directorio del proyecto
-3. Crear un entorno virtual:
-    - Windows:
-        ```
+
+3. **Crear y activar el entorno virtual**
+    * **Windows:**
+        ```powershell
         python -m venv venv
-
         .\venv\Scripts\activate
-
+        ```
+        *(Nota: Si recibes un error de permisos en PowerShell, ejecuta primero: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`)*
+        
+        Una vez activado:
+        ```powershell
         pip install -r requirements.txt
         ```
-    - Linux:
-        ```
+
+    * **Linux:**
+        ```bash
         python3 -m venv venv
         source venv/bin/activate
         pip install -r requirements.txt
         ```
-4. Genera tu SECRET_KEY
-        ```
-        python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-        ```
-    Copia la clave, crea un archivo .env en la raíz del proyecto con el siguiente contenido:
+
+4. **Configurar variables de entorno (.env)**
+    
+    Genera una clave secreta ejecutando este comando en tu terminal:
+    ```bash
+    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
     ```
-    SECRET_KEY=tu_clave
+    
+    Crea un archivo llamado `.env` en la raíz del proyecto (al mismo nivel que `manage.py`) y pega el siguiente contenido. Asegúrate de reemplazar `pegatuclaveaqui` con la clave que generaste arriba:
+
+    ```env
+    SECRET_KEY=pegatuclaveaqui
     DEBUG=True
+    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/asopadel_barinas
     ```
-5. Crear la base de datos
-    ```
+
+5. **Configurar la Base de Datos**
+    Necesitamos crear la base de datos y asegurar que el usuario `postgres` tenga la contraseña `postgres` para coincidir con el archivo `.env`.
+
+    * **Windows:**
+        1.  Abre la aplicación **SQL Shell (psql)** desde el menú inicio o ejecuta `psql -U postgres` en tu terminal.
+        2.  Ingresa la contraseña que definiste al instalar PostgreSQL (no se verá al escribir).
+        3.  Ejecuta los siguientes comandos SQL:
+            ```sql
+            CREATE DATABASE asopadel_barinas;
+            ALTER USER postgres WITH PASSWORD 'postgres';
+            \q
+            ```
+
+    * **Linux:**
+        Ejecuta en tu terminal:
+        ```bash
+        sudo -u postgres psql
+        ```
+        Una vez dentro de la consola de Postgres:
+        ```sql
+        CREATE DATABASE asopadel_barinas;
+        ALTER USER postgres WITH PASSWORD 'postgres';
+        \q
+        ```
+
+6. **Crear las tablas (Migraciones)**
+    ```bash
     python manage.py migrate
     ```
-6. Ejecutar el servidor
-    ```
+
+7. **Ejecutar el servidor**
+    ```bash
     python manage.py runserver
     ```
     
 ## Obligatorio
-    - Por favor usen ramas de git para trabajar en el proyecto.
-    - Por favor, no uses el main para trabajar en el proyecto.
-    - Sigan el flujo de trabajo de GitHub Flow.
-    - Las ramas deben ser nombradas con el siguiente formato:
-        * feature/nombre-del-feature
-        * bugfix/nombre-del-bugfix
-        * release/nombre-del-release
-    - Los commits deben ser nombrados con el siguiente formato:
-        * feat: nombre del feature
-        * fix: nombre del bugfix
-        * refactor: nombre del refactor
-    - Las ramas deben ser creadas desde el main.
-    - Las ramas deben ser borradas despues de ser fusionadas.
-    - Solo seran fusionadas ramas cuando pasen los tests. 
+- Por favor usen ramas de git para trabajar en el proyecto.
+- **No usen el main** para trabajar directamente.
+- Sigan el flujo de trabajo de **GitHub Flow**.
+- Las ramas deben ser nombradas con el siguiente formato:
+    * `feature/nombre-del-feature`
+    * `bugfix/nombre-del-bugfix`
+    * `release/nombre-del-release`
+- Los commits deben ser nombrados con el siguiente formato:
+    * `feat: nombre del feature`
+    * `fix: nombre del bugfix`
+    * `refactor: nombre del refactor`
+- Las ramas deben ser creadas desde el `main`.
+- Las ramas deben ser borradas después de ser fusionadas.
+- Solo serán fusionadas ramas cuando pasen los tests.
