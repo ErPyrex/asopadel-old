@@ -18,14 +18,16 @@ Sistema de Gestión para la Asociación de Pádel de Barinas
 
 ### Instalación Manual
 
-* **Python** 3.10 o superior
+- **Python** 3.10 o superior
+
 - **Git**
 - **PostgreSQL** 16
 - **pip** y **virtualenv**
 
 ### Instalación con Docker (Recomendado)
 
-* **Docker Engine**
+- **Docker Engine**
+
 - **Docker Compose**
 
 ---
@@ -129,13 +131,29 @@ sudo -u postgres psql
 # Luego ejecutar los mismos comandos SQL de arriba
 ```
 
-### 6. Aplicar Migraciones
+### 6. Crear Directorio de Logs
+
+```bash
+mkdir -p logs
+```
+
+### 7. Aplicar Migraciones
+
+**Linux/macOS:**
 
 ```bash
 python manage.py migrate
 ```
 
-### 7. Crear Superusuario
+**Windows:**
+
+```powershell
+python manage.py migrate
+```
+
+> 💡 Si `python` no funciona, intenta con `python3` en Linux/macOS o `py` en Windows.
+
+### 8. Crear Superusuario
 
 ```bash
 python manage.py createsuperuser
@@ -148,7 +166,7 @@ Ingresa:
 - **Nombre y Apellido**
 - **Contraseña:** Mínimo 10 caracteres
 
-### 8. Ejecutar Servidor de Desarrollo
+### 9. Ejecutar Servidor de Desarrollo
 
 ```bash
 python manage.py runserver
@@ -182,14 +200,22 @@ Accede a: [http://localhost:8000](http://localhost:8000)
 
 ### 2. Configurar Variables de Entorno
 
+**IMPORTANTE:** Debes crear el archivo `.env` antes de ejecutar Docker.
+
 ```bash
 cp .env.example .env
 ```
 
-Edita `.env` con valores seguros:
+**Genera una SECRET_KEY segura:**
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+Edita `.env` y reemplaza los valores:
 
 ```env
-SECRET_KEY=genera-una-clave-secreta-aqui
+SECRET_KEY=pega-aqui-la-clave-generada
 DEBUG=True
 DATABASE_URL=postgresql://asopadel_user:password_seguro@db:5432/asopadel_barinas
 ALLOWED_HOSTS=localhost,127.0.0.1
@@ -197,6 +223,8 @@ POSTGRES_DB=asopadel_barinas
 POSTGRES_USER=asopadel_user
 POSTGRES_PASSWORD=password_seguro
 ```
+
+> ⚠️ Cambia `password_seguro` por una contraseña fuerte.
 
 ### 3. Construir y Ejecutar
 
