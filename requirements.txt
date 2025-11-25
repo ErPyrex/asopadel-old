@@ -1,7 +1,17 @@
-Django
-gunicorn
-psycopg2-binary
-python-decouple
-dj-database-url
-whitenoise
-Pillow
+# Django and Core Dependencies
+Django==5.0.1
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+
+# Configuration and Database
+python-decouple==3.8
+dj-database-url==2.1.0
+
+# Static Files
+whitenoise==6.6.0
+
+# Image Processing
+Pillow==10.2.0
+
+# Security - Rate Limiting
+django-ratelimit==4.1.0
