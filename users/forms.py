@@ -64,20 +64,30 @@ class CustomUsuarioCreationForm(UserCreationForm):
             user.save()
         return user
 
-# 🟢 Edición de perfil de usuario
-class CustomUsuarioChangeForm(UserChangeForm):
-    """Formulario para la edición de un usuario existente."""
-    class Meta(UserChangeForm.Meta):
+# 🟢 Edición de perfil de usuario (SEGURO - sin campos privilegiados)
+class UsuarioPerfilForm(forms.ModelForm):
+    """
+    Safe form for users to edit their own profile.
+    Does NOT include role fields or admin permissions to prevent privilege escalation.
+    """
+    
+    class Meta:
         model = Usuario
         fields = (
-            'cedula', 'email', 'first_name', 'last_name',
-            'telefono', 'categoria_jugador', 'ranking', 'foto', 'biografia',
-            'es_admin_aso', 'es_arbitro', 'es_jugador',
-            'is_active', 'is_staff', 'is_superuser'
+            'first_name', 'last_name', 'telefono', 
+            'foto', 'biografia'
         )
-
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Apellido'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Teléfono'}),
+            'biografia': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Biografía'}),
+        }
+    
     def __init__(self, *args, **kwargs):
+        """
+        Initialize the form with custom styling.
+        """
         super().__init__(*args, **kwargs)
-        for field_name in ['es_admin_aso', 'es_arbitro', 'es_jugador']:
-            if field_name in self.fields:
-                self.fields[field_name].widget.attrs.update({'class': 'form-check-input'})
+        # Make cedula and email read-only in the template
+        # Users should not be able to change these critical fields
