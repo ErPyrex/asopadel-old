@@ -1,274 +1,464 @@
 # ASOPADEL
 
-Sistema para la Asociación de Pádel de Barinas
+Sistema de Gestión para la Asociación de Pádel de Barinas
 
-## Como instalar el proyecto
+## 📋 Tabla de Contenidos
 
-### Requerimientos
+- [Requerimientos](#requerimientos)
+- [Instalación para Desarrollo](#instalación-para-desarrollo)
+- [Instalación con Docker (Recomendado)](#instalación-con-docker-recomendado)
+- [Configuración de Seguridad](#configuración-de-seguridad)
+- [Modo Desarrollo vs Producción](#modo-desarrollo-vs-producción)
+- [Tests](#tests)
+- [Flujo de Trabajo Git](#flujo-de-trabajo-git)
 
-* **Python** (versión 3.10 o superior recomendada)
-* **Git** (para clonar el repositorio)
-* **Pip** (para instalar las dependencias)
-* **Virtualenv** (para crear un entorno virtual)
-* **PostgreSQL** (para la base de datos)
+---
 
-### Instalación
+## 🔧 Requerimientos
 
-1. **Clonar el repositorio**
+### Instalación Manual
 
-    ```bash
-    git clone [https://github.com/ErPyrex/asopadel.git](https://github.com/ErPyrex/asopadel.git)
-    ```
+* **Python** 3.10 o superior
+- **Git**
+- **PostgreSQL** 16
+- **pip** y **virtualenv**
 
-2. **Entrar al directorio del proyecto**
+### Instalación con Docker (Recomendado)
 
-    ```bash
-    cd asopadel
-    ```
+* **Docker Engine**
+- **Docker Compose**
 
-3. **Crear y activar el entorno virtual**
-    * **Windows:**
+---
 
-        ```powershell
-        python -m venv venv
-        .\venv\Scripts\activate
-        ```
+## 💻 Instalación para Desarrollo
 
-        *(Nota: Si recibes un error de permisos en PowerShell, ejecuta primero: `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`)*
+### 1. Clonar el Repositorio
 
-        Una vez activado:
+```bash
+git clone https://github.com/ErPyrex/asopadel.git
+cd asopadel
+```
 
-        ```powershell
-        pip install -r requirements.txt
-        ```
+### 2. Crear Entorno Virtual
 
-    * **Linux:**
+**Windows:**
 
-        ```bash
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -r requirements.txt
-        ```
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+```
 
-4. **Configurar variables de entorno (.env)**
+**Linux/macOS:**
 
-    Genera una clave secreta ejecutando este comando en tu terminal:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-    ```bash
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
+### 3. Instalar Dependencias
 
-    Crea un archivo llamado `.env` en la raíz del proyecto (al mismo nivel que `manage.py`) y pega el siguiente contenido. Asegúrate de reemplazar `pegatuclaveaqui` con la clave que generaste arriba:
+```bash
+pip install -r requirements.txt
+```
 
-    ```env
-    SECRET_KEY=pegatuclaveaqui
-    DEBUG=True
-    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/asopadel_barinas
-    ```
+### 4. Configurar Variables de Entorno
 
-    **Nota Importante:**
-    * El proyecto usa `dj-database-url` para leer la configuración de la base de datos desde `DATABASE_URL`
-    * Para instalación manual, usa `localhost` como host (como se muestra arriba)
-    * Para Docker, las variables de entorno se configuran automáticamente en `docker-compose.yml`
-    * El formato de `DATABASE_URL` es: `postgresql://usuario:contraseña@host:puerto/nombre_base_datos`
+**IMPORTANTE:** El proyecto requiere un archivo `.env` para funcionar.
 
-5. **Configurar la Base de Datos**
-    Necesitamos crear la base de datos `asopadel_barinas` y asegurar que el usuario `postgres` tenga la contraseña `postgres` para coincidir con el archivo `.env`.
+1. Copia el archivo de ejemplo:
 
-    * **Windows:**
-        1. Abre la aplicación **SQL Shell (psql)** desde el menú inicio o ejecuta `psql -U postgres` en tu terminal.
-        2. Ingresa la contraseña que definiste al instalar PostgreSQL (no se verá al escribir).
-        3. Ejecuta los siguientes comandos SQL:
+   ```bash
+   cp .env.example .env
+   ```
 
-            ```sql
-            CREATE DATABASE asopadel_barinas;
-            ALTER USER postgres WITH PASSWORD 'postgres';
-            \q
-            ```
+2. Genera una clave secreta segura:
 
-    * **Linux:**
-        Ejecuta en tu terminal:
+   ```bash
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
 
-        ```bash
-        sudo -u postgres psql
-        ```
+3. Edita el archivo `.env` y configura las variables:
 
-        Una vez dentro de la consola de Postgres:
+```env
+# Django Configuration
+SECRET_KEY=tu-clave-secreta-generada-aqui
+DEBUG=True
 
-        ```sql
-        CREATE DATABASE asopadel_barinas;
-        ALTER USER postgres WITH PASSWORD 'postgres';
-        \q
-        ```
+# Database Configuration
+DATABASE_URL=postgresql://asopadel_user:tu_password_seguro@localhost:5432/asopadel_barinas
 
-6. **Crear las tablas (Migraciones)**
+# Allowed Hosts (comma-separated)
+ALLOWED_HOSTS=localhost,127.0.0.1
 
-    ```bash
-    python manage.py migrate
-    ```
+# PostgreSQL Configuration
+POSTGRES_DB=asopadel_barinas
+POSTGRES_USER=asopadel_user
+POSTGRES_PASSWORD=tu_password_seguro
 
-7. **Ejecutar el servidor**
+# Security Settings (Development)
+SECURE_SSL_REDIRECT=False
+SECURE_HSTS_SECONDS=0
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+```
 
-    ```bash
-    python manage.py runserver
-    ```
+> ⚠️ **NUNCA** subas el archivo `.env` a Git. Ya está incluido en `.gitignore`.
 
-## Instalación y ejecución con Docker
+### 5. Configurar PostgreSQL
 
-Esta es la forma recomendada para levantar el proyecto, ya que simplifica la gestión de la base de datos y las dependencias del sistema.
+**Windows:**
 
-### Requerimientos de Docker
+```powershell
+# Abrir SQL Shell (psql)
+psql -U postgres
 
-* **Docker Engine** y **Docker Compose**
+# Dentro de psql:
+CREATE DATABASE asopadel_barinas;
+CREATE USER asopadel_user WITH PASSWORD 'tu_password_seguro';
+ALTER ROLE asopadel_user SET client_encoding TO 'utf8';
+ALTER ROLE asopadel_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE asopadel_user SET timezone TO 'America/Caracas';
+GRANT ALL PRIVILEGES ON DATABASE asopadel_barinas TO asopadel_user;
+\q
+```
 
-#### Instalación de Docker
+**Linux/macOS:**
 
-* **Windows:**
-    Se recomienda instalar **Docker Desktop**. Puedes seguir la guía oficial:
-    [https://docs.docker.com/desktop/install/windows-install/](https://docs.docker.com/desktop/install/windows-install/)
-    Asegúrate de que WSL 2 (Windows Subsystem for Linux 2) esté habilitado.
+```bash
+sudo -u postgres psql
+# Luego ejecutar los mismos comandos SQL de arriba
+```
 
-* **Linux:**
-    Sigue la guía de instalación para tu distribución:
-  * **Ubuntu:** [https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
-  * **Debian:** [https://docs.docker.com/engine/install/debian/](https://docs.docker.com/engine/install/debian/)
-  * **Fedora:** [https://docs.docker.com/engine/install/fedora/](https://docs.docker.com/engine/install/fedora/)
+### 6. Aplicar Migraciones
 
-    Después de instalar, es crucial seguir los pasos de post-instalación para poder ejecutar Docker sin `sudo`:
-    [https://docs.docker.com/engine/install/linux-postinstall/](https://docs.docker.com/engine/install/linux-postinstall/)
+```bash
+python manage.py migrate
+```
 
-### Pasos para ejecutar el proyecto con Docker
+### 7. Crear Superusuario
 
-1. **Clonar el repositorio y entrar al directorio**
-    (Si ya lo hiciste para la instalación manual, puedes omitir este paso)
+```bash
+python manage.py createsuperuser
+```
 
-    ```bash
-    git clone https://github.com/ErPyrex/asopadel.git
-    cd asopadel
-    ```
+Ingresa:
 
-2. **Construir y levantar los contenedores**
-    Este comando construirá las imágenes y levantará los servicios (la aplicación y la base de datos).
+- **Cédula:** Tu número de identificación (será tu usuario)
+- **Email:** Tu correo electrónico
+- **Nombre y Apellido**
+- **Contraseña:** Mínimo 10 caracteres
 
-    ```bash
-    docker-compose up --build
-    ```
+### 8. Ejecutar Servidor de Desarrollo
 
-    *La opción `--build` solo es necesaria la primera vez o si se hacen cambios en el `Dockerfile` o `requirements.txt`.*
+```bash
+python manage.py runserver
+```
 
-    **Nota:** Las migraciones se aplican automáticamente al iniciar el contenedor gracias al script `entrypoint.sh`. No necesitas ejecutarlas manualmente.
+Accede a: [http://localhost:8000](http://localhost:8000)
 
-3. **Crear un superusuario (IMPORTANTE)**
-    Para acceder al panel de administración y gestionar otros administradores, necesitas crear un superusuario.
+---
 
-    Abre una **nueva terminal** (sin detener los contenedores) y ejecuta:
+## 🐳 Instalación con Docker (Recomendado)
 
-    ```bash
-    docker compose exec web python manage.py createsuperuser
-    ```
+### Ventajas de Docker
 
-    El sistema te pedirá la siguiente información:
-    * **Cédula:** Tu número de identificación (será tu usuario de login)
-    * **Email:** Tu correo electrónico
-    * **Nombre:** Tu primer nombre
-    * **Apellido:** Tu apellido
-    * **Contraseña:** Mínimo 8 caracteres (no se mostrará al escribir)
-    * **Confirmar contraseña:** Repite la contraseña
+- ✅ No necesitas instalar PostgreSQL manualmente
+- ✅ Entorno consistente entre desarrollo y producción
+- ✅ Fácil de configurar y ejecutar
+- ✅ Aislamiento de dependencias
 
-    **Ejemplo:**
+### 1. Instalar Docker
 
-    ```
-    Cédula: 12345678
-    Email: admin@asopadel.com
-    Nombre: Juan
-    Apellido: Administrador
-    Password: ********
-    Password (again): ********
-    Superuser created successfully.
-    ```
+**Windows:**
 
-    > **Nota:** Solo los superusuarios pueden crear y gestionar otros administradores desde el panel web.
+- Descarga [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
+- Asegúrate de habilitar WSL 2
 
-4. **¡Listo!**
-    La aplicación estará disponible en [http://localhost:8000](http://localhost:8000).
+**Linux:**
 
-    **Para detener los contenedores:**
+- [Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+- [Debian](https://docs.docker.com/engine/install/debian/)
+- Sigue los [pasos post-instalación](https://docs.docker.com/engine/install/linux-postinstall/)
 
-    ```bash
-    docker-compose down
-    ```
+### 2. Configurar Variables de Entorno
 
-    **Para volver a iniciar (sin rebuild):**
+```bash
+cp .env.example .env
+```
 
-    ```bash
-    docker-compose up
-    ```
+Edita `.env` con valores seguros:
 
-5. **Ejecutar Tests (Opcional)**
+```env
+SECRET_KEY=genera-una-clave-secreta-aqui
+DEBUG=True
+DATABASE_URL=postgresql://asopadel_user:password_seguro@db:5432/asopadel_barinas
+ALLOWED_HOSTS=localhost,127.0.0.1
+POSTGRES_DB=asopadel_barinas
+POSTGRES_USER=asopadel_user
+POSTGRES_PASSWORD=password_seguro
+```
 
-    El proyecto incluye 43 tests automatizados. Para ejecutarlos desde Docker:
+### 3. Construir y Ejecutar
 
-    **En Linux/macOS:**
+```bash
+docker-compose up --build
+```
 
-    ```bash
-    # Ejecutar todos los tests
-    docker compose exec web python manage.py test users --verbosity=2
-    
-    # Tests específicos
-    docker compose exec web python manage.py test users.test_models
-    docker compose exec web python manage.py test users.test_forms
-    docker compose exec web python manage.py test users.test_views
-    ```
+> 💡 La primera vez tomará unos minutos mientras descarga las imágenes.
 
-    **En Windows (PowerShell):**
+### 4. Crear Superusuario
 
-    ```powershell
-    # Ejecutar todos los tests
-    docker compose exec web python manage.py test users --verbosity=2
-    
-    # Tests específicos
-    docker compose exec web python manage.py test users.test_models
-    docker compose exec web python manage.py test users.test_forms
-    docker compose exec web python manage.py test users.test_views
-    ```
+En una **nueva terminal**:
 
-    **En Windows (CMD):**
+```bash
+docker compose exec web python manage.py createsuperuser
+```
 
-    ```cmd
-    REM Ejecutar todos los tests
-    docker compose exec web python manage.py test users --verbosity=2
-    
-    REM Tests específicos
-    docker compose exec web python manage.py test users.test_models
-    ```
+### 5. Acceder a la Aplicación
 
-    **Resultado esperado:**
+- **Aplicación:** [http://localhost:8000](http://localhost:8000)
+- **Admin:** [http://localhost:8000/admin](http://localhost:8000/admin)
 
-    ```
-    Creating test database...
-    test_create_user (users.test_models.UsuarioManagerTestCase) ... ok
-    test_register_jugador_success (users.test_views.RegistrationViewTestCase) ... ok
-    ...
-    ----------------------------------------------------------------------
-    Ran 43 tests in 2.345s
-    
-    OK
-    ```
+### Comandos Útiles de Docker
 
-## Obligatorio
+```bash
+# Detener contenedores
+docker-compose down
 
-* Por favor usen ramas de git para trabajar en el proyecto.
+# Ver logs
+docker-compose logs -f web
 
-* **No usen el main** para trabajar directamente.
-* Sigan el flujo de trabajo de **GitHub Flow**.
-* Las ramas deben ser nombradas con el siguiente formato:
-  * `feature/nombre-del-feature`
-  * `bugfix/nombre-del-bugfix`
-  * `release/nombre-del-release`
-* Los commits deben ser nombrados con el siguiente formato:
-  * `feat: nombre del feature`
-  * `fix: nombre del bugfix`
-  * `refactor: nombre del refactor`
-* Las ramas deben ser creadas desde el `main`.
-* Las ramas deben ser borradas después de ser fusionadas.
-* Solo serán fusionadas ramas cuando pasen los tests.
+# Ejecutar migraciones
+docker compose exec web python manage.py migrate
+
+# Ejecutar comandos de Django
+docker compose exec web python manage.py <comando>
+
+# Acceder al shell de Django
+docker compose exec web python manage.py shell
+
+# Limpiar todo (⚠️ elimina la base de datos)
+docker-compose down -v
+```
+
+---
+
+## 🔒 Configuración de Seguridad
+
+### Características de Seguridad Implementadas
+
+1. **Variables de Entorno**
+   - Todas las credenciales están en `.env`
+   - No hay secretos hardcodeados en el código
+
+2. **Rate Limiting**
+   - Login limitado a 5 intentos por minuto por IP
+   - Previene ataques de fuerza bruta
+
+3. **Validación de Archivos**
+   - Imágenes limitadas a 5MB
+   - Solo formatos permitidos: jpg, jpeg, png, webp
+
+4. **Sesiones Seguras**
+   - Timeout de 1 hora de inactividad
+   - Cookies HttpOnly y SameSite
+
+5. **Headers de Seguridad**
+   - HSTS (en producción)
+   - X-Frame-Options: DENY
+   - Content-Type-Nosniff
+
+6. **Separación de Privilegios**
+   - Usuarios normales no pueden modificar roles
+   - Solo admins pueden gestionar permisos
+
+### Logging de Seguridad
+
+Los eventos de seguridad se registran en `logs/security.log`:
+
+```bash
+# Ver logs de seguridad
+tail -f logs/security.log
+```
+
+---
+
+## 🔄 Modo Desarrollo vs Producción
+
+### Desarrollo (DEBUG=True)
+
+```env
+DEBUG=True
+SECURE_SSL_REDIRECT=False
+SECURE_HSTS_SECONDS=0
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+### Producción (DEBUG=False)
+
+```env
+DEBUG=False
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+ALLOWED_HOSTS=tudominio.com,www.tudominio.com
+```
+
+> ⚠️ **IMPORTANTE:** En producción DEBES usar HTTPS y configurar todas las variables de seguridad.
+
+### Checklist de Despliegue a Producción
+
+- [ ] `DEBUG=False`
+- [ ] `SECRET_KEY` única y segura (50+ caracteres)
+- [ ] `ALLOWED_HOSTS` configurado correctamente
+- [ ] Contraseña de base de datos fuerte
+- [ ] HTTPS habilitado
+- [ ] Todas las variables de seguridad en `True`
+- [ ] Archivos estáticos recolectados (`collectstatic`)
+- [ ] Migraciones aplicadas
+- [ ] Backup de base de datos configurado
+
+---
+
+## 🧪 Tests
+
+El proyecto incluye 43+ tests automatizados.
+
+### Ejecutar Todos los Tests
+
+```bash
+# Sin Docker
+python manage.py test users --verbosity=2
+
+# Con Docker
+docker compose exec web python manage.py test users --verbosity=2
+```
+
+### Tests Específicos
+
+```bash
+# Tests de modelos
+python manage.py test users.test_models
+
+# Tests de formularios
+python manage.py test users.test_forms
+
+# Tests de vistas
+python manage.py test users.test_views
+```
+
+### Verificación de Seguridad
+
+```bash
+# Verificar configuración de despliegue
+python manage.py check --deploy
+
+# Verificar problemas de seguridad
+python manage.py check --deploy --fail-level WARNING
+```
+
+---
+
+## 📝 Flujo de Trabajo Git
+
+### Reglas Obligatorias
+
+1. **NO trabajar directamente en `main`**
+2. Seguir **GitHub Flow**
+3. Crear ramas desde `main`
+4. Borrar ramas después de fusionar
+5. Solo fusionar si pasan los tests
+
+### Nomenclatura de Ramas
+
+```
+feature/nombre-del-feature
+bugfix/nombre-del-bugfix
+security/nombre-del-fix
+refactor/nombre-del-refactor
+docs/nombre-de-la-documentacion
+```
+
+### Nomenclatura de Commits
+
+```
+feat: agregar nueva funcionalidad
+fix: corregir bug
+security: corregir vulnerabilidad
+refactor: refactorizar código
+docs: actualizar documentación
+test: agregar o modificar tests
+```
+
+### Ejemplo de Flujo de Trabajo
+
+```bash
+# 1. Actualizar main
+git checkout main
+git pull origin main
+
+# 2. Crear rama de feature
+git checkout -b feature/nueva-funcionalidad
+
+# 3. Hacer cambios y commits
+git add .
+git commit -m "feat: agregar nueva funcionalidad"
+
+# 4. Ejecutar tests
+python manage.py test
+
+# 5. Push a GitHub
+git push origin feature/nueva-funcionalidad
+
+# 6. Crear Pull Request en GitHub
+# 7. Después de aprobación, fusionar y borrar rama
+```
+
+---
+
+## 📚 Documentación Adicional
+
+Para más detalles técnicos, consulta:
+
+- [DOCUMENTACION_TECNICA.md](DOCUMENTACION_TECNICA.md) - Arquitectura y detalles técnicos
+- [Reporte de Seguridad](docs/security_report.md) - Auditoría de seguridad completa
+
+---
+
+## 🆘 Solución de Problemas
+
+### Error: "SECRET_KEY not found"
+
+- Asegúrate de tener el archivo `.env` en la raíz del proyecto
+- Verifica que `SECRET_KEY` esté definido en `.env`
+
+### Error de conexión a PostgreSQL
+
+- Verifica que PostgreSQL esté corriendo
+- Confirma las credenciales en `.env`
+- En Docker, asegúrate de que el contenedor `db` esté activo
+
+### Error: "Rate limited"
+
+- Has excedido 5 intentos de login por minuto
+- Espera 1 minuto antes de intentar nuevamente
+
+### Archivos no se suben
+
+- Verifica que el archivo sea jpg, jpeg, png o webp
+- Confirma que el tamaño sea menor a 5MB
+
+---
+
+## 👥 Contribuidores
+
+- ErPyrex - Desarrollador Principal
+
+## 📄 Licencia
+
+Este proyecto es privado y pertenece a la Asociación de Pádel de Barinas.

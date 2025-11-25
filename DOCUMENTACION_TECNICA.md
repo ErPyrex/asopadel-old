@@ -6,14 +6,15 @@
 2. [Arquitectura del Sistema](#arquitectura-del-sistema)
 3. [Modelos de Datos](#modelos-de-datos)
 4. [Sistema de Autenticación](#sistema-de-autenticación)
-5. [Roles y Permisos](#roles-y-permisos)
-6. [Módulos del Sistema](#módulos-del-sistema)
-7. [Flujos de Trabajo](#flujos-de-trabajo)
-8. [API y Endpoints](#api-y-endpoints)
-9. [Frontend y Templates](#frontend-y-templates)
-10. [Tests y Calidad](#tests-y-calidad)
-11. [Configuración y Despliegue](#configuración-y-despliegue)
-12. [Guías de Desarrollo](#guías-de-desarrollo)
+5. [**Seguridad del Sistema**](#seguridad-del-sistema) ⭐ **NUEVO**
+6. [Roles y Permisos](#roles-y-permisos)
+7. [Módulos del Sistema](#módulos-del-sistema)
+8. [Flujos de Trabajo](#flujos-de-trabajo)
+9. [API y Endpoints](#api-y-endpoints)
+10. [Frontend y Templates](#frontend-y-templates)
+11. [Tests y Calidad](#tests-y-calidad)
+12. [Configuración y Despliegue](#configuración-y-despliegue)
+13. [Guías de Desarrollo](#guías-de-desarrollo)
 
 ---
 
@@ -390,6 +391,413 @@ class CustomUsuarioCreationForm(UserCreationForm):
 3. Sistema valida datos (unicidad de cédula/email)
 4. Crea usuario con rol seleccionado
 5. Redirige a login para autenticarse
+
+---
+
+---
+
+## Seguridad del Sistema
+
+### Resumen de Seguridad
+
+El sistema ASOPADEL implementa múltiples capas de seguridad para proteger los datos de los usuarios y prevenir vulnerabilidades comunes. Todas las correcciones de seguridad han sido implementadas siguiendo las mejores prácticas de OWASP y Django Security Guidelines.
+
+### Características de Seguridad Implementadas
+
+#### 1. Gestión Segura de Secretos
+
+**Problema Resuelto:** Secretos hardcodeados en el código
+
+**Implementación:**
+
+- Todas las credenciales y secretos se almacenan en variables de entorno
+- Archivo `.env` para configuración local (excluido de Git)
+- Archivo `.env.example` como plantilla sin secretos reales
+
+**Archivos Modificados:**
+
+- `settings.py`: Lee configuración desde variables de entorno
+- `docker-compose.yml`: Usa `${VARIABLE}` en lugar de valores hardcodeados
+- `.gitignore`: Incluye `.env` y `logs/`
+
+**Ejemplo de Configuración:**
+
+```python
+# settings.py
+SECRET_KEY = config('SECRET_KEY')  # Desde .env
+DEBUG = config('DEBUG', default=False, cast=bool)
+AllowedHostsStr = config('ALLOWED_HOSTS', default='localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in AllowedHostsStr.split(',')]
+```
+
+#### 2. Rate Limiting (Protección contra Fuerza Bruta)
+
+**Problema Resuelto:** Ataques de fuerza bruta en el login
+
+**Implementación:**
+
+- Librería: `django-ratelimit==4.1.0`
+- Límite: 5 intentos de login por minuto por dirección IP
+- Bloqueo automático después de exceder el límite
+
+**Código:**
+
+```python
+# users/views.py
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
+
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='post')
+class CustomLoginView(LoginView):
+    """
+    Custom login view with rate limiting.
+    Limits login attempts to 5 per minute per IP address.
+    """
+    pass
+```
+
+**Comportamiento:**
+
+- Primeros 5 intentos: Normales
+- Intento 6+: Error 429 (Too Many Requests)
+- Reset: Después de 1 minuto
+
+#### 3. Validación de Archivos Subidos
+
+**Problema Resuelto:** Subida de archivos maliciosos
+
+**Implementación:**
+
+- Validación de extensión de archivo
+- Validación de tamaño (máximo 5MB)
+- Solo imágenes permitidas: jpg, jpeg, png, webp
+
+**Código:**
+
+```python
+# users/models.py
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+
+def ValidateImageSize(Image):
+    """Validate that uploaded image is under 5MB"""
+    MaxSizeMb = 5
+    MaxSizeBytes = MaxSizeMb * 1024 * 1024
+    
+    if Image.size > MaxSizeBytes:
+        raise ValidationError(
+            f'El tamaño máximo permitido es {MaxSizeMb}MB. '
+            f'Tu archivo tiene {Image.size / (1024 * 1024):.2f}MB'
+        )
+
+class Usuario(AbstractUser):
+    foto = models.ImageField(
+        upload_to='perfiles/',
+        blank=True,
+        null=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp'],
+                message='Solo se permiten archivos de imagen (jpg, jpeg, png, webp)'
+            ),
+            ValidateImageSize
+        ]
+    )
+```
+
+#### 4. Prevención de Escalada de Privilegios
+
+**Problema Resuelto:** Usuarios podían hacerse administradores editando su perfil
+
+**Implementación:**
+
+- Formularios separados para usuarios y administradores
+- `UsuarioPerfilForm`: Solo campos seguros (nombre, teléfono, foto, biografía)
+- `AdminUsuarioChangeForm`: Solo para administradores en panel admin
+
+**Archivos:**
+
+- `users/forms.py`: Formulario seguro para usuarios
+- `users/forms_admin.py`: Formulario privilegiado para admins
+- `users/views.py`: Usa formulario correcto según contexto
+
+**Antes (VULNERABLE):**
+
+```python
+# ❌ PELIGROSO - Permitía escalada de privilegios
+class CustomUsuarioChangeForm(UserChangeForm):
+    class Meta:
+        fields = (
+            'cedula', 'email', 'first_name', 'last_name',
+            'es_admin_aso', 'es_arbitro', 'es_jugador',  # ⚠️ PELIGRO
+            'is_active', 'is_staff', 'is_superuser'      # ⚠️ CRÍTICO
+        )
+```
+
+**Después (SEGURO):**
+
+```python
+# ✅ SEGURO - Solo campos no privilegiados
+class UsuarioPerfilForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ('first_name', 'last_name', 'telefono', 'foto', 'biografia')
+```
+
+#### 5. Headers de Seguridad HTTP
+
+**Implementación:**
+
+```python
+# settings.py
+
+# HTTPS Settings (Producción)
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=False, cast=bool)
+SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=False, cast=bool)
+
+# Cookie Security
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+SESSION_COOKIE_HTTPONLY = True  # Previene acceso JavaScript
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'  # Protección CSRF
+CSRF_COOKIE_SAMESITE = 'Lax'
+
+# Security Headers
+X_FRAME_OPTIONS = 'DENY'  # Previene clickjacking
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Previene MIME sniffing
+SECURE_BROWSER_XSS_FILTER = True  # Filtro XSS del navegador
+```
+
+**Protecciones:**
+
+- **HSTS**: Fuerza HTTPS en producción
+- **HttpOnly Cookies**: Previene robo de sesión via XSS
+- **SameSite**: Protección contra CSRF
+- **X-Frame-Options**: Previene clickjacking
+- **Content-Type-Nosniff**: Previene ataques MIME
+
+#### 6. Gestión de Sesiones
+
+**Implementación:**
+
+```python
+# settings.py
+
+# Session Management
+SESSION_COOKIE_AGE = 3600  # 1 hora en segundos
+SESSION_SAVE_EVERY_REQUEST = True  # Actualiza en cada request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Limpia al cerrar navegador
+```
+
+**Comportamiento:**
+
+- Sesiones expiran después de 1 hora de inactividad
+- Se renuevan con cada request (sliding window)
+- Se eliminan al cerrar el navegador
+- Previene session hijacking
+
+#### 7. Logging de Seguridad
+
+**Implementación:**
+
+```python
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'security.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['file', 'console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
+```
+
+**Eventos Registrados:**
+
+- Intentos de login fallidos
+- Errores de seguridad
+- Requests sospechosos
+- Errores del servidor
+
+**Ubicación de Logs:**
+
+- `logs/security.log`: Eventos de seguridad
+- Rotación automática recomendada en producción
+
+#### 8. Dependencias con Versiones Fijas
+
+**Problema Resuelto:** Instalación de versiones vulnerables
+
+**Implementación:**
+
+```text
+# requirements.txt
+
+# Django and Core Dependencies
+Django==5.0.1
+gunicorn==21.2.0
+psycopg2-binary==2.9.9
+
+# Configuration and Database
+python-decouple==3.8
+dj-database-url==2.1.0
+
+# Static Files
+whitenoise==6.6.0
+
+# Image Processing
+Pillow==10.2.0
+
+# Security - Rate Limiting
+django-ratelimit==4.1.0
+```
+
+**Beneficios:**
+
+- Reproducibilidad del entorno
+- Prevención de vulnerabilidades conocidas
+- Control de versiones para auditorías
+
+### Configuración de Seguridad por Entorno
+
+#### Desarrollo
+
+```env
+# .env (Desarrollo)
+DEBUG=True
+SECURE_SSL_REDIRECT=False
+SECURE_HSTS_SECONDS=0
+SESSION_COOKIE_SECURE=False
+CSRF_COOKIE_SECURE=False
+ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+#### Producción
+
+```env
+# .env (Producción)
+DEBUG=False
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+SESSION_COOKIE_SECURE=True
+CSRF_COOKIE_SECURE=True
+ALLOWED_HOSTS=tudominio.com,www.tudominio.com
+```
+
+### Checklist de Seguridad
+
+#### Pre-Despliegue
+
+- [ ] `DEBUG=False` en producción
+- [ ] `SECRET_KEY` única y segura (50+ caracteres)
+- [ ] `ALLOWED_HOSTS` configurado correctamente
+- [ ] Contraseña de base de datos fuerte
+- [ ] HTTPS habilitado y certificado válido
+- [ ] Todas las variables de seguridad en `True`
+- [ ] Archivos estáticos recolectados
+- [ ] Migraciones aplicadas
+- [ ] Tests pasando
+
+#### Post-Despliegue
+
+- [ ] Verificar headers de seguridad con securityheaders.com
+- [ ] Verificar SSL con ssllabs.com
+- [ ] Revisar logs de seguridad
+- [ ] Configurar backup de base de datos
+- [ ] Configurar monitoreo de errores
+
+### Comandos de Verificación
+
+```bash
+# Verificar configuración de despliegue
+python manage.py check --deploy
+
+# Verificar problemas de seguridad
+python manage.py check --deploy --fail-level WARNING
+
+# Ver logs de seguridad
+tail -f logs/security.log
+
+# Ejecutar tests de seguridad
+python manage.py test users --verbosity=2
+```
+
+### Vulnerabilidades Corregidas
+
+| ID | Severidad | Vulnerabilidad | Estado |
+|----|-----------|----------------|--------|
+| 1 | 🔴 Crítica | SECRET_KEY hardcodeada | ✅ Corregido |
+| 2 | 🔴 Crítica | ALLOWED_HOSTS = ["*"] | ✅ Corregido |
+| 3 | 🔴 Crítica | DEBUG=True en producción | ✅ Corregido |
+| 4 | 🔴 Crítica | Credenciales de BD hardcodeadas | ✅ Corregido |
+| 5 | 🔴 Crítica | Escalada de privilegios | ✅ Corregido |
+| 6 | 🔴 Crítica | Falta validación de archivos | ✅ Corregido |
+| 7 | 🔴 Crítica | Sin rate limiting | ✅ Corregido |
+| 8 | 🔴 Crítica | Headers de seguridad ausentes | ✅ Corregido |
+| 9 | 🟠 Alta | Sin logging de seguridad | ✅ Corregido |
+| 10 | 🟠 Alta | Sin timeout de sesiones | ✅ Corregido |
+| 11 | 🟠 Alta | Dependencias sin versiones | ✅ Corregido |
+
+### Mejores Prácticas de Seguridad
+
+#### Para Desarrolladores
+
+1. **Nunca** commitear archivos `.env`
+2. **Siempre** usar variables de entorno para secretos
+3. **Validar** toda entrada de usuario
+4. **Sanitizar** datos antes de mostrarlos
+5. **Usar** formularios de Django (protección CSRF automática)
+6. **Revisar** logs de seguridad regularmente
+7. **Mantener** dependencias actualizadas
+
+#### Para Administradores
+
+1. **Usar** contraseñas fuertes (12+ caracteres)
+2. **Habilitar** autenticación de dos factores (futuro)
+3. **Revisar** usuarios con privilegios regularmente
+4. **Monitorear** intentos de login fallidos
+5. **Realizar** backups regulares
+6. **Actualizar** el sistema regularmente
+
+### Recursos Adicionales
+
+- [Django Security Documentation](https://docs.djangoproject.com/en/5.0/topics/security/)
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [Security Headers](https://securityheaders.com/)
+- [SSL Labs](https://www.ssllabs.com/ssltest/)
 
 ---
 
