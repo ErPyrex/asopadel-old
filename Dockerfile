@@ -15,6 +15,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the project code into the container
 COPY . /app/
 
+# Fix line endings and set execute permissions for entrypoint.sh (Windows compatibility)
+RUN chmod +x /app/entrypoint.sh && \
+    sed -i 's/\r$//' /app/entrypoint.sh
+
 # Expose the port the app runs on
 EXPOSE 8000
 
