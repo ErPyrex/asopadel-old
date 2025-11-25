@@ -1,9 +1,41 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.core.validators import FileExtensionValidator
+from django.core.exceptions import ValidationError
+
+
+def ValidateImageSize(Image):
+    """
+    Validator function to check if uploaded image size is within limits.
+    Maximum allowed size is 5MB.
+    
+    Args:
+        Image: The uploaded image file
+        
+    Raises:
+        ValidationError: If image size exceeds 5MB
+    """
+    MaxSizeMb = 5
+    MaxSizeBytes = MaxSizeMb * 1024 * 1024  # Convert MB to bytes
+    
+    if Image.size > MaxSizeBytes:
+        raise ValidationError(f'El tamaño máximo permitido es {MaxSizeMb}MB. Tu archivo tiene {Image.size / (1024 * 1024):.2f}MB')
+
 
 # Manager personalizado
 class UsuarioManager(BaseUserManager):
     def create_user(self, cedula, password=None, **extra_fields):
+        """
+        Create and save a regular user with the given cedula and password.
+        
+        Args:
+            cedula: Venezuelan ID number
+            password: User password
+            **extra_fields: Additional fields for the user
+            
+        Returns:
+            Usuario: The created user instance
+        """
         if not cedula:
             raise ValueError("La cédula es obligatoria")
         user = self.model(cedula=cedula, **extra_fields)
@@ -12,6 +44,17 @@ class UsuarioManager(BaseUserManager):
         return user
 
     def create_superuser(self, cedula, password=None, **extra_fields):
+        """
+        Create and save a superuser with the given cedula and password.
+        
+        Args:
+            cedula: Venezuelan ID number
+            password: User password
+            **extra_fields: Additional fields for the user
+            
+        Returns:
+            Usuario: The created superuser instance
+        """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('es_admin_aso', True)
@@ -50,7 +93,21 @@ class Usuario(AbstractUser):
         null=True
     )
     ranking = models.IntegerField(default=0, blank=True, null=True)
-    foto = models.ImageField(upload_to='perfiles/', blank=True, null=True)
+    
+    # Foto de perfil con validación de seguridad
+    foto = models.ImageField(
+        upload_to='perfiles/', 
+        blank=True, 
+        null=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png', 'webp'],
+                message='Solo se permiten archivos de imagen (jpg, jpeg, png, webp)'
+            ),
+            ValidateImageSize
+        ]
+    )
+    
     biografia = models.TextField(blank=True, null=True)
 
     USERNAME_FIELD = 'cedula'
