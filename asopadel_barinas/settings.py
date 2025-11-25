@@ -5,9 +5,16 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Security: SECRET_KEY must be set in environment variables
 SECRET_KEY = config('SECRET_KEY')
+
+# Security: DEBUG should be False in production
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = ["*"]
+
+# Security: ALLOWED_HOSTS must be explicitly configured
+# Format: comma-separated list like "example.com,www.example.com"
+AllowedHostsStr = config('ALLOWED_HOSTS', default='localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in AllowedHostsStr.split(',') if host.strip()]
 
 # Aplicaciones instaladas
 INSTALLED_APPS = [
@@ -96,3 +103,74 @@ AUTH_USER_MODEL = 'users.Usuario'
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'core:dashboard_by_role'
 LOGOUT_REDIRECT_URL = 'core:home'
+
+# ==============================================================================
+# SECURITY CONFIGURATIONS
+# ==============================================================================
+
+# HTTPS and SSL Settings
+# Note: Enable these in production with proper SSL certificates
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config('SECURE_HSTS_INCLUDE_SUBDOMAINS', default=False, cast=bool)
+SECURE_HSTS_PRELOAD = config('SECURE_HSTS_PRELOAD', default=False, cast=bool)
+
+# Cookie Security
+# Note: Set to True in production with HTTPS
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie
+CSRF_COOKIE_HTTPONLY = True  # Prevent JavaScript access to CSRF cookie
+SESSION_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+CSRF_COOKIE_SAMESITE = 'Lax'  # CSRF protection
+
+# Session Management
+# Sessions expire after 1 hour of inactivity
+SESSION_COOKIE_AGE = 3600  # 1 hour in seconds
+SESSION_SAVE_EVERY_REQUEST = True  # Update session on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Clear session when browser closes
+
+# Security Headers
+X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking attacks
+SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
+SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filter
+
+# ==============================================================================
+# LOGGING CONFIGURATION
+# ==============================================================================
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'security.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django.security': {
+            'handlers': ['file', 'console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['file', 'console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
