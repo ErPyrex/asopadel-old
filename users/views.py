@@ -4,16 +4,27 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required # Necesitamos este decorador
-from .forms import LoginCedulaForm, CustomUsuarioCreationForm, CustomUsuarioChangeForm # Importa CustomUsuarioChangeForm
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
+from .forms import LoginCedulaForm, CustomUsuarioCreationForm, UsuarioPerfilForm # Importa CustomUsuarioChangeForm
 from .models import Usuario # Importa el modelo Usuario
 
-# Vista de Login Personalizada (usando cédula)
+# Vista de Login Personalizada (usando cédula) con Rate Limiting
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='post')
 class CustomLoginView(LoginView):
+    """
+    Custom login view using cedula (Venezuelan ID) instead of username.
+    Includes rate limiting to prevent brute force attacks (5 attempts per minute per IP).
+    """
     template_name = 'users/login.html' # Asegúrate de tener este template
     form_class = LoginCedulaForm # Usamos nuestro formulario de login con cédula
     redirect_authenticated_user = True
 
     def form_valid(self, form):
+        """
+        Process valid login form.
+        Authenticates user and redirects to appropriate dashboard.
+        """
         cedula = form.cleaned_data['username']
         password = form.cleaned_data['password']
         user = authenticate(self.request, username=cedula, password=password)
@@ -25,6 +36,9 @@ class CustomLoginView(LoginView):
             return self.form_invalid(form)
 
     def get_success_url(self):
+        """
+        Redirect to dashboard based on user role.
+        """
         # Redirige al dashboard apropiado según el rol del usuario
         return reverse_lazy('core:dashboard_by_role')
 
