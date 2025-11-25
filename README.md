@@ -204,9 +204,61 @@ Esta es la forma recomendada para levantar el proyecto, ya que simplifica la ges
     docker-compose up
     ```
 
+5. **Ejecutar Tests (Opcional)**
+
+    El proyecto incluye 43 tests automatizados. Para ejecutarlos desde Docker:
+
+    **En Linux/macOS:**
+
+    ```bash
+    # Ejecutar todos los tests
+    docker compose exec web python manage.py test users --verbosity=2
+    
+    # Tests específicos
+    docker compose exec web python manage.py test users.test_models
+    docker compose exec web python manage.py test users.test_forms
+    docker compose exec web python manage.py test users.test_views
+    ```
+
+    **En Windows (PowerShell):**
+
+    ```powershell
+    # Ejecutar todos los tests
+    docker compose exec web python manage.py test users --verbosity=2
+    
+    # Tests específicos
+    docker compose exec web python manage.py test users.test_models
+    docker compose exec web python manage.py test users.test_forms
+    docker compose exec web python manage.py test users.test_views
+    ```
+
+    **En Windows (CMD):**
+
+    ```cmd
+    REM Ejecutar todos los tests
+    docker compose exec web python manage.py test users --verbosity=2
+    
+    REM Tests específicos
+    docker compose exec web python manage.py test users.test_models
+    ```
+
+    **Resultado esperado:**
+
+    ```
+    Creating test database...
+    test_create_user (users.test_models.UsuarioManagerTestCase) ... ok
+    test_register_jugador_success (users.test_views.RegistrationViewTestCase) ... ok
+    ...
+    ----------------------------------------------------------------------
+    Ran 43 tests in 2.345s
+    
+    OK
+    ```
+
 ## Obligatorio
 
-- Por favor usen ramas de git para trabajar en el proyecto.
+* Por favor usen ramas de git para trabajar en el proyecto.
+
 * **No usen el main** para trabajar directamente.
 * Sigan el flujo de trabajo de **GitHub Flow**.
 * Las ramas deben ser nombradas con el siguiente formato:

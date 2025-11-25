@@ -950,14 +950,14 @@ El proyecto implementa **43 tests** organizados en 3 archivos:
 
 ### Ejecución de Tests
 
-#### Opción 1: Script Automatizado
+#### Opción 1: Script Automatizado (Solo instalación manual)
 
 ```bash
 chmod +x run_tests.sh
 ./run_tests.sh
 ```
 
-#### Opción 2: Comandos Manuales
+#### Opción 2: Comandos Manuales (Instalación manual)
 
 ```bash
 # Activar entorno virtual
@@ -974,6 +974,106 @@ python manage.py test users.test_views --verbosity=2
 # Test individual
 python manage.py test users.test_views.AdminManagementViewTestCase.test_promote_user_to_admin
 ```
+
+#### Opción 3: Ejecutar Tests en Docker
+
+Si estás usando Docker, puedes ejecutar los tests directamente en el contenedor.
+
+##### En Linux/macOS
+
+```bash
+# Ejecutar todos los tests
+docker compose exec web python manage.py test users --verbosity=2
+
+# Tests específicos por archivo
+docker compose exec web python manage.py test users.test_models --verbosity=2
+docker compose exec web python manage.py test users.test_forms --verbosity=2
+docker compose exec web python manage.py test users.test_views --verbosity=2
+
+# Test individual específico
+docker compose exec web python manage.py test users.test_views.AdminManagementViewTestCase.test_promote_user_to_admin
+
+# Con cobertura (si coverage está instalado)
+docker compose exec web coverage run --source='.' manage.py test users
+docker compose exec web coverage report
+```
+
+##### En Windows (PowerShell)
+
+```powershell
+# Ejecutar todos los tests
+docker compose exec web python manage.py test users --verbosity=2
+
+# Tests específicos por archivo
+docker compose exec web python manage.py test users.test_models --verbosity=2
+docker compose exec web python manage.py test users.test_forms --verbosity=2
+docker compose exec web python manage.py test users.test_views --verbosity=2
+
+# Test individual específico
+docker compose exec web python manage.py test users.test_views.AdminManagementViewTestCase.test_promote_user_to_admin
+
+# Con cobertura (si coverage está instalado)
+docker compose exec web coverage run --source='.' manage.py test users
+docker compose exec web coverage report
+```
+
+##### En Windows (CMD)
+
+```cmd
+REM Ejecutar todos los tests
+docker compose exec web python manage.py test users --verbosity=2
+
+REM Tests específicos por archivo
+docker compose exec web python manage.py test users.test_models --verbosity=2
+docker compose exec web python manage.py test users.test_forms --verbosity=2
+docker compose exec web python manage.py test users.test_views --verbosity=2
+
+REM Test individual específico
+docker compose exec web python manage.py test users.test_views.AdminManagementViewTestCase.test_promote_user_to_admin
+```
+
+##### Salida Esperada
+
+```text
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+
+test_create_user (users.test_models.UsuarioManagerTestCase) ... ok
+test_create_user_without_cedula (users.test_models.UsuarioManagerTestCase) ... ok
+test_create_superuser (users.test_models.UsuarioManagerTestCase) ... ok
+test_str_method (users.test_models.UsuarioModelTestCase) ... ok
+test_get_full_name (users.test_models.UsuarioModelTestCase) ... ok
+test_jugador_role (users.test_models.UsuarioModelTestCase) ... ok
+test_form_fields (users.test_forms.LoginCedulaFormTestCase) ... ok
+test_role_choices_no_admin (users.test_forms.CustomUsuarioCreationFormTestCase) ... ok
+test_create_jugador (users.test_forms.CustomUsuarioCreationFormTestCase) ... ok
+test_register_page_loads (users.test_views.RegistrationViewTestCase) ... ok
+test_cannot_register_as_admin (users.test_views.RegistrationViewTestCase) ... ok
+test_promote_user_to_admin (users.test_views.AdminManagementViewTestCase) ... ok
+...
+
+----------------------------------------------------------------------
+Ran 43 tests in 2.345s
+
+OK
+Destroying test database for alias 'default'...
+```
+
+##### Notas Importantes para Docker
+
+> 💡 **Tip:** Los tests en Docker crean una base de datos temporal que se destruye automáticamente al finalizar.
+
+> ⚠️ **Importante:** Asegúrate de que los contenedores estén corriendo antes de ejecutar los tests:
+>
+> ```bash
+> docker compose ps
+> ```
+
+> 🔄 **Reiniciar si es necesario:**
+>
+> ```bash
+> docker compose restart web
+> ```
 
 ### Cobertura de Tests
 
