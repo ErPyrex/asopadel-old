@@ -92,6 +92,61 @@ Sistema para la Asociación de Pádel de Barinas
     ```bash
     python manage.py runserver
     ```
+
+## Instalación y ejecución con Docker
+
+Esta es la forma recomendada para levantar el proyecto, ya que simplifica la gestión de la base de datos y las dependencias del sistema.
+
+### Requerimientos de Docker
+
+*   **Docker Engine** y **Docker Compose**
+
+#### Instalación de Docker
+
+*   **Windows:**
+    Se recomienda instalar **Docker Desktop**. Puedes seguir la guía oficial:
+    [https://docs.docker.com/desktop/install/windows-install/](https://docs.docker.com/desktop/install/windows-install/)
+    Asegúrate de que WSL 2 (Windows Subsystem for Linux 2) esté habilitado.
+
+*   **Linux:**
+    Sigue la guía de instalación para tu distribución:
+    *   **Ubuntu:** [https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
+    *   **Debian:** [https://docs.docker.com/engine/install/debian/](https://docs.docker.com/engine/install/debian/)
+    *   **Fedora:** [https://docs.docker.com/engine/install/fedora/](https://docs.docker.com/engine/install/fedora/)
+
+    Después de instalar, es crucial seguir los pasos de post-instalación para poder ejecutar Docker sin `sudo`:
+    [https://docs.docker.com/engine/install/linux-postinstall/](https://docs.docker.com/engine/install/linux-postinstall/)
+
+### Pasos para ejecutar el proyecto con Docker
+
+1.  **Clonar el repositorio y entrar al directorio**
+    (Si ya lo hiciste para la instalación manual, puedes omitir este paso)
+    ```bash
+    git clone https://github.com/ErPyrex/asopadel.git
+    cd asopadel
+    ```
+
+2.  **Construir y levantar los contenedores**
+    Este comando construirá las imágenes y levantará los servicios (la aplicación y la base de datos).
+    ```bash
+    docker-compose up --build
+    ```
+    *La opción `--build` solo es necesaria la primera vez o si se hacen cambios en el `Dockerfile` o `requirements.txt`.*
+
+3.  **Aplicar las migraciones (solo la primera vez)**
+    Abre una **nueva terminal** (sin detener los contenedores) y ejecuta:
+    ```bash
+    docker-compose exec web python manage.py migrate
+    ```
+
+4.  **Crear un superusuario (opcional)**
+    Si necesitas acceso al panel de administración:
+    ```bash
+    docker-compose exec web python manage.py createsuperuser
+    ```
+
+5.  **¡Listo!**
+    La aplicación estará disponible en [http://localhost:8000](http://localhost:8000).
     
 ## Obligatorio
 - Por favor usen ramas de git para trabajar en el proyecto.
