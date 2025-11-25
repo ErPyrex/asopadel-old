@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   web:
@@ -9,13 +9,19 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    environment:
+      - SECRET_KEY=django-insecure-docker-dev-key-change-in-production
+      - DEBUG=True
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/asopadel_barinas
     entrypoint: /app/entrypoint.sh
   db:
     image: postgres:16
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      - POSTGRES_DB=asopadel_barinas
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
 
 volumes:
   postgres_data:

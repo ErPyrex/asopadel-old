@@ -58,14 +58,15 @@ Sistema para la Asociación de Pádel de Barinas
     DATABASE_URL=postgresql://postgres:postgres@localhost:5432/asopadel_barinas
     ```
 
-    **Nota Importante para instalaciones manuales (sin Docker):**
-    El proyecto está configurado para leer la cadena de conexión de la base de datos desde la variable de entorno `DATABASE_URL` en el archivo `.env`.
-    Asegúrate de que `DATABASE_URL` apunte a tu instancia local de PostgreSQL (por ejemplo, `localhost`).
-    No es necesario modificar directamente el archivo `asopadel_barinas/settings.py` para cambiar el host de la base de datos, ya que `dj_database_url` lo manejará automáticamente.
+    **Nota Importante:**
+    - El proyecto usa `dj-database-url` para leer la configuración de la base de datos desde `DATABASE_URL`
+    - Para instalación manual, usa `localhost` como host (como se muestra arriba)
+    - Para Docker, las variables de entorno se configuran automáticamente en `docker-compose.yml`
+    - El formato de `DATABASE_URL` es: `postgresql://usuario:contraseña@host:puerto/nombre_base_datos`
     
 
 5. **Configurar la Base de Datos**
-    Necesitamos crear la base de datos y asegurar que el usuario `postgres` tenga la contraseña `postgres` para coincidir con el archivo `.env`.
+    Necesitamos crear la base de datos `asopadel_barinas` y asegurar que el usuario `postgres` tenga la contraseña `postgres` para coincidir con el archivo `.env`.
 
     * **Windows:**
         1.  Abre la aplicación **SQL Shell (psql)** desde el menú inicio o ejecuta `psql -U postgres` en tu terminal.
@@ -138,21 +139,27 @@ Esta es la forma recomendada para levantar el proyecto, ya que simplifica la ges
     docker-compose up --build
     ```
     *La opción `--build` solo es necesaria la primera vez o si se hacen cambios en el `Dockerfile` o `requirements.txt`.*
+    
+    **Nota:** Las migraciones se aplican automáticamente al iniciar el contenedor gracias al script `entrypoint.sh`. No necesitas ejecutarlas manualmente.
 
-3.  **Aplicar las migraciones (solo la primera vez)**
-    Abre una **nueva terminal** (sin detener los contenedores) y ejecuta:
-    ```bash
-    docker-compose exec web python manage.py migrate
-    ```
-
-4.  **Crear un superusuario (opcional)**
-    Si necesitas acceso al panel de administración:
+3.  **Crear un superusuario (opcional)**
+    Si necesitas acceso al panel de administración, abre una **nueva terminal** y ejecuta:
     ```bash
     docker-compose exec web python manage.py createsuperuser
     ```
 
-5.  **¡Listo!**
+4.  **¡Listo!**
     La aplicación estará disponible en [http://localhost:8000](http://localhost:8000).
+    
+    **Para detener los contenedores:**
+    ```bash
+    docker-compose down
+    ```
+    
+    **Para volver a iniciar (sin rebuild):**
+    ```bash
+    docker-compose up
+    ```
     
 ## Obligatorio
 - Por favor usen ramas de git para trabajar en el proyecto.

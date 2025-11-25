@@ -60,13 +60,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'asopadel_barinas.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
-    }
+    'default': dj_database_url.config(
+        default='postgresql://postgres:postgres@localhost:5432/asopadel_barinas',
+        conn_max_age=600
+    )
 }
 
 AUTH_PASSWORD_VALIDATORS = [
