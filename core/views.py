@@ -3,24 +3,21 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
 from blog.models import Hero, Noticia
 from competitions.models import Torneo, Partido
 from facilities.models import Cancha, ReservaCancha
 from users.models import Usuario
 from .forms import HeroForm, NoticiaForm, TorneoForm, CanchaForm, PartidoForm, ReservaCanchaForm
 from users.forms import CustomUsuarioCreationForm
-from users.forms_admin import AdminUsuarioChangeForm  # Import admin form
+from users.forms_admin import AdminUsuarioChangeForm
 from .forms import JugadorForm, ArbitroForm
+from .utils import IsAdmin, IsArbitro, IsJugador
 
-# 🔐 Funciones auxiliares para verificar roles
-def is_admin(user):
-    return user.is_authenticated and user.es_admin_aso
-
-def is_arbitro(user):
-    return user.is_authenticated and user.es_arbitro
-
-def is_jugador(user):
-    return user.is_authenticated and user.es_jugador
+# Aliases for backward compatibility with existing code
+is_admin = IsAdmin
+is_arbitro = IsArbitro
+is_jugador = IsJugador
 
 # 🧭 Redirección por rol
 @login_required
@@ -195,12 +192,13 @@ def admin_delete_player(request, jugador_id):
         return redirect('core:admin_player_list')
     return render(request, 'core/jugadores/confirmar_eliminar_jugador.html', {'jugador': jugador})
 
-def is_jugador(user):
-    return user.is_authenticated and user.es_jugador
-
 @login_required
 @user_passes_test(is_jugador)
 def jugador_dashboard(request):
+    """
+    Dashboard view for players (jugadores).
+    Shows their reservations and matches.
+    """
     reservas = ReservaCancha.objects.filter(jugador=request.user)
     partidos = Partido.objects.filter(jugadores=request.user)
     return render(request, 'users/panel_jugador.html', {
@@ -251,12 +249,12 @@ def admin_delete_referee(request, arbitro_id):
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 
-def is_arbitro(user):
-    return user.is_authenticated and user.es_arbitro
-
 @login_required
 @user_passes_test(is_arbitro)
 def arbitro_dashboard(request):
+    """
+    Dashboard view for referees (arbitros).
+    """
     return render(request, 'users/panel_arbitro.html')
 
 
@@ -300,26 +298,7 @@ def player_reserve_court(request):
     })
     
     
-    #### from django.core.paginator import Paginator
-from django.core.paginator import Paginator
-
-@login_required
-@user_passes_test(is_admin)
-def admin_player_list(request):
-    query = request.GET.get('q')
-    jugadores = Usuario.objects.filter(es_jugador=True)
-
-    if query:
-        jugadores = jugadores.filter(first_name__icontains=query)
-
-    paginator = Paginator(jugadores, 10)  # 10 jugadores por página
-    page = request.GET.get('page')
-    jugadores_paginados = paginator.get_page(page)
-
-    return render(request, 'core/jugadores/jugadores.html', {
-        'jugadores': jugadores_paginados,
-        'query': query  # para mantener el valor en el input de búsqueda
-    })
+# Note: admin_player_list is defined above with pagination and search
     
 # hero y noticias 
 @login_required
