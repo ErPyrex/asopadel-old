@@ -1,29 +1,25 @@
 // Animación de entrada para el hero
 document.addEventListener("DOMContentLoaded", () => {
-  const hero = document.querySelector(".hero-home");
-  if (hero) {
-    hero.style.opacity = 0;
-    setTimeout(() => {
-      hero.style.opacity = 1;
-    }, 300);
-  }
-});
-
-// Scroll suave a secciones con data-target
-document.querySelectorAll(".btn-scroll").forEach(btn => {
-  btn.addEventListener("click", e => {
-    e.preventDefault();
-    const targetSelector = btn.dataset.target;
-    const target = document.querySelector(targetSelector);
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    const hero = document.querySelector(".hero-home");
+    if (hero) {
+        hero.style.opacity = 0;
+        setTimeout(() => {
+            hero.style.opacity = 1;
+        }, 300);
     }
-  });
-});
 
+    // Scroll suave a secciones con data-target
+    document.querySelectorAll(".btn-scroll").forEach(btn => {
+        btn.addEventListener("click", e => {
+            e.preventDefault();
+            const targetSelector = btn.dataset.target;
+            const target = document.querySelector(targetSelector);
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+    });
 
-document.addEventListener('DOMContentLoaded', () => {
-    
     // --- Contador Animado para Métricas (Dashboard Admin) ---
     const metricCounters = document.querySelectorAll('.metric-value');
 
@@ -80,3 +76,104 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+// =======================================================
+// === LÓGICA MODO OSCURO (BOOTSTRAP THEME TOGGLER ADAPTADO)
+// === Implementación del selector de tema avanzado de Bootstrap
+// =======================================================
+
+(() => {
+ "use strict";
+
+ const storedTheme = localStorage.getItem("theme");
+
+ const getPreferredTheme = () => {
+  if (storedTheme) {
+   return storedTheme;
+  }
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+   ? "dark"
+   : "light";
+ };
+
+ const setTheme = function (theme) {
+  let themeToApply = theme;
+
+  // Determinar el tema final a aplicar, manejando el caso 'auto'
+  if (
+   theme === "auto" &&
+   window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) {
+   themeToApply = "dark";
+  } else if (theme === "auto") {
+        themeToApply = "light";
+    }
+
+    // 1. Aplicar el atributo de Bootstrap al HTML (Controla estilos de componentes de Bootstrap)
+  document.documentElement.setAttribute("data-bs-theme", themeToApply);
+
+    // 2. ADAPTACIÓN CRÍTICA PARA TU CSS:
+    // Añadir/Quitar la clase 'dark-mode' del <body> (Necesario para tu fondo y estilos personalizados)
+    if (themeToApply === "dark") {
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+    }
+ };
+
+ setTheme(getPreferredTheme());
+
+ const showActiveTheme = (theme) => {
+  const activeThemeIcon = document.querySelector(".theme-icon-active use");
+    // Usamos document.documentElement para buscar el tema si está en 'auto' y no en 'light' o 'dark'
+    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || theme;
+
+  // Determinar el icono a mostrar en el botón principal
+    let svgIconHref;
+    if (currentTheme === 'light') {
+        svgIconHref = '#sun-fill';
+    } else if (currentTheme === 'dark') {
+        svgIconHref = '#moon-stars-fill';
+    } else {
+        svgIconHref = '#circle-half';
+    }
+    
+    if (activeThemeIcon) {
+        activeThemeIcon.setAttribute("href", svgIconHref);
+    }
+    
+    // Marcar el botón correcto como 'active' en el menú desplegable
+  document.querySelectorAll("[data-bs-theme-value]").forEach((element) => {
+   element.classList.remove("active");
+  });
+    
+    const btnToActive = document.querySelector(
+   `[data-bs-theme-value="${theme}"]`
+  );
+    if (btnToActive) {
+        btnToActive.classList.add("active");
+    }
+ };
+
+ window
+  .matchMedia("(prefers-color-scheme: dark)")
+  .addEventListener("change", () => {
+   if (storedTheme !== "light" || storedTheme !== "dark") {
+    setTheme(getPreferredTheme());
+   }
+  });
+
+ window.addEventListener("DOMContentLoaded", () => {
+  showActiveTheme(getPreferredTheme());
+
+  document.querySelectorAll("[data-bs-theme-value]").forEach((toggle) => {
+   toggle.addEventListener("click", () => {
+    const theme = toggle.getAttribute("data-bs-theme-value");
+    localStorage.setItem("theme", theme);
+    setTheme(theme);
+    showActiveTheme(theme);
+   });
+  });
+ });
+})();
