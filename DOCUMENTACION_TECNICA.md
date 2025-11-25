@@ -1116,9 +1116,6 @@ gunicorn asopadel_barinas.wsgi:application --bind 0.0.0.0:8000
 # Construir y levantar
 docker compose up --build
 
-# Crear superusuario
-docker compose exec web python manage.py createsuperuser
-
 # Ver logs
 docker compose logs -f web
 
@@ -1127,6 +1124,113 @@ docker compose down
 
 # Detener y eliminar volúmenes
 docker compose down -v
+```
+
+### Crear Superusuario en Docker
+
+Una vez que los contenedores están corriendo, necesitas crear un superusuario para acceder al panel de administración y gestionar otros administradores.
+
+#### Paso 1: Verificar que los contenedores estén corriendo
+
+```bash
+docker compose ps
+```
+
+Deberías ver algo como:
+
+```
+NAME                    STATUS
+asopadel-web-1         Up
+asopadel-db-1          Up
+```
+
+#### Paso 2: Ejecutar el comando createsuperuser
+
+Abre una **nueva terminal** (sin detener los contenedores) y ejecuta:
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+#### Paso 3: Completar la información solicitada
+
+El sistema te pedirá los siguientes datos:
+
+| Campo | Descripción | Ejemplo |
+|-------|-------------|---------|
+| **Cédula** | Número de identificación único (será tu username) | `12345678` |
+| **Email** | Correo electrónico | `admin@asopadel.com` |
+| **Nombre** | Primer nombre | `Juan` |
+| **Apellido** | Apellido | `Administrador` |
+| **Password** | Contraseña (mínimo 8 caracteres, no se muestra) | `********` |
+| **Password (again)** | Confirmación de contraseña | `********` |
+
+#### Ejemplo Completo de Sesión
+
+```bash
+$ docker compose exec web python manage.py createsuperuser
+
+Cédula: 12345678
+Email: admin@asopadel.com
+Nombre: Juan
+Apellido: Administrador
+Password: 
+Password (again): 
+Superuser created successfully.
+```
+
+#### Paso 4: Iniciar Sesión
+
+1. Abre tu navegador en [http://localhost:8000](http://localhost:8000)
+2. Click en "Iniciar Sesión"
+3. Ingresa:
+   - **Cédula:** `12345678`
+   - **Contraseña:** La que configuraste
+4. Serás redirigido al panel de administrador
+
+#### Características del Superusuario
+
+El superusuario creado tendrá:
+
+- ✅ `is_superuser = True` - Acceso completo al sistema
+- ✅ `is_staff = True` - Acceso al Django Admin
+- ✅ `es_admin_aso = True` - Rol de administrador de la asociación
+- ✅ **Acceso al panel de gestión de administradores** en `/users/admin-management/`
+- ✅ Capacidad de promover/degradar otros administradores
+
+#### Notas Importantes
+
+> ⚠️ **Seguridad:** El superusuario tiene acceso total al sistema. Guarda las credenciales de forma segura.
+
+> 💡 **Diferencia con Admin Regular:** Solo los superusuarios pueden crear y gestionar otros administradores. Los administradores regulares (creados desde el panel web) NO tienen este privilegio.
+
+> 🔄 **Múltiples Superusuarios:** Puedes crear varios superusuarios ejecutando el comando múltiples veces con diferentes cédulas.
+
+#### Solución de Problemas
+
+**Error: "No such service: web"**
+
+```bash
+# Verifica que los contenedores estén corriendo
+docker compose ps
+
+# Si no están corriendo, inícielos primero
+docker compose up -d
+```
+
+**Error: "django.db.utils.OperationalError: could not connect to server"**
+
+```bash
+# Espera unos segundos a que PostgreSQL esté listo
+# Luego intenta de nuevo
+docker compose exec web python manage.py createsuperuser
+```
+
+**Error: "UNIQUE constraint failed: users_usuario.cedula"**
+
+```bash
+# La cédula ya existe en el sistema
+# Usa una cédula diferente o elimina el usuario existente desde Django Admin
 ```
 
 ---
