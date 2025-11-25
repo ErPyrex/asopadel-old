@@ -1503,135 +1503,273 @@ coverage html
 
 ## Configuración y Despliegue
 
+Esta sección detalla los procedimientos para instalar, configurar y desplegar la aplicación en diferentes entornos (Desarrollo y Producción) y sistemas operativos (Windows y Linux).
+
+### Requisitos del Sistema
+
+| Componente | Versión Mínima | Notas |
+|------------|----------------|-------|
+| **Docker** | 20.10+ | Recomendado para desarrollo y producción |
+| **Docker Compose** | v2.0+ | Requerido para orquestación de contenedores |
+| **Python** | 3.10+ | Solo para ejecución local sin Docker |
+| **PostgreSQL** | 16+ | Base de datos principal |
+| **Git** | 2.30+ | Control de versiones |
+
+---
+
+### Guía de Instalación: Docker (Recomendado)
+
+El uso de Docker garantiza que el entorno de desarrollo sea idéntico al de producción, eliminando problemas de compatibilidad ("funciona en mi máquina").
+
+#### 1. Instalación de Docker
+
+**En Windows:**
+
+1. Descargar e instalar [Docker Desktop para Windows](https://docs.docker.com/desktop/install/windows-install/).
+2. Durante la instalación, asegurar que la opción **"Use WSL 2 instead of Hyper-V"** esté marcada (recomendado).
+3. Iniciar Docker Desktop y esperar a que el motor arranque.
+
+**En Linux (Ubuntu/Debian):**
+
+```bash
+# Eliminar versiones antiguas
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+# Configurar repositorio
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Instalar Docker Engine
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Configurar permisos (para no usar sudo)
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+#### 2. Configuración del Proyecto
+
+1. **Clonar el repositorio:**
+
+   ```bash
+   git clone https://github.com/ErPyrex/asopadel.git
+   cd asopadel
+   ```
+
+2. **Configurar variables de entorno:**
+
+   ```bash
+   # Windows
+   copy .env.example .env
+   
+   # Linux
+   cp .env.example .env
+   ```
+
+3. **Generar SECRET_KEY segura:**
+
+   ```bash
+   # Windows/Linux
+   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+   ```
+
+   *Copiar la clave generada y pegarla en el archivo `.env` en la variable `SECRET_KEY`.*
+
+4. **Verificar configuración en `.env` para Docker:**
+   Asegurar que `DATABASE_URL` apunte al servicio `db` y no a `localhost`:
+
+   ```env
+   DATABASE_URL=postgresql://asopadel_user:postgres@db:5432/asopadel_barinas
+   ```
+
+#### 3. Ejecución
+
+1. **Construir y levantar contenedores:**
+
+   ```bash
+   docker compose up --build
+   ```
+
+2. **Crear superusuario (en otra terminal):**
+
+   ```bash
+   docker compose exec web python manage.py createsuperuser
+   ```
+
+3. **Acceder a la aplicación:**
+   - Frontend: <http://localhost:8000>
+   - Admin: <http://localhost:8000/admin>
+
+---
+
+### Guía de Instalación: Python Local
+
+Si prefiere ejecutar la aplicación directamente en el sistema operativo sin contenedores.
+
+#### 1. Preparación del Entorno
+
+**En Windows:**
+
+1. Instalar Python 3.10+ desde [python.org](https://www.python.org/downloads/). Asegurar marcar "Add Python to PATH".
+2. Instalar PostgreSQL 16 desde [postgresql.org](https://www.postgresql.org/download/windows/).
+3. Instalar Git desde [git-scm.com](https://git-scm.com/download/win).
+
+**En Linux:**
+
+```bash
+sudo apt-get update
+sudo apt-get install python3 python3-venv python3-pip postgresql postgresql-contrib git libpq-dev
+```
+
+#### 2. Configuración de Base de Datos
+
+**En Windows (SQL Shell / pgAdmin):**
+
+```sql
+CREATE DATABASE asopadel_barinas;
+CREATE USER asopadel_user WITH PASSWORD 'postgres';
+GRANT ALL PRIVILEGES ON DATABASE asopadel_barinas TO asopadel_user;
+ALTER ROLE asopadel_user SET client_encoding TO 'utf8';
+ALTER ROLE asopadel_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE asopadel_user SET timezone TO 'America/Caracas';
+\c asopadel_barinas
+GRANT ALL ON SCHEMA public TO asopadel_user;
+```
+
+**En Linux:**
+
+```bash
+sudo -u postgres psql -c "CREATE DATABASE asopadel_barinas;"
+sudo -u postgres psql -c "CREATE USER asopadel_user WITH PASSWORD 'postgres';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE asopadel_barinas TO asopadel_user;"
+# ... (configuraciones adicionales igual que arriba)
+```
+
+#### 3. Configuración del Proyecto
+
+1. **Crear entorno virtual:**
+
+   ```bash
+   # Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   
+   # Linux
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+2. **Instalar dependencias:**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configurar variables de entorno:**
+
+   ```bash
+   # Copiar archivo ejemplo
+   cp .env.example .env
+   ```
+
+   **Importante:** Editar `.env` para usar `localhost` en lugar de `db`:
+
+   ```env
+   DATABASE_URL=postgresql://asopadel_user:postgres@localhost:5432/asopadel_barinas
+   ```
+
+4. **Crear directorio de logs:**
+
+   ```bash
+   # Windows
+   mkdir logs
+   
+   # Linux
+   mkdir -p logs
+   ```
+
+5. **Inicializar base de datos:**
+
+   ```bash
+   python manage.py migrate
+   ```
+
+6. **Crear superusuario:**
+
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+7. **Ejecutar servidor:**
+
+   ```bash
+   python manage.py runserver
+   ```
+
+---
+
 ### Variables de Entorno (.env)
 
-```env
-# Seguridad
-SECRET_KEY=tu-clave-secreta-aqui
-DEBUG=True
+El archivo `.env` es crítico para la configuración y seguridad. **Nunca debe subirse al control de versiones.**
 
-# Base de Datos (desarrollo)
-DATABASE_URL=sqlite:///db.sqlite3
+| Variable | Descripción | Ejemplo Desarrollo | Ejemplo Producción |
+|----------|-------------|--------------------|-------------------|
+| `SECRET_KEY` | Llave criptográfica de Django | `django-insecure...` | `k3n$7...` (Aleatoria y larga) |
+| `DEBUG` | Modo de depuración | `True` | `False` |
+| `ALLOWED_HOSTS` | Hosts permitidos | `localhost,127.0.0.1` | `asopadel.com,www.asopadel.com` |
+| `DATABASE_URL` | Conexión a BD | `postgres://user:pass@db:5432/db` | `postgres://user:pass@prod-db:5432/db` |
+| `POSTGRES_DB` | Nombre de la BD (Docker) | `asopadel_barinas` | `asopadel_prod` |
+| `POSTGRES_USER` | Usuario de BD (Docker) | `asopadel_user` | `admin_prod` |
+| `POSTGRES_PASSWORD` | Password de BD (Docker) | `postgres` | `Xy9#mK2$vL` |
 
-# Base de Datos (producción)
-DATABASE_URL=postgresql://usuario:password@host:puerto/nombre_db
-
-# Email (opcional)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=tu-email@gmail.com
-EMAIL_HOST_PASSWORD=tu-password
-```
+---
 
 ### Configuración de Producción
 
-#### settings.py
+Para un despliegue seguro en producción, se deben realizar los siguientes ajustes en `settings.py` (controlados vía variables de entorno):
 
-```python
-# Seguridad
-DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = ['tudominio.com', 'www.tudominio.com']
+1. **Desactivar Debug:** `DEBUG=False`
+2. **Hosts Permitidos:** `ALLOWED_HOSTS` debe contener solo el dominio real.
+3. **HTTPS:**
+    - `SECURE_SSL_REDIRECT=True`
+    - `SESSION_COOKIE_SECURE=True`
+    - `CSRF_COOKIE_SECURE=True`
+4. **Base de Datos:** Usar un servicio de PostgreSQL gestionado (ej. AWS RDS, DigitalOcean Managed DB) o un clúster robusto.
+5. **Archivos Estáticos:** Usar WhiteNoise (ya configurado) o servir vía Nginx/AWS S3.
 
-# Base de datos
-DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://user:pass@localhost/dbname',
-        conn_max_age=600
-    )
-}
+#### Archivos de Docker para Producción
 
-# Archivos estáticos
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+El proyecto incluye configuración Docker lista para producción:
 
-# Media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
-```
+**Dockerfile:**
 
-### Despliegue con Docker
+- Usa imagen base ligera `python:3.10-slim`.
+- Evita archivos `.pyc` y buffering de salida.
+- Instala dependencias.
+- Expone puerto 8000.
+- Usa `entrypoint.sh` para migraciones y estáticos.
 
-#### Dockerfile
+**entrypoint.sh:**
 
-```dockerfile
-FROM python:3.10-slim
+- Ejecuta `collectstatic` automáticamente.
+- Aplica migraciones pendientes.
+- Inicia Gunicorn como servidor de aplicaciones WSGI (no `runserver`).
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-WORKDIR /app
-
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /app/
-
-EXPOSE 8000
-
-ENTRYPOINT ["/app/entrypoint.sh"]
-```
-
-#### docker-compose.yml
-
-```yaml
-services:
-  web:
-    build: .
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - db
-    environment:
-      - SECRET_KEY=django-insecure-docker-dev-key
-      - DEBUG=True
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/asopadel_barinas
-    entrypoint: /app/entrypoint.sh
-    
-  db:
-    image: postgres:16
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_DB=asopadel_barinas
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-
-volumes:
-  postgres_data:
-```
-
-#### entrypoint.sh
-
-```bash
-#!/bin/sh
-
-echo "Collecting static files..."
-python manage.py collectstatic --noinput
-
-echo "Applying database migrations..."
-python manage.py migrate
-
-echo "Starting server..."
-gunicorn asopadel_barinas.wsgi:application --bind 0.0.0.0:8000
-```
-
-### Comandos de Despliegue
+**Comandos de Despliegue:**
 
 ```bash
 # Construir y levantar
-docker compose up --build
+docker compose up --build -d
 
 # Ver logs
 docker compose logs -f web
 
-# Detener
-docker compose down
-
-# Detener y eliminar volúmenes
-docker compose down -v
+# Ejecutar tareas administrativas
+docker compose exec web python manage.py [comando]
 ```
 
 ### Crear Superusuario en Docker
