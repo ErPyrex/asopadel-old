@@ -38,7 +38,6 @@ class CustomUsuarioCreationForm(UserCreationForm):
     ROLE_CHOICES = (
         ('es_jugador', 'Jugador'),
         ('es_arbitro', 'Árbitro'),
-        ('es_admin_aso', 'Administrador'),
     )
     role = forms.ChoiceField(
         choices=ROLE_CHOICES,
@@ -60,8 +59,7 @@ class CustomUsuarioCreationForm(UserCreationForm):
             user.es_jugador = True
         elif role == 'es_arbitro':
             user.es_arbitro = True
-        elif role == 'es_admin_aso':
-            user.es_admin_aso = True
+        # Removed es_admin_aso option - admins can only be created via createsuperuser or admin panel
         if commit:
             user.save()
         return user

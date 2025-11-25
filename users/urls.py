@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import admin_management
 from django.contrib.auth.views import LogoutView
 
 
@@ -19,6 +20,11 @@ urlpatterns = [
     # URL para perfil de usuario (si la gestionas aquí, no en core)
     # Si 'perfil_usuario' es una vista en users/views.py para que un usuario vea/edite su propio perfil.
     path('perfil/', views.perfil_usuario, name='perfil'),
+    
+    # Admin Management (only for superusers)
+    path('admin-management/', admin_management.admin_management, name='admin_management'),
+    path('admin-management/promote/<int:user_id>/', admin_management.promote_to_admin, name='promote_to_admin'),
+    path('admin-management/demote/<int:user_id>/', admin_management.demote_from_admin, name='demote_from_admin'),
     
     # Eliminadas:
     # - path('panel/jugador/', views.panel_jugador, name='panel_jugador'),
