@@ -8,7 +8,8 @@ from competitions.models import Torneo, Partido
 from facilities.models import Cancha, ReservaCancha
 from users.models import Usuario
 from .forms import HeroForm, NoticiaForm, TorneoForm, CanchaForm, PartidoForm, ReservaCanchaForm
-from users.forms import CustomUsuarioCreationForm, CustomUsuarioChangeForm
+from users.forms import CustomUsuarioCreationForm
+from users.forms_admin import AdminUsuarioChangeForm  # Import admin form
 from .forms import JugadorForm, ArbitroForm
 
 # 🔐 Funciones auxiliares para verificar roles

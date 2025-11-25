@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required # Necesitamos este decorador
-from .forms import LoginCedulaForm, CustomUsuarioCreationForm, CustomUsuarioChangeForm # Importa CustomUsuarioChangeForm
+from .forms import LoginCedulaForm, CustomUsuarioCreationForm, UsuarioPerfilForm # Importa UsuarioPerfilForm
 from .models import Usuario # Importa el modelo Usuario
 
 # Vista de Login Personalizada (usando cédula)
@@ -46,14 +46,19 @@ def register_user(request):
 # NUEVA VISTA: Perfil de Usuario
 @login_required # Solo usuarios autenticados pueden ver su perfil
 def perfil_usuario(request):
+    """
+    View for users to edit their own profile.
+    Uses UsuarioPerfilForm which only allows editing safe fields.
+    Prevents privilege escalation by not exposing role or permission fields.
+    """
     usuario = request.user # El usuario actualmente logueado
     if request.method == 'POST':
-        form = CustomUsuarioChangeForm(request.POST, request.FILES, instance=usuario)
+        form = UsuarioPerfilForm(request.POST, request.FILES, instance=usuario)
         if form.is_valid():
             form.save()
             messages.success(request, 'Tu perfil ha sido actualizado exitosamente.')
             return redirect('users:perfil') # Redirige de nuevo a la página de perfil
     else:
-        form = CustomUsuarioChangeForm(instance=usuario)
+        form = UsuarioPerfilForm(instance=usuario)
     
     return render(request, 'users/perfil.html', {'form': form, 'usuario': usuario}) # Asegúrate de tener este template
