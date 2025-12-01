@@ -58,7 +58,7 @@ ROOT_URLCONF = 'asopadel_barinas.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Plantillas globales
+        'DIRS': [],  # No templates needed - using React frontend
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,7 +94,6 @@ USE_TZ = True
 
 # Archivos estáticos
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -106,10 +105,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = 'users.Usuario'
-# Redirecciones de autenticación
-LOGIN_URL = 'users:login'
-LOGIN_REDIRECT_URL = 'core:dashboard_by_role'
-LOGOUT_REDIRECT_URL = 'core:home'
 
 # ==============================================================================
 # SECURITY CONFIGURATIONS

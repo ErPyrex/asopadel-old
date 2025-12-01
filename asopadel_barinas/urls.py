@@ -7,13 +7,10 @@ urlpatterns = [
     # Panel de administración de Django
     path('admin/', admin.site.urls),
 
-    # Rutas principales del sitio
-    path('', include('core.urls')),         # Página de inicio, dashboard, home, etc.
-    path('users/', include('users.urls')),  # Login, registro, paneles por rol
-    path('api/', include('api.urls')),  # API REST endpoints
+    # API REST endpoints
+    path('api/', include('api.urls')),
 ]
 
-# Archivos estáticos y media en modo desarrollo
+# Archivos media en modo desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
