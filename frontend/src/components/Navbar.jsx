@@ -4,7 +4,7 @@ import { authService } from '../services/authService';
 export default function Navbar({ user }) {
     const handleLogout = () => {
         authService.logout();
-        window.location.href = '/login';
+        window.location.href = '/';
     };
 
     return (
@@ -16,19 +16,26 @@ export default function Navbar({ user }) {
                     </Link>
 
                     <div className="flex gap-6 items-center">
-                        <Link to="/torneos" className="hover:text-primary-200 transition">
-                            Torneos
-                        </Link>
-                        <Link to="/partidos" className="hover:text-primary-200 transition">
-                            Partidos
-                        </Link>
-                        <Link to="/canchas" className="hover:text-primary-200 transition">
-                            Canchas
-                        </Link>
-                        {user?.es_admin_aso && (
-                            <Link to="/usuarios" className="hover:text-primary-200 transition">
-                                Usuarios
-                            </Link>
+                        {user && (
+                            <>
+                                <Link to="/dashboard" className="hover:text-primary-200 transition">
+                                    Dashboard
+                                </Link>
+                                <Link to="/torneos" className="hover:text-primary-200 transition">
+                                    Torneos
+                                </Link>
+                                <Link to="/partidos" className="hover:text-primary-200 transition">
+                                    Partidos
+                                </Link>
+                                <Link to="/canchas" className="hover:text-primary-200 transition">
+                                    Canchas
+                                </Link>
+                                {user.es_admin_aso && (
+                                    <Link to="/usuarios" className="hover:text-primary-200 transition">
+                                        Usuarios
+                                    </Link>
+                                )}
+                            </>
                         )}
 
                         {user ? (
