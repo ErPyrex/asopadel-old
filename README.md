@@ -1,307 +1,123 @@
-# ASOPADEL
+# ASOPADEL - React/Vite Frontend + Django REST API
 
-Sistema de Gestión para la Asociación de Pádel de Barinas
-
----
-
-## 📋 Tabla de Contenidos
-
-- [Instalación con Docker](#-instalación-con-docker-recomendado)
-- [Instalación con Python Local](#-instalación-con-python-local)
-- [Comandos Útiles](#-comandos-útiles)
-- [Solución de Problemas](#️-solución-de-problemas)
-- [Seguridad](#-seguridad)
+Sistema de Gestión para la Asociación de Pádel de Barinas con arquitectura moderna de frontend/backend separados.
 
 ---
 
-## 🐳 Instalación con Docker (Recomendado)
+## 🏗️ Arquitectura
 
-### Requisitos
+**Frontend:** React + Vite + Tailwind CSS (Puerto 5173)  
+**Backend:** Django REST Framework + PostgreSQL (Puerto 8000)  
+**Comunicación:** API REST con autenticación JWT
 
-- Docker Desktop (Windows) o Docker Engine (Linux)
-- Git
-
-### Windows
-
-1. **Instalar Docker Desktop**
-    - Descargar de: <https://docs.docker.com/desktop/install/windows-install/>
-    - Habilitar WSL 2 durante la instalación
-
-2. **Clonar el proyecto**
-
-    ```powershell
-    git clone https://github.com/ErPyrex/asopadel.git
-    cd asopadel
-    ```
-
-3. **Configurar variables de entorno**
-
-    ```powershell
-    copy .env.example .env
-    ```
-
-    Generar SECRET_KEY:
-
-    ```powershell
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    Editar `.env` y pegar la SECRET_KEY generada.
-
-4. **Ejecutar Docker**
-
-    ```powershell
-    docker compose up --build
-    ```
-
-5. **Crear superusuario** (en otra terminal PowerShell)
-
-    ```powershell
-    docker compose exec web python manage.py createsuperuser
-    ```
-
-6. **Acceder:** <http://localhost:8000>
-
-### Linux
-
-1. **Instalar Docker**
-
-    ```bash
-    # Ubuntu/Debian
-    sudo apt-get update
-    sudo apt-get install docker.io docker-compose-plugin
-    
-    # Post-instalación (ejecutar Docker sin sudo)
-    sudo usermod -aG docker $USER
-    newgrp docker
-    ```
-
-2. **Clonar el proyecto**
-
-    ```bash
-    git clone https://github.com/ErPyrex/asopadel.git
-    cd asopadel
-    ```
-
-3. **Configurar variables de entorno**
-
-    ```bash
-    cp .env.example .env
-    ```
-
-    Generar SECRET_KEY:
-
-    ```bash
-    python3 -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    Editar `.env` y pegar la SECRET_KEY generada.
-
-4. **Ejecutar Docker**
-
-    ```bash
-    docker compose up --build
-    ```
-
-5. **Crear superusuario** (en otra terminal)
-
-    ```bash
-    docker compose exec web python manage.py createsuperuser
-    ```
-
-6. **Acceder:** <http://localhost:8000>
+```
+┌─────────────┐      HTTP/JSON      ┌──────────────┐      ┌────────────┐
+│   React     │ ◄──────────────────► │   Django     │ ◄───►│ PostgreSQL │
+│   (Vite)    │    JWT Tokens       │   REST API   │      │            │
+└─────────────┘                      └──────────────┘      └────────────┘
+  Port 5173                            Port 8000
+```
 
 ---
 
-## 💻 Instalación con Python Local
+## 🚀 Inicio Rápido
 
-### Windows
+### Opción 1: Docker (Recomendado)
 
-#### Requisitos
+```bash
+# 1. Clonar el proyecto
+git clone https://github.com/ErPyrex/asopadel.git
+cd asopadel
 
-- Python 3.10+ (desde python.org)
-- PostgreSQL 16 (desde postgresql.org)
+# 2. Configurar variables de entorno
+cp .env.example .env
+# Edita .env y agrega tu SECRET_KEY
+
+# 3. Iniciar todos los servicios
+docker compose up --build
+
+# 4. Crear superusuario (en otra terminal)
+docker compose exec backend python manage.py createsuperuser
+
+# 5. Acceder
+# Frontend: http://localhost:5173
+# Backend API: http://localhost:8000/api
+# Admin: http://localhost:8000/admin
+```
+
+### Opción 2: Desarrollo Local
+
+#### Backend (Django)
+
+```bash
+# 1. Crear entorno virtual
+python3 -m venv venv
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
+
+# 2. Instalar dependencias
+pip install -r requirements.txt
+
+# 3. Configurar .env
+cp .env.example .env
+# Edita .env: cambia @db por @localhost y agrega SECRET_KEY
+
+# 4. Configurar PostgreSQL
+sudo -u postgres psql
+```
+
+```sql
+CREATE DATABASE asopadel_barinas;
+CREATE USER asopadel_user WITH PASSWORD 'postgres';
+GRANT ALL PRIVILEGES ON DATABASE asopadel_barinas TO asopadel_user;
+\c asopadel_barinas
+GRANT ALL ON SCHEMA public TO asopadel_user;
+\q
+```
+
+```bash
+# 5. Aplicar migraciones
+python manage.py migrate
+
+# 6. Crear superusuario
+python manage.py createsuperuser
+
+# 7. Ejecutar servidor backend
+python manage.py runserver
+```
+
+#### Frontend (React/Vite)
+
+```bash
+# 1. Ir al directorio frontend
+cd frontend
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Configurar variables de entorno
+cp .env.example .env
+# El archivo ya tiene: VITE_API_URL=http://localhost:8000/api
+
+# 4. Ejecutar servidor frontend
+npm run dev
+
+# 5. Acceder: http://localhost:5173
+```
+
+---
+
+## 📋 Requisitos
+
+### Docker
+
+- Docker Engine 20.10+
+- Docker Compose v2.0+
+
+### Desarrollo Local
+
+- **Backend:** Python 3.10+, PostgreSQL 16
+- **Frontend:** Node.js 18+, npm 9+
 - Git
-
-#### Pasos
-
-1. **Clonar el proyecto**
-
-    ```powershell
-    git clone https://github.com/ErPyrex/asopadel.git
-    cd asopadel
-    ```
-
-2. **Crear entorno virtual**
-
-    ```powershell
-    python -m venv venv
-    .\venv\Scripts\activate
-    ```
-
-3. **Instalar dependencias**
-
-    ```powershell
-    pip install -r requirements.txt
-    ```
-
-4. **Configurar .env**
-
-    ```powershell
-    copy .env.example .env
-    ```
-
-    Generar SECRET_KEY:
-
-    ```powershell
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    Editar `.env`:
-    - Pegar SECRET_KEY
-    - Cambiar `@db:` por `@localhost:`
-
-5. **Configurar PostgreSQL**
-
-    Abrir SQL Shell (psql) desde el menú inicio:
-
-    ```sql
-    CREATE DATABASE asopadel_barinas;
-    CREATE USER asopadel_user WITH PASSWORD 'postgres';
-    GRANT ALL PRIVILEGES ON DATABASE asopadel_barinas TO asopadel_user;
-    ALTER ROLE asopadel_user SET client_encoding TO 'utf8';
-    ALTER ROLE asopadel_user SET default_transaction_isolation TO 'read committed';
-    ALTER ROLE asopadel_user SET timezone TO 'America/Caracas';
-    \c asopadel_barinas
-    GRANT ALL ON SCHEMA public TO asopadel_user;
-    \q
-    ```
-
-6. **Crear directorio de logs**
-
-    ```powershell
-    mkdir logs
-    ```
-
-7. **Aplicar migraciones**
-
-    ```powershell
-    python manage.py migrate
-    ```
-
-8. **Crear superusuario**
-
-    ```powershell
-    python manage.py createsuperuser
-    ```
-
-9. **Ejecutar servidor**
-
-    ```powershell
-    python manage.py runserver
-    ```
-
-10. **Acceder:** <http://localhost:8000>
-
-### Linux
-
-#### Requisitos
-
-- Python 3.10+
-- PostgreSQL 16
-- Git
-
-#### Pasos
-
-1. **Instalar dependencias del sistema**
-
-    ```bash
-    # Ubuntu/Debian
-    sudo apt-get update
-    sudo apt-get install python3 python3-venv python3-pip postgresql postgresql-contrib git
-    ```
-
-2. **Clonar el proyecto**
-
-    ```bash
-    git clone https://github.com/ErPyrex/asopadel.git
-    cd asopadel
-    ```
-
-3. **Crear entorno virtual**
-
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
-
-4. **Instalar dependencias**
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-5. **Configurar .env**
-
-    ```bash
-    cp .env.example .env
-    ```
-
-    Generar SECRET_KEY:
-
-    ```bash
-    python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
-    ```
-
-    Editar `.env`:
-    - Pegar SECRET_KEY
-    - Cambiar `@db:` por `@localhost:`
-
-6. **Configurar PostgreSQL**
-
-    ```bash
-    sudo -u postgres psql
-    ```
-
-    Dentro de psql:
-
-    ```sql
-    CREATE DATABASE asopadel_barinas;
-    CREATE USER asopadel_user WITH PASSWORD 'postgres';
-    GRANT ALL PRIVILEGES ON DATABASE asopadel_barinas TO asopadel_user;
-    ALTER ROLE asopadel_user SET client_encoding TO 'utf8';
-    ALTER ROLE asopadel_user SET default_transaction_isolation TO 'read committed';
-    ALTER ROLE asopadel_user SET timezone TO 'America/Caracas';
-    \c asopadel_barinas
-    GRANT ALL ON SCHEMA public TO asopadel_user;
-    \q
-    ```
-
-7. **Crear directorio de logs**
-
-    ```bash
-    mkdir -p logs
-    ```
-
-8. **Aplicar migraciones**
-
-    ```bash
-    python manage.py migrate
-    ```
-
-9. **Crear superusuario**
-
-    ```bash
-    python manage.py createsuperuser
-    ```
-
-10. **Ejecutar servidor**
-
-    ```bash
-    python manage.py runserver
-    ```
-
-11. **Acceder:** <http://localhost:8000>
 
 ---
 
@@ -310,50 +126,28 @@ Sistema de Gestión para la Asociación de Pádel de Barinas
 ### Docker
 
 ```bash
-# Ver logs en tiempo real
-docker compose logs -f web
+# Ver logs
+docker compose logs -f backend
+docker compose logs -f frontend
 
-# Ver estado de contenedores
-docker compose ps
+# Reiniciar servicios
+docker compose restart backend
+docker compose restart frontend
 
-# Detener contenedores
+# Detener todo
 docker compose down
 
-# Limpiar todo (⚠️ elimina datos)
+# Limpiar volúmenes (⚠️ elimina datos)
 docker compose down -v
 
 # Ejecutar comandos Django
-docker compose exec web python manage.py <comando>
+docker compose exec backend python manage.py <comando>
 
 # Acceder a PostgreSQL
 docker compose exec db psql -U asopadel_user -d asopadel_barinas
-
-# Ejecutar tests
-docker compose exec web python manage.py test users --verbosity=2
 ```
 
-### Python Local
-
-**Windows (PowerShell):**
-
-```powershell
-# Activar entorno virtual
-.\venv\Scripts\activate
-
-# Crear migraciones
-python manage.py makemigrations
-
-# Aplicar migraciones
-python manage.py migrate
-
-# Ejecutar tests
-python manage.py test users --verbosity=2
-
-# Recolectar estáticos
-python manage.py collectstatic
-```
-
-**Linux:**
+### Backend Local
 
 ```bash
 # Activar entorno virtual
@@ -366,97 +160,28 @@ python manage.py makemigrations
 python manage.py migrate
 
 # Ejecutar tests
-python manage.py test users --verbosity=2
+python manage.py test
 
-# Recolectar estáticos
-python manage.py collectstatic
+# Shell interactivo
+python manage.py shell
 ```
 
----
-
-## ⚠️ Solución de Problemas
-
-### Windows
-
-**"docker-compose: command not found"**
-
-- Usa `docker compose` (con espacio) en Docker Desktop
-
-**"python: command not found"**
-
-- Usa `py` en lugar de `python`
-- O agrega Python al PATH del sistema
-
-**"Permission denied" en PowerShell**
-
-```powershell
-Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-
-**PostgreSQL no inicia**
-
-- Verifica que el servicio esté corriendo en Servicios de Windows
-- Inicia manualmente si es necesario
-
-### Linux
-
-**"docker: permission denied"**
+### Frontend Local
 
 ```bash
-sudo usermod -aG docker $USER
-newgrp docker
-```
+cd frontend
 
-**"python: command not found"**
+# Desarrollo
+npm run dev
 
-- Usa `python3` en lugar de `python`
+# Build para producción
+npm run build
 
-**"Permission denied: logs/security.log"**
+# Preview de producción
+npm run preview
 
-```bash
-rm -f logs/security.log
-touch logs/security.log
-```
-
-**PostgreSQL no inicia**
-
-```bash
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-```
-
-### Ambos Sistemas
-
-**"password authentication failed"**
-
-Verifica que `.env` tenga credenciales consistentes:
-
-```env
-DATABASE_URL=postgresql://asopadel_user:postgres@db:5432/asopadel_barinas
-POSTGRES_USER=asopadel_user
-POSTGRES_PASSWORD=postgres
-```
-
-**Cambiar entre Docker y Local**
-
-Para Docker:
-
-```bash
-# Windows
-(Get-Content .env) -replace '@localhost:', '@db:' | Set-Content .env
-
-# Linux
-sed -i 's|@localhost:|@db:|g' .env
-```
-
-Para Local:
-
-```bash
-# Windows
-(Get-Content .env) -replace '@db:', '@localhost:' | Set-Content .env
-
-# Linux
-sed -i 's|@db:|@localhost:|g' .env
+# Linting
+npm run lint
 ```
 
 ---
@@ -465,34 +190,90 @@ sed -i 's|@db:|@localhost:|g' .env
 
 ### Características Implementadas
 
-- ✅ Variables de entorno para secretos
-- ✅ Rate limiting (5 intentos/minuto en login)
+- ✅ JWT Authentication (tokens de acceso y refresh)
+- ✅ CORS configurado para frontend
+- ✅ Rate limiting en endpoints críticos
 - ✅ Validación de archivos (5MB máx, solo imágenes)
 - ✅ Separación de privilegios
 - ✅ Headers de seguridad HTTP
-- ✅ Sesiones seguras (timeout 1 hora)
+- ✅ Sesiones seguras
 - ✅ Logging de eventos de seguridad
 
-### Importante
+### Configuración de Producción
 
-**Desarrollo:**
+**Backend (.env):**
 
-- `DEBUG=True`
-- Contraseñas simples aceptables
-- HTTP permitido
+```env
+DEBUG=False
+ALLOWED_HOSTS=tudominio.com,www.tudominio.com
+SECRET_KEY=<clave-segura-aleatoria>
+SECURE_SSL_REDIRECT=True
+```
 
-**Producción:**
+**Frontend (.env):**
 
-- `DEBUG=False` (obligatorio)
-- Contraseñas fuertes (12+ caracteres)
-- HTTPS obligatorio
-- Configurar todas las variables de seguridad
+```env
+VITE_API_URL=https://api.tudominio.com/api
+```
 
 ---
 
-## 📚 Documentación Adicional
+## 📚 Documentación
 
-- **[DOCUMENTACION_TECNICA.md](DOCUMENTACION_TECNICA.md)** - Arquitectura, modelos, seguridad y detalles técnicos completos
+- **[DOCUMENTACION_TECNICA.md](DOCUMENTACION_TECNICA.md)** - Arquitectura completa, modelos, API endpoints
+- **[FRONTEND_MIGRATION_GUIDE.md](FRONTEND_MIGRATION_GUIDE.md)** - Guía detallada de la migración a React/Vite
+- **API Docs:** <http://localhost:8000/api/> (cuando el servidor está corriendo)
+
+---
+
+## 🎨 Modificar el Diseño
+
+El frontend usa **Tailwind CSS** para estilos. Para modificar el diseño:
+
+### Cambiar Colores
+
+Edita `frontend/tailwind.config.js`:
+
+```javascript
+theme: {
+  extend: {
+    colors: {
+      primary: {
+        500: '#3b82f6',  // Tu color principal
+        600: '#2563eb',
+      },
+    },
+  },
+}
+```
+
+### Modificar Componentes
+
+Los componentes están en `frontend/src/components/`:
+
+```jsx
+// Ejemplo: frontend/src/components/Navbar.jsx
+<nav className="bg-primary-600 text-white shadow-lg">
+  {/* Cambia las clases de Tailwind directamente */}
+</nav>
+```
+
+### Crear Nuevos Componentes
+
+```bash
+# Crear nuevo componente
+touch frontend/src/components/MiComponente.jsx
+```
+
+```jsx
+export default function MiComponente() {
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      {/* Tu contenido */}
+    </div>
+  );
+}
+```
 
 ---
 
@@ -509,36 +290,48 @@ git add .
 git commit -m "feat: descripción del cambio"
 
 # 3. Ejecutar tests
-python manage.py test
+python manage.py test  # Backend
+cd frontend && npm run lint  # Frontend
 
 # 4. Push y crear Pull Request
 git push origin feature/nueva-funcionalidad
 ```
 
-### Nomenclatura
-
-**Ramas:**
-
-- `feature/nombre-del-feature`
-- `bugfix/nombre-del-bugfix`
-- `security/nombre-del-fix`
-
-**Commits:**
-
-- `feat: nueva funcionalidad`
-- `fix: corrección de bug`
-- `security: corrección de vulnerabilidad`
-- `docs: actualización de documentación`
-
 ---
 
-## 👥 Contribución
+## ⚠️ Solución de Problemas
 
-1. No trabajar directamente en `main`
-2. Seguir GitHubFlow
-3. Ejecutar tests antes de PR
-4. Usar nombres descriptivos en commits
-5. Documentar cambios significativos
+### "CORS error" en el frontend
+
+Verifica que el backend tenga configurado CORS:
+
+```python
+# settings.py
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+```
+
+### "401 Unauthorized" en requests
+
+El token JWT expiró. Cierra sesión y vuelve a iniciar sesión.
+
+### Frontend no se conecta al backend
+
+Verifica la variable de entorno:
+
+```bash
+# frontend/.env
+VITE_API_URL=http://localhost:8000/api
+```
+
+### Docker: "port already in use"
+
+```bash
+# Detener servicios que usan los puertos
+docker compose down
+# O cambiar puertos en docker-compose.yml
+```
 
 ---
 
@@ -550,4 +343,8 @@ Proyecto privado - Asociación de Pádel de Barinas
 
 ## 🆘 Soporte
 
-Para problemas o preguntas, consulta la [documentación técnica](DOCUMENTACION_TECNICA.md) o abre un issue en GitHub.
+Para problemas o preguntas:
+
+- Consulta la [documentación técnica](DOCUMENTACION_TECNICA.md)
+- Revisa la [guía de migración](FRONTEND_MIGRATION_GUIDE.md)
+- Abre un issue en GitHub
