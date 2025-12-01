@@ -211,7 +211,7 @@ class HeroViewSet(viewsets.ModelViewSet):
     """
     ViewSet for Hero model (homepage hero sections).
     """
-    queryset = Hero.objects.filter(activo=True).order_by('orden')
+    queryset = Hero.objects.filter(activo=True)
     serializer_class = HeroSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
