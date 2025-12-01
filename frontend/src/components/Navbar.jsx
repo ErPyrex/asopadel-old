@@ -19,15 +19,23 @@ export default function Navbar({ user }) {
                         <Link to="/torneos" className="hover:text-primary-200 transition">
                             Torneos
                         </Link>
+                        <Link to="/partidos" className="hover:text-primary-200 transition">
+                            Partidos
+                        </Link>
                         <Link to="/canchas" className="hover:text-primary-200 transition">
                             Canchas
                         </Link>
+                        {user?.es_admin_aso && (
+                            <Link to="/usuarios" className="hover:text-primary-200 transition">
+                                Usuarios
+                            </Link>
+                        )}
 
                         {user ? (
                             <>
-                                <Link to="/perfil" className="hover:text-primary-200 transition">
+                                <span className="text-primary-100">
                                     {user.first_name || user.cedula}
-                                </Link>
+                                </span>
                                 <button
                                     onClick={handleLogout}
                                     className="bg-white text-primary-600 px-4 py-2 rounded hover:bg-primary-50 transition"

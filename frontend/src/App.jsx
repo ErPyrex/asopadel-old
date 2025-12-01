@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Torneos from './pages/Torneos';
+import Canchas from './pages/Canchas';
+import Usuarios from './pages/Usuarios';
+import Partidos from './pages/Partidos';
 import { authService } from './services/authService';
 import './index.css';
 
@@ -49,6 +53,46 @@ function App() {
               element={
                 authService.isAuthenticated() ? (
                   <Dashboard />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/torneos"
+              element={
+                authService.isAuthenticated() ? (
+                  <Torneos />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/canchas"
+              element={
+                authService.isAuthenticated() ? (
+                  <Canchas />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/usuarios"
+              element={
+                authService.isAuthenticated() ? (
+                  <Usuarios />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/partidos"
+              element={
+                authService.isAuthenticated() ? (
+                  <Partidos />
                 ) : (
                   <Navigate to="/login" />
                 )
