@@ -10,6 +10,7 @@ urlpatterns = [
     # Rutas principales del sitio
     path('', include('core.urls')),         # Página de inicio, dashboard, home, etc.
     path('users/', include('users.urls')),  # Login, registro, paneles por rol
+    path('api/', include('api.urls')),  # API REST endpoints
 ]
 
 # Archivos estáticos y media en modo desarrollo
