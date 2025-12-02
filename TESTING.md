@@ -2,6 +2,317 @@
 
 ## 📋 Índice
 
+1. [Scripts Automatizados](#scripts-automatizados)
+2. [Testing del Backend (API)](#testing-del-backend-api)
+3. [Testing del Frontend (React)](#testing-del-frontend-react)
+4. [Testing de Integración](#testing-de-integración)
+5. [Testing con Docker](#testing-con-docker)
+6. [Testing Manual](#testing-manual)
+
+---
+
+## Scripts Automatizados
+
+### 🔧 Script Maestro: `test_all.sh`
+
+Ejecuta todos los tests del proyecto.
+
+```bash
+./scripts/test_all.sh                 # Todos los tests
+./scripts/test_all.sh --backend-only  # Solo backend
+./scripts/test_all.sh --frontend-only # Solo frontend
+./scripts/test_all.sh --api-only      # Solo API
+./scripts/test_all.sh --docker        # Incluir Docker tests
+```
+
+### Scripts Individuales
+
+**Backend:**
+
+```bash
+./scripts/test_backend.sh  # Tests Django + coverage opcional
+```
+
+**Frontend:**
+
+```bash
+./scripts/test_frontend.sh  # Tests React + coverage opcional
+```
+
+**API Integration:**
+
+```bash
+./scripts/test_api.sh  # Tests de endpoints con curl
+```
+
+**Docker:**
+
+```bash
+./scripts/test_docker.sh  # Health checks de contenedores
+```
+
+---
+
+## Testing del Backend (API)
+
+### Ejecutar Tests
+
+```bash
+# Todos los tests
+python manage.py test
+
+# Tests de una app específica
+python manage.py test api
+
+# Con verbosidad
+python manage.py test --verbosity=2
+
+# Con coverage
+coverage run --source='.' manage.py test
+coverage report
+coverage html
+```
+
+### Ejemplo de Tests para API
+
+**Crear `api/tests.py`:**
+
+```python
+from django.test import TestCase
+from rest_framework.test import APIClient
+from rest_framework import status
+from users.models import Usuario
+
+class TestAuthenticationAPI(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = Usuario.objects.create_user(
+            cedula='12345678',
+            password='testpass123',
+            email='test@example.com'
+        )
+    
+    def test_login_success(self):
+        response = self.client.post('/api/auth/login/', {
+            'cedula': '12345678',
+            'password': 'testpass123'
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('access', response.data)
+```
+
+---
+
+## Testing del Frontend (React)
+
+### Configuración
+
+```bash
+cd frontend
+npm install -D vitest @testing-library/react @testing-library/jest-dom
+```
+
+**Configurar `vite.config.js`:**
+
+```javascript
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
+})
+```
+
+### Ejecutar Tests
+
+```bash
+cd frontend
+npm run test           # Ejecutar tests
+npm run test -- --watch  # Watch mode
+npm run test -- --coverage  # Con coverage
+```
+
+---
+
+## Testing de Integración
+
+### Con curl
+
+```bash
+# Login
+curl -X POST http://localhost:8000/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"cedula":"12345678","password":"testpass"}'
+
+# Listar torneos (con token)
+TOKEN="tu_token_aqui"
+curl http://localhost:8000/api/torneos/ \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Script Automatizado
+
+El script `test_api.sh` prueba automáticamente:
+
+- ✅ API Root accesible
+- ✅ Endpoints públicos (torneos, canchas, partidos)
+- ✅ Autenticación requerida
+- ✅ Permisos de admin
+
+---
+
+## Testing con Docker
+
+### Tests en Contenedores
+
+```bash
+# Ejecutar tests del backend
+docker compose exec backend python manage.py test
+
+# Con coverage
+docker compose exec backend coverage run manage.py test
+docker compose exec backend coverage report
+```
+
+### Health Checks
+
+```bash
+# Estado de servicios
+docker compose ps
+
+# Logs
+docker compose logs backend
+docker compose logs frontend
+
+# Verificar DB
+docker compose exec db psql -U asopadel_user -d asopadel_barinas
+```
+
+---
+
+## Testing Manual
+
+### Checklist de Funcionalidades
+
+#### Autenticación
+
+- [ ] Registro como Jugador
+- [ ] Registro como Árbitro
+- [ ] Login con cédula
+- [ ] Logout
+- [ ] Token refresh automático
+
+#### Navegación
+
+- [ ] Home pública accesible
+- [ ] Dashboard solo autenticado
+- [ ] Menú móvil funciona
+- [ ] Links correctos
+
+#### Torneos
+
+- [ ] Listar torneos
+- [ ] Ver detalle
+- [ ] Crear (solo admin)
+
+#### Canchas
+
+- [ ] Listar canchas
+- [ ] Ver disponibilidad
+- [ ] Reservar (autenticado)
+
+#### Usuarios (Solo Admin)
+
+- [ ] Listar usuarios
+- [ ] Ver roles
+
+### Tests de Responsividad
+
+- [ ] Mobile (< 768px)
+- [ ] Tablet (768px - 1024px)
+- [ ] Desktop (> 1024px)
+
+---
+
+## Automatización CI/CD
+
+### GitHub Actions
+
+**`.github/workflows/test.yml`:**
+
+```yaml
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+      - run: pip install -r requirements.txt
+      - run: python manage.py test
+  
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+      - run: cd frontend && npm install
+      - run: cd frontend && npm run test
+```
+
+---
+
+## Métricas de Calidad
+
+### Coverage Mínimo Recomendado
+
+- **Backend:** 80%
+- **Frontend:** 70%
+- **Integración:** 60%
+
+---
+
+## Troubleshooting
+
+### "Permission denied" en scripts
+
+```bash
+chmod +x scripts/*.sh
+```
+
+### API no responde
+
+```bash
+# Verificar que el servidor esté corriendo
+curl http://localhost:8000/api/
+```
+
+### Frontend no carga
+
+```bash
+# Verificar puerto
+curl http://localhost:5173
+```
+
+---
+
+## Próximos Pasos
+
+1. Implementar tests unitarios para ViewSets
+2. Agregar tests de componentes React
+3. Configurar CI/CD
+4. Tests E2E con Playwright
+
+## 📋 Índice
+
 1. [Testing del Backend (API)](#testing-del-backend-api)
 2. [Testing del Frontend (React)](#testing-del-frontend-react)
 3. [Testing de Integración](#testing-de-integración)
