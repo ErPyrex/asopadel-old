@@ -106,6 +106,91 @@ npm run dev
 
 ---
 
+## 🔄 Actualizar Proyecto Existente y Ejecutar
+
+Si ya tienes el repositorio clonado y quieres actualizarlo a los últimos cambios:
+
+### Con Docker (Recomendado para Windows)
+
+```bash
+# 1. Navegar al directorio del proyecto
+cd ruta/al/proyecto/asopadel
+
+# 2. Obtener últimos cambios
+git pull origin main
+# O si trabajas en la rama de migración:
+git pull origin feature/react-vite-migration
+
+# 3. Reconstruir e iniciar servicios
+docker compose down
+docker compose up --build
+
+# 4. Si hay nuevas migraciones, aplicarlas
+docker compose exec backend python manage.py migrate
+
+# ✅ Listo! Accede a http://localhost:5173
+```
+
+### Sin Docker (Desarrollo Local)
+
+```bash
+# 1. Actualizar código
+git pull origin main
+
+# 2. Backend - Actualizar dependencias y migraciones
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver  # En terminal 1
+
+# 3. Frontend - Actualizar dependencias
+cd frontend
+npm install
+npm run dev  # En terminal 2
+
+# ✅ Listo! Accede a http://localhost:5173
+```
+
+### Notas para Colaboradores en Windows
+
+**Requisitos:**
+
+- Docker Desktop para Windows (<https://www.docker.com/products/docker-desktop/>)
+- Git para Windows (<https://git-scm.com/download/win>)
+
+**Comandos en PowerShell:**
+
+```powershell
+# Clonar (primera vez)
+git clone https://github.com/ErPyrex/asopadel.git
+cd asopadel
+
+# Copiar variables de entorno
+copy .env.example .env
+
+# Iniciar con Docker
+docker compose up --build
+
+# Crear superusuario (en otra terminal)
+docker compose exec backend python manage.py createsuperuser
+```
+
+**Flujo de trabajo diario:**
+
+```powershell
+# Al empezar
+git pull
+docker compose up
+
+# Al terminar
+git add .
+git commit -m "descripción de cambios"
+git push
+docker compose stop
+```
+
+---
+
 ## 📋 Requisitos
 
 ### Docker
