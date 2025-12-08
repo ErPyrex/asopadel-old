@@ -9,7 +9,29 @@ __pycache__/
 *.pyd
 venv/
 .env
+.env.example
+.env.backup
 
 # Docker
 Dockerfile
 docker-compose.yml
+
+# Django
+/staticfiles/
+/media/
+/logs/
+*.log
+db.sqlite3
+
+# IDEs
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# Project Specific
+backup_data.json
+users_backup.json
+users_only.json
+DOCUMENTACION_TECNICA.md
