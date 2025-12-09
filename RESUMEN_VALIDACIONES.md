@@ -33,11 +33,11 @@
 - ✅ Mayúsculas (A-Z)
 - ✅ Minúsculas (a-z)
 - ✅ Números (0-9)
-- ✅ Caracteres especiales (`@#$%^&+=!`)
+- ✅ Caracteres especiales (Cualquiera no alfanumérico)
 
 #### Validaciones Frontend (HTML5):
-- ✅ Pattern: `(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}`
-- ✅ Mensaje en globo: "Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y símbolo (@#$%^&+=!)"
+- ✅ Pattern: `(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}`
+- ✅ Mensaje en globo: "Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y algún carácter especial"
 - ✅ Placeholder: "Ej: MiClave123!"
 
 #### Ejemplos de Validación:

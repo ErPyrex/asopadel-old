@@ -245,8 +245,8 @@ class ReservaCanchaForm(forms.ModelForm):
 class ArbitroForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'pattern': '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}',
-            'title': 'Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y símbolo (@#$%^&+=!)',
+            'pattern': '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{8,}',
+            'title': 'Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y algún carácter especial',
             'placeholder': 'Ej: MiClave123!'
         }),
         label="Contraseña"
@@ -339,8 +339,8 @@ class ArbitroForm(forms.ModelForm):
 class JugadorForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'pattern': '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}',
-            'title': 'Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y símbolo (@#$%^&+=!)',
+            'pattern': '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{8,}',
+            'title': 'Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y algún carácter especial',
             'placeholder': 'Ej: MiClave123!'
         }),
         label="Contraseña"
@@ -484,8 +484,8 @@ class JugadorForm(forms.ModelForm):
             raise forms.ValidationError("La contraseña debe contener al menos un número")
         
         # Al menos un carácter especial
-        if not re.search(r'[@#$%^&+=!]', password):
-            raise forms.ValidationError("La contraseña debe contener al menos un carácter especial (@#$%^&+=!)")
+        if not re.search(r'[^a-zA-Z0-9]', password):
+            raise forms.ValidationError("La contraseña debe contener al menos un carácter especial")
         
         return password
     

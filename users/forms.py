@@ -62,8 +62,8 @@ class CustomUsuarioCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         password_attrs = {
-            'pattern': '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).{8,}',
-            'title': 'Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y símbolo (@#$%^&+=!)',
+            'pattern': '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{8,}',
+            'title': 'Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y algún carácter especial',
             'placeholder': 'Ej: MiClave123!'
         }
         # Aplicar a todos los campos de contraseña (password y confirmación)
