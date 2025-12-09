@@ -1,14 +1,15 @@
 services:
   backend:
-    build: .
+    build: ./backend
     volumes:
-      - .:/app
+      - ./backend:/app
+      - ./backend/media:/app/media
     ports:
       - "8000:8000"
     depends_on:
       - db
     env_file:
-      - .env
+      - ./backend/.env
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG:-False}
@@ -18,7 +19,7 @@ services:
       sh -c "python manage.py collectstatic --noinput &&
              python manage.py migrate &&
              gunicorn asopadel_barinas.wsgi:application --bind 0.0.0.0:8000"
-
+  
   frontend:
     build: ./frontend
     volumes:
@@ -28,6 +29,7 @@ services:
       - "5173:5173"
     environment:
       - VITE_API_URL=http://localhost:8000/api
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
 
