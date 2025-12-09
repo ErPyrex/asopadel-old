@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from . import views_api
 
 app_name = 'core'
 
@@ -9,6 +10,7 @@ urlpatterns = [
     path('', views.home, name='home'),  # ✅ vista completa con noticias, torneos, ranking y canchas
     path('torneos/', views.public_tournament_list, name='public_torneos_list'),
     path('canchas/', views.public_court_list, name='public_canchas_list'),
+    path('canchas/<int:cancha_id>/', views.public_court_detail, name='public_court_detail'),
     path('ranking/', views.public_ranking_list, name='public_ranking_list'),
 
     # 🔐 Dashboards por rol
@@ -53,4 +55,5 @@ urlpatterns = [
     path('admin-gestion/noticias/', views.admin_noticias_list, name='admin_noticias_list'),
     path('admin-gestion/noticias/crear/', views.admin_create_noticia, name='admin_create_noticia'),
 
+    path('api/get-court-availability/', views_api.get_court_availability, name='get_court_availability'),
 ]

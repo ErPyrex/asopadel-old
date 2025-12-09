@@ -49,6 +49,10 @@ def public_court_list(request):
     canchas = Cancha.objects.all()
     return render(request, 'core/torneos/public_canchas_list.html', {'canchas': canchas})
 
+def public_court_detail(request, cancha_id):
+    cancha = get_object_or_404(Cancha, id=cancha_id)
+    return render(request, 'core/canchas/detalle_cancha.html', {'cancha': cancha})
+
 def public_ranking_list(request):
     return render(request, 'core/torneos/public_ranking_list.html', {})  # Agrega datos reales cuando estén listos
 
@@ -246,8 +250,7 @@ def admin_delete_referee(request, arbitro_id):
         return redirect('core:admin_arbitros_list')
     return render(request, 'core/arbitros/confirmar_eliminar_arbitro.html', {'arbitro': arbitro})
 
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render
+
 
 @login_required
 @user_passes_test(is_arbitro)
@@ -275,7 +278,6 @@ def admin_create_match(request):
 # 🧑‍🎾 Reserva de Canchas (Jugador)
 # ====================================================================================
 @login_required
-@user_passes_test(lambda u: u.es_jugador)
 def player_reserve_court(request):
     cancha_id = request.GET.get('cancha_id')
     cancha = None
@@ -287,10 +289,11 @@ def player_reserve_court(request):
     if form.is_valid():
         reserva = form.save(commit=False)
         reserva.jugador = request.user
-        reserva.cancha = cancha  # ← asignar cancha si no viene del formulario
+        if cancha:
+            reserva.cancha = cancha
         reserva.save()
         messages.success(request, "Reserva realizada exitosamente.")
-        return redirect('users:perfil')
+        return redirect('core:dashboard_by_role')
 
     return render(request, 'core/reservas/reservar_cancha.html', {
         'form': form,

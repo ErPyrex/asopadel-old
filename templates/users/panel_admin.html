@@ -99,8 +99,11 @@
                         <div class="card-body">
                             <h5 class="card-title">Noticias y comunicados</h5>
                             <p>Publica novedades para la comunidad.</p>
-                            <a href="{% url 'core:admin_noticias_list' %}" class="btn btn-primary">Ver noticias</a>
-                            <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">Crear noticia</a>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{% url 'core:admin_noticias_list' %}" class="btn btn-primary">Ver noticias</a>
+                                <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">Crear
+                                    noticia</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -108,29 +111,40 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Gestión de árbitros</h5>
-                            <a href="{% url 'core:admin_arbitros_list' %}" class="btn btn-primary">Ver árbitros</a>
-                            <a href="{% url 'core:admin_create_arbitro' %}" class="btn btn-success">Crear árbitro</a>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{% url 'core:admin_arbitros_list' %}" class="btn btn-primary">Ver árbitros</a>
+                                <a href="{% url 'core:admin_create_arbitro' %}" class="btn btn-success">Crear
+                                    árbitro</a>
+                            </div>
                         </div>
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Gestión de torneos</h5>
-                            <a href="{% url 'core:admin_torneos_list' %}" class="btn btn-primary">Ver torneos</a>
-                            <a href="{% url 'core:admin_create_tournament' %}" class="btn btn-success">Crear torneo</a>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{% url 'core:admin_torneos_list' %}" class="btn btn-primary">Ver torneos</a>
+                                <a href="{% url 'core:admin_create_tournament' %}" class="btn btn-success">Crear
+                                    torneo</a>
+                            </div>
                         </div>
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Gestión de canchas</h5>
-                            <a href="{% url 'core:admin_canchas_list' %}" class="btn btn-primary">Ver canchas</a>
-                            <a href="{% url 'core:admin_create_court' %}" class="btn btn-success">Registrar cancha</a>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{% url 'core:admin_canchas_list' %}" class="btn btn-primary">Ver canchas</a>
+                                <a href="{% url 'core:admin_create_court' %}" class="btn btn-success">Registrar
+                                    cancha</a>
+                            </div>
                         </div>
                     </div>
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title">Gestión de jugadores</h5>
-                            <a href="{% url 'core:admin_player_list' %}" class="btn btn-primary">Ver jugadores</a>
-                            <a href="{% url 'core:admin_create_player' %}" class="btn btn-success">Crear jugador</a>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{% url 'core:admin_player_list' %}" class="btn btn-primary">Ver jugadores</a>
+                                <a href="{% url 'core:admin_create_player' %}" class="btn btn-success">Crear jugador</a>
+                            </div>
                         </div>
                     </div>
                 </div>

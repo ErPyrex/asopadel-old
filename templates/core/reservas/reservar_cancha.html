@@ -14,6 +14,14 @@
                         <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
                     </div>
                     {% endif %}
+                    <div id="availability-section" class="mb-4" style="display:none;">
+                        <h5>Disponibilidad para <span id="selected-date-display"></span></h5>
+                        <ul id="slots-list" class="list-group">
+                            <!-- Slots will be populated here -->
+                        </ul>
+                        <small class="text-muted">Horario de atención: 08:00 - 22:00</small>
+                    </div>
+
                     <form method="post">
                         {% csrf_token %}
                         {{ form.as_p }}
@@ -26,4 +34,55 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateInput = document.getElementById('id_fecha');
+    const canchaInput = document.getElementById('id_cancha');
+    const availabilitySection = document.getElementById('availability-section');
+    const slotsList = document.getElementById('slots-list');
+    const dateDisplay = document.getElementById('selected-date-display');
+
+    function fetchAvailability() {
+        const date = dateInput.value;
+        const cancha = canchaInput.value;
+
+        if (date && cancha) {
+            dateDisplay.textContent = date;
+            
+            fetch(`{% url 'core:get_court_availability' %}?date=${date}&court_id=${cancha}`)
+                .then(response => response.json())
+                .then(data => {
+                    slotsList.innerHTML = ''; // Clear previous
+                    availabilitySection.style.display = 'block';
+
+                    if (data.occupied_slots && data.occupied_slots.length > 0) {
+                        data.occupied_slots.forEach(slot => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item list-group-item-danger';
+                            li.textContent = `🚫 Ocupado: ${slot.start} - ${slot.end} (${slot.status})`;
+                            slotsList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item list-group-item-success';
+                        li.textContent = '✅ Todo el día disponible (08:00 - 22:00)';
+                        slotsList.appendChild(li);
+                    }
+                })
+                .catch(err => console.error('Error fetching availability:', err));
+        } else {
+            availabilitySection.style.display = 'none';
+        }
+    }
+
+    if (dateInput) dateInput.addEventListener('change', fetchAvailability);
+    if (canchaInput) canchaInput.addEventListener('change', fetchAvailability);
+    
+    // Initial fetch if values are present (e.g. on validation error)
+    if (dateInput.value && canchaInput.value) {
+        fetchAvailability();
+    }
+});
+</script>
 {% endblock %}

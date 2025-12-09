@@ -74,7 +74,12 @@
       <div class="col-md-4 mb-4">
         <div class="card h-100">
           <div class="card-body">
-            <h5 class="card-title">{{ cancha.nombre }}</h5>
+            <h5 class="card-title">
+              <a href="{% url 'core:public_court_detail' cancha.id %}"
+                class="text-decoration-none text-dark stretched-link">
+                {{ cancha.nombre }}
+              </a>
+            </h5>
             <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
             <p><strong>Estado:</strong>
               {% if cancha.estado == 'disponible' %}
@@ -110,7 +115,8 @@
       <div class="col-md-4 mb-4">
         <div class="card h-100">
           {% if noticia.imagen %}
-          <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
+          <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}"
+            style="height: 200px; object-fit: cover;">
           {% endif %}
           <div class="card-body">
             <h5 class="card-title">{{ noticia.titulo }}</h5>
