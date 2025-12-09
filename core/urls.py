@@ -6,7 +6,7 @@ app_name = 'core'
 
 urlpatterns = [
     # 🏠 Públicas
-    path('', views.home, name='home'),  # ✅ vista completa con hero, noticias, torneos, ranking y canchas
+    path('', views.home, name='home'),  # ✅ vista completa con noticias, torneos, ranking y canchas
     path('torneos/', views.public_tournament_list, name='public_torneos_list'),
     path('canchas/', views.public_court_list, name='public_canchas_list'),
     path('ranking/', views.public_ranking_list, name='public_ranking_list'),
@@ -49,7 +49,7 @@ urlpatterns = [
 
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
         
-    path('admin-gestion/hero/editar/', views.admin_edit_hero, name='admin_edit_hero'),
+
     path('admin-gestion/noticias/', views.admin_noticias_list, name='admin_noticias_list'),
     path('admin-gestion/noticias/crear/', views.admin_create_noticia, name='admin_create_noticia'),
 

@@ -15,7 +15,7 @@ class TipoCancha(models.Model):
 class Cancha(models.Model):
     nombre = models.CharField(max_length=100)
     ubicacion = models.CharField(max_length=200)
-    tipo = models.ForeignKey(TipoCancha, on_delete=models.SET_NULL, null=True)
+    tipo = models.ForeignKey(TipoCancha, on_delete=models.SET_NULL, null=True, blank=True)
     estado = models.CharField(max_length=50, choices=[
         ('disponible', 'Disponible'),
         ('reservada', 'Reservada'),

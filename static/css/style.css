@@ -91,6 +91,9 @@ a:hover {
     box-shadow: var(--shadow-base);
     padding: 1rem 0;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .navbar-brand {
@@ -116,30 +119,7 @@ a:hover {
     transform: translateY(-2px);
 }
 
-/* Hero Section */
-.hero-section {
-    background: var(--gradient-primary);
-    padding: 5rem 2rem;
-    text-align: center;
-    color: white;
-    border-radius: var(--border-radius-lg);
-    margin-bottom: 3rem;
-    box-shadow: var(--shadow-glow);
-    position: relative;
-    overflow: hidden;
-}
 
-.hero-section h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    color: white;
-}
-
-.hero-section p {
-    font-size: 1.25rem;
-    max-width: 650px;
-    margin: 1rem auto;
-}
 
 /* Tarjetas (Cards) - Modo Claro */
 .card {
@@ -252,7 +232,7 @@ a:hover {
 /* Sidebar */
 .sidebar-rounded {
     border-radius: var(--border-radius-lg);
-    height: 52vh;
+    height: 52.5vh;
     border: 2px solid var(--color-primary);
     overflow-y: auto;
     /*box-shadow: var(--shadow-base);*/
@@ -290,9 +270,7 @@ a:hover {
 
 /* --- Tablet (a partir de 768px) --- */
 @media (min-width: 768px) {
-    .hero-section {
-        padding: 5rem 2rem;
-    }
+
 
     .card-body {
         padding: 1.75rem;
@@ -305,23 +283,16 @@ a:hover {
 
 /* --- Desktop (a partir de 992px) --- */
 @media (min-width: 992px) {
-    .hero-section h1 {
-        font-size: 3rem;
-    }
-
-    .hero-section p {
-        font-size: 1.25rem;
-    }
-
     .nav-link {
         margin-left: 1.5rem;
     }
 
     .sidebar-rounded {
 
-        height: 52vh;
+        height: 52.5vh;
         max-height: initial;
     }
+
 }
 
 
@@ -392,6 +363,9 @@ body.dark-mode {
 .dark-mode .navbar {
     background: var(--gradient-primary) !important;
     box-shadow: 0 4px 20px rgba(23, 162, 184, 0.3) !important;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .dark-mode .nav-link,
@@ -472,11 +446,7 @@ body.dark-mode {
     /*box-shadow: 0 12px 40px rgba(237, 75, 158, 0.3) !important;*/
 }
 
-/* Hero section en modo oscuro */
-.dark-mode .hero-section {
-    background: var(--gradient-primary) !important;
-    box-shadow: 0 10px 40px rgba(23, 162, 184, 0.4) !important;
-}
+
 
 /* Personalizar botón success  */
 .btn-success {

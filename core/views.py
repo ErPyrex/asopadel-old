@@ -4,11 +4,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
-from blog.models import Hero, Noticia
+from blog.models import Noticia
 from competitions.models import Torneo, Partido
 from facilities.models import Cancha, ReservaCancha
 from users.models import Usuario
-from .forms import HeroForm, NoticiaForm, TorneoForm, CanchaForm, PartidoForm, ReservaCanchaForm
+from .forms import NoticiaForm, TorneoForm, CanchaForm, PartidoForm, ReservaCanchaForm
 from users.forms import CustomUsuarioCreationForm
 from users.forms_admin import AdminUsuarioChangeForm
 from .forms import JugadorForm, ArbitroForm
@@ -300,17 +300,7 @@ def player_reserve_court(request):
     
 # Note: admin_player_list is defined above with pagination and search
     
-# hero y noticias 
-@login_required
-@user_passes_test(is_admin)
-def admin_edit_hero(request):
-    hero = Hero.objects.filter(activo=True).first()
-    form = HeroForm(request.POST or None, request.FILES or None, instance=hero)
-    if form.is_valid():
-        form.save()
-        messages.success(request, "Hero actualizado exitosamente.")
-        return redirect('core:admin_dashboard')
-    return render(request, 'core/hero/editar_hero.html', {'form': form})
+# noticias 
 
 @login_required
 @user_passes_test(is_admin)
@@ -331,18 +321,16 @@ def admin_create_noticia(request):
     return render(request, 'core/noticias/crear_noticia.html', {'form': form})
 
 from django.shortcuts import render
-from blog.models import Hero, Noticia
+from blog.models import Noticia
 from facilities.models import Cancha
 from competitions.models import Torneo
 
 def home(request):
-    hero_activo = Hero.objects.filter(activo=True).first()
     noticias = Noticia.objects.order_by('-fecha_publicacion')[:3]  # solo las 3 más recientes
     canchas = Cancha.objects.all()
     torneos = Torneo.objects.order_by('-fecha_inicio')[:5]  # opcional si quieres mostrar torneos
 
     context = {
-        'hero_activo': hero_activo,
         'noticias': noticias,
         'canchas': canchas,
         'torneos': torneos,

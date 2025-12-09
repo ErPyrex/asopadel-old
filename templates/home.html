@@ -4,30 +4,21 @@
 {% block content %}
 <div class="container">
 
-  {% if hero_activo %}
-  <section class="hero-section text-center" style="background-image: url('{{ hero_activo.imagen.url }}');">
-    <div class="hero-content">
-      <h1>{{ hero_activo.titulo }}</h1>
-      <p class="lead">{{ hero_activo.subtitulo }}</p>
-    </div>
-  </section>
-  {% endif %}
-
   <div class="row justify-content-center mt-5">
     <div class="col-md-8">
       <div class="card text-center shadow-sm mb-5">
         <div class="card-body">
           <h3 class="card-title">Accede a tu panel</h3>
           {% if user.is_authenticated %}
-            <p>Tu sesión está activa. Accede a tu panel personalizado.</p>
-            <a href="{% url 'core:dashboard_by_role' %}" class="btn btn-primary">Ir a mi panel</a>
-            <form method="POST" action="{% url 'users:logout' %}" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger ms-2">Cerrar sesión</button>
-            </form>
+          <p>Tu sesión está activa. Accede a tu panel personalizado.</p>
+          <a href="{% url 'core:dashboard_by_role' %}" class="btn btn-primary">Ir a mi panel</a>
+          <form method="POST" action="{% url 'users:logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger ms-2">Cerrar sesión</button>
+          </form>
           {% else %}
-            <p>Inicia sesión para acceder a tu panel personalizado.</p>
-            <a href="{% url 'users:login' %}" class="btn btn-primary">Iniciar sesión</a>
+          <p>Inicia sesión para acceder a tu panel personalizado.</p>
+          <a href="{% url 'users:login' %}" class="btn btn-primary">Iniciar sesión</a>
           {% endif %}
         </div>
       </div>
@@ -39,17 +30,17 @@
       <section class="tournaments-section">
         <h3 class="text-center mb-4">Torneos Recientes</h3>
         {% if torneos %}
-          <div class="list-group">
-            {% for torneo in torneos %}
-              <a href="{% url 'core:public_torneos_list' %}" class="list-group-item list-group-item-action">
-                <h5>{{ torneo.nombre }}</h5>
-                <p class="mb-1"><strong>Ubicación:</strong> {{ torneo.ubicacion }}</p>
-                <small>Fecha de inicio: {{ torneo.fecha_inicio }}</small>
-              </a>
-            {% endfor %}
-          </div>
+        <div class="list-group">
+          {% for torneo in torneos %}
+          <a href="{% url 'core:public_torneos_list' %}" class="list-group-item list-group-item-action">
+            <h5>{{ torneo.nombre }}</h5>
+            <p class="mb-1"><strong>Ubicación:</strong> {{ torneo.ubicacion }}</p>
+            <small>Fecha de inicio: {{ torneo.fecha_inicio }}</small>
+          </a>
+          {% endfor %}
+        </div>
         {% else %}
-          <p class="text-center">No hay torneos registrados aún.</p>
+        <p class="text-center">No hay torneos registrados aún.</p>
         {% endif %}
       </section>
     </div>
@@ -58,19 +49,19 @@
       <section class="ranking-section">
         <h3 class="text-center mb-4">Top 10 del Ranking</h3>
         {% if ranking %}
-          <ul class="list-group">
-            {% for jugador in ranking %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                {{ jugador.nombre }}
-                <span class="badge bg-primary rounded-pill">{{ jugador.puntos }} pts</span>
-              </li>
-            {% endfor %}
-          </ul>
-          <div class="text-center mt-3">
-            <a href="{% url 'core:public_ranking_list' %}" class="btn btn-secondary">Ver Ranking Completo</a>
-          </div>
+        <ul class="list-group">
+          {% for jugador in ranking %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ jugador.nombre }}
+            <span class="badge bg-primary rounded-pill">{{ jugador.puntos }} pts</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="text-center mt-3">
+          <a href="{% url 'core:public_ranking_list' %}" class="btn btn-secondary">Ver Ranking Completo</a>
+        </div>
         {% else %}
-          <p class="text-center">No hay jugadores en el ranking aún.</p>
+        <p class="text-center">No hay jugadores en el ranking aún.</p>
         {% endif %}
       </section>
     </div>
@@ -80,32 +71,31 @@
     <h3 class="text-center mb-4">Actualidad de las Canchas</h3>
     <div class="row">
       {% for cancha in canchas %}
-        <div class="col-md-4 mb-4">
-          <div class="card h-100">
-            <div class="card-body">
-              <h5 class="card-title">{{ cancha.nombre }}</h5>
-              <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
-              <p><strong>Tipo:</strong> {{ cancha.tipo }}</p>
-              <p><strong>Estado:</strong>
-                {% if cancha.estado == 'disponible' %}
-                  <span class="badge bg-success">Disponible</span>
-                {% elif cancha.estado == 'reservada' %}
-                  <span class="badge bg-danger">Ocupada</span>
-                {% else %}
-                  <span class="badge bg-warning text-dark">Mantenimiento</span>
-                {% endif %}
-              </p>
-              {% if user.is_authenticated and user.es_jugador and cancha.estado == 'disponible' %}
-                <form method="get" action="{% url 'core:player_reserve_court' %}">
-                  <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
-                  <button type="submit" class="btn btn-primary">Reservar</button>
-                </form>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ cancha.nombre }}</h5>
+            <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
+            <p><strong>Estado:</strong>
+              {% if cancha.estado == 'disponible' %}
+              <span class="badge bg-success">Disponible</span>
+              {% elif cancha.estado == 'reservada' %}
+              <span class="badge bg-danger">Ocupada</span>
+              {% else %}
+              <span class="badge bg-warning text-dark">Mantenimiento</span>
               {% endif %}
-            </div>
+            </p>
+            {% if user.is_authenticated and user.es_jugador and cancha.estado == 'disponible' %}
+            <form method="get" action="{% url 'core:player_reserve_court' %}">
+              <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
+              <button type="submit" class="btn btn-primary">Reservar</button>
+            </form>
+            {% endif %}
           </div>
         </div>
+      </div>
       {% empty %}
-        <p class="text-center">No hay canchas disponibles.</p>
+      <p class="text-center">No hay canchas disponibles.</p>
       {% endfor %}
     </div>
     <div class="text-center mt-3">
@@ -117,20 +107,20 @@
     <h3 class="text-center mb-4">Noticias Recientes</h3>
     <div class="row">
       {% for noticia in noticias %}
-        <div class="col-md-4 mb-4">
-          <div class="card h-100">
-            {% if noticia.imagen %}
-              <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
-            {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ noticia.titulo }}</h5>
-              <p class="card-text">{{ noticia.cuerpo|truncatewords:20 }}</p>
-              <small class="text-muted">Publicado el {{ noticia.fecha_publicacion }}</small>
-            </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          {% if noticia.imagen %}
+          <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ noticia.titulo }}</h5>
+            <p class="card-text">{{ noticia.cuerpo|truncatewords:20 }}</p>
+            <small class="text-muted">Publicado el {{ noticia.fecha_publicacion }}</small>
           </div>
         </div>
+      </div>
       {% empty %}
-        <p class="text-center">No hay noticias publicadas aún.</p>
+      <p class="text-center">No hay noticias publicadas aún.</p>
       {% endfor %}
     </div>
   </section>
