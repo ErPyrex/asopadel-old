@@ -26,7 +26,8 @@ class RegistrationViewTestCase(TestCase):
             'last_name': 'Jugador',
             'password1': 'complexpass123',
             'password2': 'complexpass123',
-            'role': 'es_jugador'
+            'role': 'es_jugador',
+            'telefono': '04141234567'
         })
         self.assertEqual(response.status_code, 302)  # Redirect after success
         self.assertTrue(Usuario.objects.filter(cedula='12345678').exists())
@@ -43,7 +44,8 @@ class RegistrationViewTestCase(TestCase):
             'last_name': 'Árbitro',
             'password1': 'complexpass123',
             'password2': 'complexpass123',
-            'role': 'es_arbitro'
+            'role': 'es_arbitro',
+            'telefono': '04127654321'
         })
         self.assertEqual(response.status_code, 302)
         user = Usuario.objects.get(cedula='87654321')
@@ -60,7 +62,8 @@ class RegistrationViewTestCase(TestCase):
             'last_name': 'Admin',
             'password1': 'complexpass123',
             'password2': 'complexpass123',
-            'role': 'es_admin_aso'  # This should not be a valid choice
+            'role': 'es_admin_aso',  # This should not be a valid choice
+            'telefono': '04169876543'
         })
         # Form should be invalid
         self.assertEqual(response.status_code, 200)  # Stays on same page

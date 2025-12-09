@@ -118,6 +118,27 @@
                 </div>
               </div>
             </div>
+            
+            <div class="row g-3 mb-4">
+              <div class="col-12 col-md-6">
+                <label for="{{ form.telefono.id_for_label }}" class="form-label fw-bold">
+                  Teléfono <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                  <input type="text"
+                         name="{{ form.telefono.name }}"
+                         id="{{ form.telefono.id_for_label }}"
+                         class="form-control {% if form.telefono.errors %}is-invalid{% endif %}"
+                         placeholder="Ej: 04141234567"
+                         value="{{ form.telefono.value|default:'' }}"
+                         required>
+                  {% if form.telefono.errors %}
+                    <div class="invalid-feedback">{{ form.telefono.errors.0 }}</div>
+                  {% endif %}
+                </div>
+                <small class="form-text text-muted">Ej: 04141234567</small>
+              </div>
 
             <!-- Contraseña -->
             <div class="row g-3 mb-4">

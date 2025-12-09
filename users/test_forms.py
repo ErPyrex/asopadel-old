@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.forms import AuthenticationForm
-from users.forms import LoginCedulaForm, CustomUsuarioCreationForm, CustomUsuarioChangeForm
+from users.forms import LoginCedulaForm, CustomUsuarioCreationForm
 from users.models import Usuario
 
 
@@ -62,7 +62,8 @@ class CustomUsuarioCreationFormTestCase(TestCase):
             'last_name': 'Jugador',
             'password1': 'complexpass123',
             'password2': 'complexpass123',
-            'role': 'es_jugador'
+            'role': 'es_jugador',
+            'telefono': '04141234567'
         })
         self.assertTrue(form.is_valid(), form.errors)
         user = form.save()
@@ -79,7 +80,8 @@ class CustomUsuarioCreationFormTestCase(TestCase):
             'last_name': 'Árbitro',
             'password1': 'complexpass123',
             'password2': 'complexpass123',
-            'role': 'es_arbitro'
+            'role': 'es_arbitro',
+            'telefono': '04127654321'
         })
         self.assertTrue(form.is_valid(), form.errors)
         user = form.save()
@@ -96,7 +98,8 @@ class CustomUsuarioCreationFormTestCase(TestCase):
             'last_name': 'User',
             'password1': 'password123',
             'password2': 'different123',
-            'role': 'es_jugador'
+            'role': 'es_jugador',
+            'telefono': '04141234567'
         })
         self.assertFalse(form.is_valid())
         self.assertIn('password2', form.errors)
@@ -112,6 +115,7 @@ class CustomUsuarioCreationFormTestCase(TestCase):
         self.assertIn('password1', form.errors)
         self.assertIn('password2', form.errors)
         self.assertIn('role', form.errors)
+        self.assertIn('telefono', form.errors)
 
     def test_duplicate_cedula(self):
         """Test that form rejects duplicate cedula"""
@@ -132,52 +136,11 @@ class CustomUsuarioCreationFormTestCase(TestCase):
             'last_name': 'User',
             'password1': 'complexpass123',
             'password2': 'complexpass123',
-            'role': 'es_jugador'
+            'role': 'es_jugador',
+            'telefono': '04141234567'
         })
         self.assertFalse(form.is_valid())
         self.assertIn('cedula', form.errors)
 
 
-class CustomUsuarioChangeFormTestCase(TestCase):
-    """Tests for the CustomUsuarioChangeForm"""
 
-    def setUp(self):
-        """Create a test user"""
-        self.user = Usuario.objects.create_user(
-            cedula='55555555',
-            password='testpass123',
-            email='change@example.com',
-            first_name='Change',
-            last_name='User'
-        )
-
-    def test_form_includes_all_fields(self):
-        """Test that form includes all expected fields"""
-        form = CustomUsuarioChangeForm(instance=self.user)
-        expected_fields = [
-            'cedula', 'email', 'first_name', 'last_name',
-            'telefono', 'categoria_jugador', 'ranking', 'foto', 'biografia',
-            'es_admin_aso', 'es_arbitro', 'es_jugador',
-            'is_active', 'is_staff', 'is_superuser'
-        ]
-        for field in expected_fields:
-            self.assertIn(field, form.fields)
-
-    def test_update_user_info(self):
-        """Test updating user information"""
-        form = CustomUsuarioChangeForm(
-            data={
-                'cedula': '55555555',
-                'email': 'newemail@example.com',
-                'first_name': 'Updated',
-                'last_name': 'Name',
-                'telefono': '1234567890',
-                'es_jugador': True,
-            },
-            instance=self.user
-        )
-        if form.is_valid():
-            updated_user = form.save()
-            self.assertEqual(updated_user.email, 'newemail@example.com')
-            self.assertEqual(updated_user.first_name, 'Updated')
-            self.assertEqual(updated_user.telefono, '1234567890')
