@@ -101,7 +101,7 @@ class TorneoForm(forms.ModelForm):
 class CanchaForm(forms.ModelForm):
     class Meta:
         model = Cancha
-        fields = ['nombre', 'ubicacion', 'estado', 'imagen']
+        fields = ['nombre', 'ubicacion', 'estado', 'precio_hora', 'horario_apertura', 'horario_cierre', 'descripcion', 'imagen']
         widgets = {
             'nombre': forms.TextInput(attrs={
                 'pattern': '.{3,50}',
@@ -203,7 +203,7 @@ class PartidoForm(forms.ModelForm):
 class ReservaCanchaForm(forms.ModelForm):
     class Meta:
         model = ReservaCancha
-        fields = ['cancha', 'fecha', 'hora_inicio', 'hora_fin', 'jugador']
+        fields = ['cancha', 'fecha', 'hora_inicio', 'hora_fin']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date'}),
             'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
@@ -212,7 +212,6 @@ class ReservaCanchaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['jugador'].queryset = Usuario.objects.filter(es_jugador=True) # Solo jugadores pueden reservar
 
         # Validación HTML5: Bloquear fechas pasadas
         today_str = timezone.now().date().isoformat()
@@ -232,11 +231,55 @@ class ReservaCanchaForm(forms.ModelForm):
         cleaned_data = super().clean()
         hora_inicio = cleaned_data.get('hora_inicio')
         hora_fin = cleaned_data.get('hora_fin')
+        fecha = cleaned_data.get('fecha')
+        cancha = cleaned_data.get('cancha')
         
-        if hora_inicio and hora_fin and hora_fin <= hora_inicio:
-            raise forms.ValidationError({
-                'hora_fin': "La hora de fin debe ser posterior a la hora de inicio"
-            })
+        # Validación de horario de operación (08:00 - 22:00)
+        from datetime import time, datetime, timedelta
+        hora_apertura = time(8, 0)
+        hora_cierre = time(22, 0)
+        
+        if hora_inicio:
+            if hora_inicio < hora_apertura or hora_inicio > hora_cierre:
+                self.add_error('hora_inicio', "Las reservas deben ser entre 8:00 AM y 10:00 PM")
+                
+        if hora_fin:
+            if hora_fin < hora_apertura or hora_fin > hora_cierre:
+                self.add_error('hora_fin', "Las reservas deben ser entre 8:00 AM y 10:00 PM")
+
+        if hora_inicio and hora_fin:
+            # Hora fin debe ser posterior
+            if hora_fin <= hora_inicio:
+                self.add_error('hora_fin', "La hora de fin debe ser posterior a la hora de inicio")
+            
+            # Duración mínima y máxima
+            # Convertir a datetime dummy para calcular diferencia
+            dummy_date = datetime.now().date()
+            dt_inicio = datetime.combine(dummy_date, hora_inicio)
+            dt_fin = datetime.combine(dummy_date, hora_fin)
+            duracion_horas = (dt_fin - dt_inicio).total_seconds() / 3600
+            
+            if duracion_horas < 1:
+                raise forms.ValidationError("La duración mínima de reserva es de 1 hora")
+            if duracion_horas > 4:
+                raise forms.ValidationError("La duración máxima de reserva es de 4 horas")
+
+        # Validación de Conflictos
+        if cancha and fecha and hora_inicio and hora_fin:
+            # Buscar reservas existentes que se solapen
+            # Solapamiento: (StartA < EndB) and (EndA > StartB)
+            conflictos = ReservaCancha.objects.filter(
+                cancha=cancha,
+                fecha=fecha,
+                estado__in=['pendiente', 'confirmada']
+            ).exclude(pk=self.instance.pk if self.instance else None)
+            
+            for reserva in conflictos:
+                if hora_inicio < reserva.hora_fin and hora_fin > reserva.hora_inicio:
+                    raise forms.ValidationError(
+                        f"Ya existe una reserva en ese horario ({reserva.hora_inicio.strftime('%H:%M')} - {reserva.hora_fin.strftime('%H:%M')})"
+                    )
+
         return cleaned_data
         
         
@@ -284,6 +327,18 @@ class ArbitroForm(forms.ModelForm):
     def clean_cedula(self):
         cedula = self.cleaned_data.get('cedula')
         
+        # Solo números
+        if not cedula.isdigit():
+            raise forms.ValidationError("La cédula solo debe contener números")
+        
+        # Longitud válida
+        if len(cedula) < 7 or len(cedula) > 10:
+            raise forms.ValidationError("La cédula debe tener entre 7 y 10 dígitos")
+        
+        # No puede comenzar con 0
+        if cedula.startswith('0'):
+            raise forms.ValidationError("La cédula no puede comenzar con 0")
+        
         # Verificar que no exista (excluyendo la instancia actual si estamos editando)
         query = Usuario.objects.filter(cedula=cedula)
         if self.instance and self.instance.pk:
@@ -293,39 +348,56 @@ class ArbitroForm(forms.ModelForm):
         
         return cedula
 
-    def clean_email(self):
-        email = self.cleaned_data.get('email').lower()
-        
-        # Verificar que no exista (excluyendo la instancia actual si estamos editando)
-        query = Usuario.objects.filter(email=email)
-        if self.instance and self.instance.pk:
-            query = query.exclude(pk=self.instance.pk)
-        if query.exists():
-            raise forms.ValidationError("Este email ya está registrado")
-        
-        # Dominios no permitidos (emails temporales)
-        dominios_bloqueados = [
-            'tempmail.com', 'guerrillamail.com', '10minutemail.com',
-            'throwaway.email', 'mailinator.com', 'maildrop.cc',
-            'temp-mail.org', 'getnada.com', 'trashmail.com'
-        ]
-        dominio = email.split('@')[1]
-        if dominio in dominios_bloqueados:
-            raise forms.ValidationError("No se permiten emails temporales o desechables")
-        
-        return email
-
     def clean_first_name(self):
         nombre = self.cleaned_data.get('first_name').strip()
+        
+        # Solo letras y espacios
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', nombre):
+            raise forms.ValidationError("El nombre solo debe contener letras")
+        
+        # Longitud mínima
+        if len(nombre) < 2:
+            raise forms.ValidationError("El nombre debe tener al menos 2 caracteres")
+        
         # Capitalizar primera letra
         return nombre.title()
 
     def clean_last_name(self):
         apellido = self.cleaned_data.get('last_name').strip()
+        
+        # Solo letras y espacios
+        if not re.match(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$', apellido):
+            raise forms.ValidationError("El apellido solo debe contener letras")
+        
+        # Longitud mínima
+        if len(apellido) < 2:
+            raise forms.ValidationError("El apellido debe tener al menos 2 caracteres")
+        
         return apellido.title()
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
+        
+        # Longitud mínima
+        if len(password) < 8:
+            raise forms.ValidationError("La contraseña debe tener al menos 8 caracteres")
+        
+        # Al menos una mayúscula
+        if not re.search(r'[A-Z]', password):
+            raise forms.ValidationError("La contraseña debe contener al menos una letra mayúscula")
+        
+        # Al menos una minúscula
+        if not re.search(r'[a-z]', password):
+            raise forms.ValidationError("La contraseña debe contener al menos una letra minúscula")
+        
+        # Al menos un número
+        if not re.search(r'\d', password):
+            raise forms.ValidationError("La contraseña debe contener al menos un número")
+        
+        # Al menos un carácter especial
+        if not re.search(r'[@#$%^&+=!]', password):
+            raise forms.ValidationError("La contraseña debe contener al menos un carácter especial (@#$%^&+=!)")
+        
         return password
 
     def save(self, commit=True):

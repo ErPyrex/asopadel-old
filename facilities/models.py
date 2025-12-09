@@ -1,26 +1,18 @@
 from django.db import models
 from users.models import Usuario
 
-class TipoCancha(models.Model):
-    nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.nombre
-
-    class Meta:
-        verbose_name = "Tipo de Cancha"
-        verbose_name_plural = "Tipos de Cancha"
-
 class Cancha(models.Model):
     nombre = models.CharField(max_length=100)
     ubicacion = models.CharField(max_length=200)
-    tipo = models.ForeignKey(TipoCancha, on_delete=models.SET_NULL, null=True, blank=True)
     estado = models.CharField(max_length=50, choices=[
         ('disponible', 'Disponible'),
         ('reservada', 'Reservada'),
         ('mantenimiento', 'Mantenimiento'),
     ])
+    precio_hora = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    horario_apertura = models.TimeField(default='08:00')
+    horario_cierre = models.TimeField(default='22:00')
+    descripcion = models.TextField(blank=True, null=True)
     imagen = models.ImageField(upload_to='canchas/', blank=True, null=True)
 
     def __str__(self):
