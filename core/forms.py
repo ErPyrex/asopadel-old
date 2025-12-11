@@ -114,7 +114,81 @@ class CanchaForm(forms.ModelForm):
                 'oninput': "this.setCustomValidity('')"
             }),
             'estado': forms.Select(attrs={'class': 'form-control'}),
+            'ubicacion': forms.TextInput(attrs={
+                'pattern': '.{10,200}',
+                'minlength': '10',
+                'maxlength': '200',
+                'class': 'form-control',
+                'title': 'La ubicación debe ser más descriptiva (mínimo 10 caracteres)',
+                'placeholder': 'Ej: Av. Principal, al lado del Club...',
+                'oninvalid': "this.setCustomValidity('La ubicación debe ser más descriptiva (mínimo 10 caracteres)')",
+                'oninput': "this.setCustomValidity('')"
+            }),
+            'precio_hora': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01',
+                'title': 'Ingrese un precio válido por hora (mayor a 0)',
+                'placeholder': 'Ej: 20.00',
+                'oninvalid': "this.setCustomValidity('El precio debe ser un valor positivo')",
+                'oninput': "this.setCustomValidity('')"
+            }),
+            'horario_apertura': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'form-control',
+                'style': 'width: auto; max-width: 200px; display: inline-block;',
+                'title': 'Hora de apertura de la cancha',
+                'oninvalid': "this.setCustomValidity('Seleccione una hora de apertura válida')",
+                'oninput': "this.setCustomValidity('')"
+            }),
+            'horario_cierre': forms.TimeInput(attrs={
+                'type': 'time',
+                'class': 'form-control',
+                'style': 'width: auto; max-width: 200px; display: inline-block;',
+                'title': 'Hora de cierre de la cancha',
+                'oninvalid': "this.setCustomValidity('Seleccione una hora de cierre válida')",
+                'oninput': "this.setCustomValidity('')"
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'minlength': '10',
+                'title': 'Descripción de la cancha (mínimo 10 caracteres)',
+                'placeholder': 'Ej: Cancha techada con iluminación LED...',
+                'oninvalid': "this.setCustomValidity('La descripción es obligatoria y debe tener mínimo 10 caracteres')",
+                'oninput': "this.setCustomValidity('')"
+            }),
         }
+
+    def clean_precio_hora(self):
+        precio = self.cleaned_data.get('precio_hora')
+        if precio is not None and precio < 0:
+            raise forms.ValidationError("El precio no puede ser negativo")
+        return precio
+
+    def clean_descripcion(self):
+        desc = self.cleaned_data.get('descripcion')
+        if desc and len(desc.strip()) < 10:
+            raise forms.ValidationError("La descripción es muy corta (mínimo 10 caracteres)")
+        return desc
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        apertura = cleaned_data.get('horario_apertura')
+        cierre = cleaned_data.get('horario_cierre')
+        
+        if apertura and cierre and cierre <= apertura:
+            raise forms.ValidationError("La hora de cierre debe ser posterior a la de apertura")
+        return cleaned_data
+
+    def clean_ubicacion(self):
+        ubicacion = self.cleaned_data.get('ubicacion')
+        if ubicacion:
+            ubicacion = ubicacion.strip()
+            if len(ubicacion) < 10:
+                 raise forms.ValidationError("La ubicación debe ser más descriptiva (mínimo 10 caracteres)")
+        return ubicacion
+
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre').strip()
@@ -140,6 +214,8 @@ class PartidoForm(forms.ModelForm):
             'fecha': forms.DateInput(attrs={'type': 'date', 'title': 'Selecciona una fecha válida (no pasada)'}),
             'hora': forms.TimeInput(attrs={
                 'type': 'time',
+                'class': 'form-control',
+                'style': 'width: auto; max-width: 200px; display: inline-block;',
                 'min': '08:00',
                 'max': '22:00',
                 'title': 'El horario de partidos es de 8:00 AM a 10:00 PM',
@@ -205,9 +281,19 @@ class ReservaCanchaForm(forms.ModelForm):
         model = ReservaCancha
         fields = ['cancha', 'fecha', 'hora_inicio', 'hora_fin']
         widgets = {
-            'fecha': forms.DateInput(attrs={'type': 'date'}),
-            'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
-            'hora_fin': forms.TimeInput(attrs={'type': 'time'}),
+            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'title': 'Selecciona la fecha de reserva'}),
+            'hora_inicio': forms.TimeInput(attrs={
+                'type': 'time', 
+                'class': 'form-control',
+                'style': 'width: auto; max-width: 200px; display: inline-block;',
+                'title': 'Hora de inicio de la reserva'
+            }),
+            'hora_fin': forms.TimeInput(attrs={
+                'type': 'time', 
+                'class': 'form-control',
+                'style': 'width: auto; max-width: 200px; display: inline-block;',
+                'title': 'Hora de fin de la reserva'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -227,60 +313,60 @@ class ReservaCanchaForm(forms.ModelForm):
             raise forms.ValidationError("La fecha de reserva no puede estar en el pasado")
         return fecha
 
+    def clean_hora_inicio(self):
+        hora_inicio = self.cleaned_data.get('hora_inicio')
+        if not hora_inicio:
+            return hora_inicio
+            
+        import datetime
+        limit_start = datetime.time(8, 0)
+        limit_end = datetime.time(22, 0)
+        
+        if hora_inicio < limit_start or hora_inicio > limit_end:
+            raise forms.ValidationError("Las reservas deben ser entre 8:00 AM y 10:00 PM")
+        return hora_inicio
+
     def clean(self):
         cleaned_data = super().clean()
         hora_inicio = cleaned_data.get('hora_inicio')
         hora_fin = cleaned_data.get('hora_fin')
-        fecha = cleaned_data.get('fecha')
         cancha = cleaned_data.get('cancha')
+        fecha = cleaned_data.get('fecha')
         
-        # Validación de horario de operación (08:00 - 22:00)
-        from datetime import time, datetime, timedelta
-        hora_apertura = time(8, 0)
-        hora_cierre = time(22, 0)
-        
-        if hora_inicio:
-            if hora_inicio < hora_apertura or hora_inicio > hora_cierre:
-                self.add_error('hora_inicio', "Las reservas deben ser entre 8:00 AM y 10:00 PM")
-                
-        if hora_fin:
-            if hora_fin < hora_apertura or hora_fin > hora_cierre:
-                self.add_error('hora_fin', "Las reservas deben ser entre 8:00 AM y 10:00 PM")
-
         if hora_inicio and hora_fin:
-            # Hora fin debe ser posterior
             if hora_fin <= hora_inicio:
-                self.add_error('hora_fin', "La hora de fin debe ser posterior a la hora de inicio")
+                raise forms.ValidationError("La hora de fin debe ser posterior a la de inicio")
+                
+            # Duración
+            import datetime
+            dummy_date = datetime.date.today()
+            dt_inicio = datetime.datetime.combine(dummy_date, hora_inicio)
+            dt_fin = datetime.datetime.combine(dummy_date, hora_fin)
+            duracion = (dt_fin - dt_inicio).total_seconds() / 3600
             
-            # Duración mínima y máxima
-            # Convertir a datetime dummy para calcular diferencia
-            dummy_date = datetime.now().date()
-            dt_inicio = datetime.combine(dummy_date, hora_inicio)
-            dt_fin = datetime.combine(dummy_date, hora_fin)
-            duracion_horas = (dt_fin - dt_inicio).total_seconds() / 3600
-            
-            if duracion_horas < 1:
-                raise forms.ValidationError("La duración mínima de reserva es de 1 hora")
-            if duracion_horas > 4:
-                raise forms.ValidationError("La duración máxima de reserva es de 4 horas")
-
-        # Validación de Conflictos
-        if cancha and fecha and hora_inicio and hora_fin:
-            # Buscar reservas existentes que se solapen
-            # Solapamiento: (StartA < EndB) and (EndA > StartB)
-            conflictos = ReservaCancha.objects.filter(
-                cancha=cancha,
-                fecha=fecha,
-                estado__in=['pendiente', 'confirmada']
-            ).exclude(pk=self.instance.pk if self.instance else None)
-            
-            for reserva in conflictos:
-                if hora_inicio < reserva.hora_fin and hora_fin > reserva.hora_inicio:
-                    raise forms.ValidationError(
-                        f"Ya existe una reserva en ese horario ({reserva.hora_inicio.strftime('%H:%M')} - {reserva.hora_fin.strftime('%H:%M')})"
-                    )
-
+            if duracion < 1:
+                raise forms.ValidationError("La reserva debe ser de al menos 1 hora")
+            if duracion > 4:
+                raise forms.ValidationError("La reserva no puede exceder las 4 horas")
+                
+            # Conflictos de Solapamiento
+            if cancha and fecha:
+                reservas = ReservaCancha.objects.filter(
+                    cancha=cancha, 
+                    fecha=fecha
+                ).exclude(estado='cancelada')
+                
+                if self.instance and self.instance.pk:
+                    reservas = reservas.exclude(pk=self.instance.pk)
+                    
+                for r in reservas:
+                    # Lógica de solapamiento: (StartA < EndB) and (EndA > StartB)
+                    if hora_inicio < r.hora_fin and hora_fin > r.hora_inicio:
+                         raise forms.ValidationError(f"Conflicto: Ya existe una reserva de {r.hora_inicio} a {r.hora_fin}")
+        
         return cleaned_data
+
+
         
         
 # core/forms.py  crear formularios de registro para árbitros y jugadores

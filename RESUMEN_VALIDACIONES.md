@@ -33,11 +33,11 @@
 - ✅ Mayúsculas (A-Z)
 - ✅ Minúsculas (a-z)
 - ✅ Números (0-9)
-- ✅ Caracteres especiales (Cualquiera no alfanumérico)
+- ✅ Caracteres especiales (`@#$%^&+=!`)
 
 #### Validaciones Frontend (HTML5):
-- ✅ Pattern: `(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}`
-- ✅ Mensaje en globo: "Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y algún carácter especial"
+- ✅ Pattern: `(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,}`
+- ✅ Mensaje en globo: "Mínimo 8 caracteres, debe incluir: mayúscula, minúscula, número y símbolo (@#$%^&+=!)"
 - ✅ Placeholder: "Ej: MiClave123!"
 
 #### Ejemplos de Validación:
@@ -241,6 +241,47 @@
 - ✅ Longitud mínima: 3
 - ✅ Unicidad: No duplicados (case insensitive)
 
+#### ✅ ubicación (Cancha) - COMPLETADO
+
+**Fecha:** 2025-12-10
+
+#### Validaciones Frontend (HTML5):
+- ✅ MinLength: 10
+- ✅ Mensaje en globo: "La ubicación debe ser más descriptiva (mínimo 10 caracteres)"
+
+#### Validaciones Backend (Django):
+- ✅ Longitud mínima: 10 caracteres
+
+### ✅ otros campos (Cancha) - COMPLETADO
+
+**Fecha:** 2025-12-10
+
+#### Campos Validados:
+
+**`precio_hora`**:
+- ✅ Frontend: Type `number`, Min `0`, Step `0.01`.
+- ✅ Backend: No negativo.
+
+**`horario_apertura` / `horario_cierre`**:
+- ✅ Frontend: Type `time`.
+- ✅ Backend: Cierre > Apertura.
+
+**`descripcion`**:
+- ✅ Link: MinLength 10.
+
+---
+
+### ✅ Reservas (Completo) - COMPLETADO
+
+**Fecha:** 2025-12-10
+
+#### Validaciones Implementadas:
+- ✅ **Horario Operativo:** 8:00 AM - 10:00 PM.
+- ✅ **Lógica Temporal:** Hora Fin > Hora Inicio.
+- ✅ **Duración:** Mínimo 1 hora, Máximo 4 horas.
+- ✅ **Conflictos:** Detección de solapamiento con otras reservas.
+- ✅ **Frontend:** Selectores de hora compactos y globos de ayuda.
+
 ---
 
 ## 🎯 Próximos Pasos Sugeridos
@@ -251,4 +292,4 @@
 
 ---
 
-**Última actualización:** 2025-12-08 17:57
+**Última actualización:** 2025-12-10 18:47

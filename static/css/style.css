@@ -1,5 +1,4 @@
 :root {
-
     --color-primary: #1FC7D4;
     /* Cyan vibrante */
     --color-secondary: #7645D9;
@@ -446,11 +445,28 @@ body.dark-mode {
     /*box-shadow: 0 12px 40px rgba(237, 75, 158, 0.3) !important;*/
 }
 
-
-
 /* Personalizar botón success  */
 .btn-success {
     background-color: #21a540;
     /* o el color que prefieras */
     border-color: #17772d;
+}
+
+/* Botón Atrás personalizado */
+.btn-back-custom {
+    width: 60px;
+    height: 60px;
+    border: 2px solid black !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-back-custom:hover {
+    transform: translateY(-3px);
+}
+
+.btn-back-custom svg {
+    width: 35px;
+    height: 35px;
+    transform: scaleY(-1);
+    transform-origin: center;
 }

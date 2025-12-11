@@ -37,8 +37,12 @@
                             <td>
                                 <a href="{% url 'core:admin_edit_player' jugador.id %}"
                                     class="btn btn-warning btn-sm">Editar</a>
-                                <a href="{% url 'core:admin_delete_player' jugador.id %}"
-                                    class="btn btn-danger btn-sm">Eliminar</a>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                    data-bs-target="#deletePlayerModal"
+                                    data-player-name="{{ jugador.first_name }} {{ jugador.last_name }}"
+                                    data-delete-url="{% url 'core:admin_delete_player' jugador.id %}">
+                                    Eliminar
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
@@ -52,21 +56,50 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
-        <nav>
-            <ul class="pagination">
-                {% if jugadores.has_previous %}
-                <li class="page-item"><a class="page-link"
-                        href="?q={{ query }}&page={{ jugadores.previous_page_number }}">Anterior</a></li>
-                {% endif %}
-                <li class="page-item disabled"><a class="page-link" href="#">Página {{ jugadores.number }} de {{
-                        jugadores.paginator.num_pages }}</a></li>
-                {% if jugadores.has_next %}
-                <li class="page-item"><a class="page-link"
-                        href="?q={{ query }}&page={{ jugadores.next_page_number }}">Siguiente</a></li>
-                {% endif %}
-            </ul>
-        </nav>
+
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="deletePlayerModal" tabindex="-1" aria-labelledby="deletePlayerModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deletePlayerModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar al jugador <strong id="modalPlayerName"></strong>?</p>
+                <p class="text-muted small">Esta acción es permanente y no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deletePlayerForm" method="POST" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar Jugador</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    const deletePlayerModal = document.getElementById('deletePlayerModal')
+    if (deletePlayerModal) {
+        deletePlayerModal.addEventListener('show.bs.modal', event => {
+            // Botón que disparó el modal
+            const button = event.relatedTarget
+            // Extraer info de los atributos data-*
+            const playerName = button.getAttribute('data-player-name')
+            const deleteUrl = button.getAttribute('data-delete-url')
+
+            // Actualizar el contenido del modal
+            const modalBodyName = deletePlayerModal.querySelector('#modalPlayerName')
+            const modalForm = deletePlayerModal.querySelector('#deletePlayerForm')
+
+            modalBodyName.textContent = playerName
+            modalForm.action = deleteUrl
+        })
+    }
+</script>
 {% endblock %}
