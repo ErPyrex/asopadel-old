@@ -135,9 +135,16 @@ X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking attacks
 SECURE_CONTENT_TYPE_NOSNIFF = True  # Prevent MIME type sniffing
 SECURE_BROWSER_XSS_FILTER = True  # Enable browser XSS filter
 
+
 # ==============================================================================
 # LOGGING CONFIGURATION
 # ==============================================================================
+
+# Ensure logs directory exists
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOGS_DIR):
+    os.makedirs(LOGS_DIR)
+
 
 LOGGING = {
     'version': 1,
