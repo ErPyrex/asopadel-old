@@ -940,10 +940,10 @@ El proyecto tiene una **base sólida** (60% completado) con los fundamentos bien
 ✅ Señales para actualización post-partido
 4. Validación de Reservas de Canchas (80% implementado)
 ✅ Sistema de reservas básico funciona
-❌ Validación de conflictos de horarios (evitar reservas superpuestas)
-❌ Calendario visual de disponibilidad
-❌ Cancelación de reservas por jugador
-❌ Historial de reservas
+✅ Validación de conflictos de horarios (evitar reservas superpuestas)
+✅ Calendario visual de disponibilidad
+✅ Cancelación de reservas por jugador
+✅ Historial de reservas
 5. Gestión Completa de Partidos (Solo 25% implementado)
 ✅ Crear partido funciona
 ❌ Listar partidos
