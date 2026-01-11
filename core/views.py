@@ -1,5 +1,6 @@
 # core/views.py
 from django.shortcuts import render, redirect, get_object_or_404
+import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.urls import reverse_lazy
@@ -54,7 +55,35 @@ def public_court_detail(request, cancha_id):
     return render(request, 'core/canchas/detalle_cancha.html', {'cancha': cancha})
 
 def public_ranking_list(request):
-    return render(request, 'core/torneos/public_ranking_list.html', {})  # Agrega datos reales cuando estén listos
+    """Vista pública del ranking de jugadores"""
+    # Obtener parámetro de categoría si existe
+    categoria_filtro = request.GET.get('categoria', None)
+    
+    # Obtener todos los jugadores
+    jugadores = Usuario.objects.filter(es_jugador=True)
+    
+    # Filtrar por categoría si se especifica
+    if categoria_filtro and categoria_filtro != 'todos':
+        jugadores = jugadores.filter(categoria_jugador=categoria_filtro)
+    
+    # Ordenar por ranking descendente y limitar a top 50
+    jugadores = jugadores.order_by('-ranking')[:50]
+    
+    # Obtener categorías disponibles para el filtro
+    categorias = [
+        ('todos', 'Todas las Categorías'),
+        ('juvenil', 'Juvenil'),
+        ('adulto', 'Adulto'),
+        ('senior', 'Senior'),
+    ]
+    
+    context = {
+        'jugadores': jugadores,
+        'categorias': categorias,
+        'categoria_actual': categoria_filtro or 'todos',
+    }
+    
+    return render(request, 'core/torneos/public_ranking_list.html', context)
 
 # ====================================================================================
 # 🧑‍💼 Dashboards por rol
@@ -271,14 +300,119 @@ def admin_create_match(request):
     if form.is_valid():
         form.save()
         messages.success(request, "Partido registrado exitosamente.")
-        return redirect('core:admin_dashboard')
+        return redirect('core:admin_partidos_list')
     return render(request, 'core/partidos/crear_partido.html', {'form': form})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_match_list(request):
+    """Lista todos los partidos con filtros opcionales"""
+    partidos = Partido.objects.all().select_related('torneo', 'cancha', 'arbitro').prefetch_related('jugadores')
+    
+    # Filtros opcionales
+    torneo_id = request.GET.get('torneo')
+    estado = request.GET.get('estado')
+    
+    if torneo_id:
+        try:
+            torneo_id = int(torneo_id)
+            partidos = partidos.filter(torneo_id=torneo_id)
+        except ValueError:
+            torneo_id = None
+    
+    if estado:
+        partidos = partidos.filter(estado=estado)
+    
+    # Ordenar por fecha y hora
+    partidos = partidos.order_by('-fecha', '-hora')
+    
+    # Obtener torneos para el filtro y marcar el seleccionado
+    torneos = Torneo.objects.all()
+    torneos_list = []
+    for torneo in torneos:
+        torneos_list.append({
+            'id': torneo.id,
+            'nombre': torneo.nombre,
+            'selected': torneo_id == torneo.id if torneo_id else False
+        })
+    
+    # Estados disponibles y marcar seleccionado
+    estados_choices = Partido._meta.get_field('estado').choices
+    estados_list = []
+    for value, label in estados_choices:
+        estados_list.append({
+            'value': value,
+            'label': label,
+            'selected': estado == value if estado else False
+        })
+    
+    context = {
+        'partidos': partidos,
+        'torneos': torneos_list,
+        'estados': estados_list,
+        'torneo_filtro': torneo_id,
+        'estado_filtro': estado,
+    }
+    
+    return render(request, 'core/partidos/lista_partidos.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_match_detail(request, partido_id):
+    """Muestra los detalles de un partido específico"""
+    partido = get_object_or_404(Partido, id=partido_id)
+    
+    context = {
+        'partido': partido,
+    }
+    
+    return render(request, 'core/partidos/detalle_partido.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_edit_match(request, partido_id):
+    """Edita un partido existente"""
+    partido = get_object_or_404(Partido, id=partido_id)
+    
+    if request.method == 'POST':
+        form = PartidoForm(request.POST, instance=partido)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Partido actualizado exitosamente.")
+            return redirect('core:admin_partidos_list')
+    else:
+        form = PartidoForm(instance=partido)
+    
+    context = {
+        'form': form,
+        'partido': partido,
+    }
+    
+    return render(request, 'core/partidos/editar_partido.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_delete_match(request, partido_id):
+    """Elimina un partido con confirmación"""
+    partido = get_object_or_404(Partido, id=partido_id)
+    
+    if request.method == 'POST':
+        partido.delete()
+        messages.success(request, "Partido eliminado exitosamente.")
+        return redirect('core:admin_partidos_list')
+    
+    context = {
+        'partido': partido,
+    }
+    
+    return render(request, 'core/partidos/confirmar_eliminar_partido.html', context)
 
 # ====================================================================================
 # 🧑‍🎾 Reserva de Canchas (Jugador)
 # ====================================================================================
 @login_required
 def player_reserve_court(request):
+    """Permite al jugador reservar una cancha con validación visual"""
     cancha_id = request.GET.get('cancha_id')
     cancha = None
     if cancha_id:
@@ -289,16 +423,117 @@ def player_reserve_court(request):
     if form.is_valid():
         reserva = form.save(commit=False)
         reserva.jugador = request.user
-        if cancha:
+        # Si el form trae cancha usala, sino la del GET, sino error
+        if not reserva.cancha and cancha:
             reserva.cancha = cancha
+            
         reserva.save()
         messages.success(request, "Reserva realizada exitosamente.")
-        return redirect('core:dashboard_by_role')
+        return redirect('core:player_reservations')
 
     return render(request, 'core/reservas/reservar_cancha.html', {
         'form': form,
         'cancha': cancha
     })
+
+@login_required
+def player_reservation_list(request):
+    """Lista el historial de reservas del jugador"""
+    # Reservas futuras (pendientes o confirmadas)
+    reservas_activas = ReservaCancha.objects.filter(
+        jugador=request.user, 
+        fecha__gte=datetime.date.today()
+    ).exclude(estado='cancelada').order_by('fecha', 'hora_inicio')
+    
+    # Historial (pasadas o canceladas)
+    historial = ReservaCancha.objects.filter(
+        jugador=request.user
+    ).exclude(id__in=reservas_activas.values_list('id', flat=True)).order_by('-fecha', '-hora_inicio')
+    
+    return render(request, 'core/reservas/mis_reservas.html', {
+        'activas': reservas_activas,
+        'historial': historial
+    })
+
+@login_required
+def player_cancel_reservation(request, reserva_id):
+    """Permite cancelar una reserva propia"""
+    reserva = get_object_or_404(ReservaCancha, id=reserva_id, jugador=request.user)
+    
+    if request.method == 'POST':
+        # Validar que no sea del pasado
+        if reserva.fecha < datetime.date.today():
+             messages.error(request, "No puedes cancelar reservas pasadas.")
+        else:
+            reserva.estado = 'cancelada'
+            reserva.save()
+            messages.success(request, "Reserva cancelada exitosamente.")
+        return redirect('core:player_reservations')
+        
+    return render(request, 'core/reservas/confirmar_cancelacion.html', {'reserva': reserva})
+
+def ranking(request):
+    """Vista pública del ranking de jugadores"""
+    categoria_filtro = request.GET.get('categoria')
+    
+    # Base query: Jugadores activos ordenados por ranking
+    # Nota: estadisticas es O2M, usamos prefetch
+    jugadores = Usuario.objects.filter(es_jugador=True).prefetch_related('estadisticas').order_by('-ranking')
+    
+    if categoria_filtro:
+        jugadores = jugadores.filter(categoria=categoria_filtro)
+    
+    # Inyectar estadística principal (la que coincide con su categoría actual)
+    for jugador in jugadores:
+        # Buscar stats de su categoría
+        stats = next((s for s in jugador.estadisticas.all() if str(s.categoria_id) == str(jugador.categoria)), None)
+        # Si no tiene de su categoría, usar la primera que encuentre o crear una dummy
+        if not stats and jugador.estadisticas.exists():
+            stats = jugador.estadisticas.first()
+            
+        jugador.stats_display = stats
+    
+    # Obtener opciones de categoría desde el modelo
+    categorias = Usuario._meta.get_field('categoria').choices
+    
+    context = {
+        'jugadores': jugadores,
+        'categorias': categorias,
+        'filtro_actual': categoria_filtro,
+    }
+    return render(request, 'core/ranking.html', context)
+
+def player_public_profile(request, player_id):
+    """Perfil público con estadísticas detalladas"""
+    jugador = get_object_or_404(Usuario, id=player_id, es_jugador=True)
+    
+    # Estadísticas globales (suma de todas las categorías)
+    stats_qs = jugador.estadisticas.all()
+    total_victorias = sum(s.victorias for s in stats_qs)
+    total_derrotas = sum(s.derrotas for s in stats_qs)
+    total_jugados = sum(s.partidos_jugados for s in stats_qs)
+    
+    # Estadisticas calculadas
+    efectividad = round((total_victorias / total_jugados * 100), 1) if total_jugados > 0 else 0
+    ratio = round(total_victorias / total_derrotas, 2) if total_derrotas > 0 else total_victorias
+    
+    # Historial de partidos (donde sea jugador)
+    # Buscamos partidos donde el jugador esté en la relación ManyToMany
+    ultimos_partidos = Partido.objects.filter(
+        jugadores=jugador, 
+        estado='finalizado'
+    ).order_by('-fecha')[:10]
+    
+    context = {
+        'jugador': jugador,
+        'total_jugados': total_jugados,
+        'total_victorias': total_victorias,
+        'total_derrotas': total_derrotas,
+        'efectividad': efectividad,
+        'ratio': ratio,
+        'ultimos_partidos': ultimos_partidos
+    }
+    return render(request, 'core/jugador_perfil.html', context)
     
     
 # Note: admin_player_list is defined above with pagination and search
@@ -332,10 +567,14 @@ def home(request):
     noticias = Noticia.objects.order_by('-fecha_publicacion')[:3]  # solo las 3 más recientes
     canchas = Cancha.objects.all()
     torneos = Torneo.objects.order_by('-fecha_inicio')[:5]  # opcional si quieres mostrar torneos
+    
+    # Obtener Top 10 del ranking
+    ranking = Usuario.objects.filter(es_jugador=True).order_by('-ranking')[:10]
 
     context = {
         'noticias': noticias,
         'canchas': canchas,
         'torneos': torneos,
+        'ranking': ranking,
     }
     return render(request, 'home.html', context)

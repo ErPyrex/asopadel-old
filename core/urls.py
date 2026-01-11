@@ -44,16 +44,25 @@ urlpatterns = [
     path('admin-gestion/arbitros/<int:arbitro_id>/eliminar/', views.admin_delete_referee, name='admin_delete_arbitro'),
 
     # 🗓️ Partidos (Admin)
+    path('admin-gestion/partidos/', views.admin_match_list, name='admin_partidos_list'),
     path('admin-gestion/partidos/crear/', views.admin_create_match, name='admin_create_match'),
+    path('admin-gestion/partidos/<int:partido_id>/', views.admin_match_detail, name='admin_match_detail'),
+    path('admin-gestion/partidos/<int:partido_id>/editar/', views.admin_edit_match, name='admin_edit_match'),
+    path('admin-gestion/partidos/<int:partido_id>/eliminar/', views.admin_delete_match, name='admin_delete_match'),
 
     # 🧑‍🎾 Reservas (Jugador)
     path('player-reservar-cancha/', views.player_reserve_court, name='player_reserve_court'),
-
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-        
-
+    path('mis-reservas/', views.player_reservation_list, name='player_reservations'),
+    path('mis-reservas/<int:reserva_id>/cancelar/', views.player_cancel_reservation, name='player_cancel_reservation'),
+    
+    # 📰 Noticias
     path('admin-gestion/noticias/', views.admin_noticias_list, name='admin_noticias_list'),
     path('admin-gestion/noticias/crear/', views.admin_create_noticia, name='admin_create_noticia'),
 
-    path('api/get-court-availability/', views_api.get_court_availability, name='get_court_availability'),
+    # 🔌 API (Internal)
+    path('api/cancha/<int:cancha_id>/disponibilidad/', views_api.get_court_availability, name='api_court_availability'),
+
+    # 🏆 Ranking
+    path('ranking/', views.ranking, name='ranking'),
+    path('jugador/<int:player_id>/', views.player_public_profile, name='player_public_profile'),
 ]

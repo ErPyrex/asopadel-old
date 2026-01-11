@@ -456,8 +456,10 @@ body.dark-mode {
 .btn-back-custom {
     width: 60px;
     height: 60px;
-    border: 2px solid black !important;
+    border: 4px solid #8c2497 !important;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 1px 1px 32px rgb(255, 255, 255) !important;
+
 }
 
 .btn-back-custom:hover {
@@ -469,4 +471,14 @@ body.dark-mode {
     height: 35px;
     transform: scaleY(-1);
     transform-origin: center;
+}
+
+/* Admin Panel Header Line */
+.admin-header-line {
+    border-bottom-color: rgb(27, 24, 24) !important;
+}
+
+body.dark-mode .admin-header-line,
+:root[data-bs-theme="dark"] .admin-header-line {
+    border-bottom-color: rgba(255, 255, 255, 0.2) !important;
 }

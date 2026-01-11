@@ -52,8 +52,13 @@
         <ul class="list-group">
           {% for jugador in ranking %}
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ jugador.nombre }}
-            <span class="badge bg-primary rounded-pill">{{ jugador.puntos }} pts</span>
+            <div>
+              <strong>{{ forloop.counter }}. {{ jugador.get_full_name }}</strong>
+              {% if jugador.categoria_jugador %}
+              <br><small class="text-muted">{{ jugador.get_categoria_jugador_display }}</small>
+              {% endif %}
+            </div>
+            <span class="badge bg-primary rounded-pill">{{ jugador.ranking|default:0 }} pts</span>
           </li>
           {% endfor %}
         </ul>
@@ -62,6 +67,7 @@
         </div>
         {% else %}
         <p class="text-center">No hay jugadores en el ranking aún.</p>
+        <p class="text-center text-muted">Los jugadores aparecerán aquí cuando finalicen partidos.</p>
         {% endif %}
       </section>
     </div>

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Eliminar Partido{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-danger">
+                <div class="card-body p-5">
+                    <h2 class="card-title text-center text-danger mb-4">⚠️ Confirmar Eliminación</h2>
+
+                    <div class="alert alert-warning">
+                        <h5>¿Estás seguro de eliminar este partido?</h5>
+                        <p class="mb-0">Esta acción no se puede deshacer.</p>
+                    </div>
+
+                    <!-- Detalles del partido -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ partido.torneo.nombre }}</h5>
+                            <p class="mb-1"><strong>Cancha:</strong> {{ partido.cancha.nombre|default:"No asignada" }}
+                            </p>
+                            <p class="mb-1"><strong>Fecha:</strong> {{ partido.fecha }} a las {{ partido.hora }}</p>
+                            <p class="mb-1"><strong>Jugadores:</strong>
+                                {% for jugador in partido.jugadores.all %}
+                                {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                Sin jugadores
+                                {% endfor %}
+                            </p>
+                            <p class="mb-1"><strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No
+                                asignado" }}</p>
+                            <p class="mb-1"><strong>Estado:</strong>
+                                <span class="badge 
+                                    {% if partido.estado == 'pendiente' %}bg-warning text-dark
+                                    {% elif partido.estado == 'confirmado' %}bg-info
+                                    {% elif partido.estado == 'finalizado' %}bg-success
+                                    {% elif partido.estado == 'cancelado' %}bg-danger
+                                    {% endif %}">
+                                    {{ partido.get_estado_display }}
+                                </span>
+                            </p>
+                            {% if partido.marcador %}
+                            <p class="mb-0"><strong>Marcador:</strong> {{ partido.marcador }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Advertencia adicional si está finalizado -->
+                    {% if partido.estado == 'finalizado' %}
+                    <div class="alert alert-danger">
+                        <strong>⚠️ Advertencia:</strong> Este partido está finalizado.
+                        Las estadísticas y puntos de ranking ya fueron actualizados y
+                        <strong>NO se revertirán automáticamente</strong> al eliminar el partido.
+                    </div>
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                Confirmar Eliminación
+                            </button>
+                            <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,43 +1,53 @@
 from django.http import JsonResponse
-from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from facilities.models import ReservaCancha
-from datetime import datetime
+from facilities.models import ReservaCancha, Cancha
+from datetime import datetime, timedelta
 
 @login_required
-def get_court_availability(request):
+def get_court_availability(request, cancha_id):
     """
-    Returns a list of booked slots for a specific court and date.
-    Params:
-        court_id: int
-        date: string 'YYYY-MM-DD'
+    API para obtener eventos de disponibilidad para FullCalendar.
+    Retorna reservas confirmadas y pendientes como eventos ocupados.
     """
-    court_id = request.GET.get('court_id')
-    date_str = request.GET.get('date')
-    
-    if not court_id or not date_str:
-        return JsonResponse({'error': 'Missing parameters'}, status=400)
-    
     try:
-        # Validate date format
-        query_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-    except ValueError:
-        return JsonResponse({'error': 'Invalid date format'}, status=400)
+        start_date_str = request.GET.get('start')
+        end_date_str = request.GET.get('end')
         
-    # Get confirmed or pending reservations
-    reservations = ReservaCancha.objects.filter(
-        cancha_id=court_id,
-        fecha=query_date,
-        estado__in=['pendiente', 'confirmada']
-    ).order_by('hora_inicio')
-    
-    data = []
-    for res in reservations:
-        data.append({
-            'start': res.hora_inicio.strftime('%H:%M'),
-            'end': res.hora_fin.strftime('%H:%M'),
-            'status': res.estado,
-            'user': res.jugador.get_full_name if request.user.is_staff else "Reservado" # Privacy
-        })
-        
-    return JsonResponse({'occupied_slots': data})
+        # FullCalendar envía ISO string (YYYY-MM-DD)
+        if start_date_str:
+            start_date = datetime.fromisoformat(start_date_str.split('T')[0]).date()
+        else:
+            start_date = datetime.today().date()
+            
+        if end_date_str:
+            end_date = datetime.fromisoformat(end_date_str.split('T')[0]).date()
+        else:
+            end_date = start_date + timedelta(days=30)
+
+        reservas = ReservaCancha.objects.filter(
+            cancha_id=cancha_id,
+            fecha__range=[start_date, end_date]
+        ).exclude(estado='cancelada')
+
+        events = []
+        for r in reservas:
+            # Color coding: Pendiente (Naranja), Confirmada (Red)
+            color = '#dc3545' if r.estado == 'confirmada' else '#ffc107'
+            title = 'Reservado' if r.estado == 'confirmada' else 'Pendiente'
+            
+            # Si es el propio usuario, mostrar "Mi Reserva"
+            if r.jugador == request.user:
+                title = "Mi Reserva"
+                color = '#198754' # Verde
+
+            events.append({
+                'title': title,
+                'start': f"{r.fecha}T{r.hora_inicio}",
+                'end': f"{r.fecha}T{r.hora_fin}",
+                'color': color,
+                'card_id': r.id,
+            })
+
+        return JsonResponse(events, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

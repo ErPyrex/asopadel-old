@@ -20,6 +20,9 @@
                         <a class="nav-link" href="{% url 'core:admin_torneos_list' %}">Torneos</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'core:admin_partidos_list' %}">Partidos</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:admin_player_list' %}">Jugadores</a>
                     </li>
                     <li class="nav-item">
@@ -53,7 +56,7 @@
 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <div
-                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+                class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom admin-header-line">
                 <h1 class="h2">Panel de Administrador</h1>
             </div>
 
@@ -125,6 +128,16 @@
                                 <a href="{% url 'core:admin_torneos_list' %}" class="btn btn-primary">Ver torneos</a>
                                 <a href="{% url 'core:admin_create_tournament' %}" class="btn btn-success">Crear
                                     torneo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Gestión de partidos</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-primary">Ver partidos</a>
+                                <a href="{% url 'core:admin_create_match' %}" class="btn btn-success">Crear
+                                    partido</a>
                             </div>
                         </div>
                     </div>

@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Ranking de Jugadores{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-danger">🏆 Ranking ASOPADEL (MODO PRUEBA)</h1>
+        <p class="lead text-muted">Si ves esto, el sistema funciona.</p>
+    </div>
+
+    <!-- Filtros de Categoría -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-2">
+                    <form method="GET" class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="{% url 'core:ranking' %}"
+                            class="btn btn-outline-primary {% if not filtro_actual %}active{% endif %}">
+                            Todas
+                        </a>
+                        {% for valor, etiqueta in categorias %}
+                        <button type="submit" name="categoria" value="{{ valor }}"
+                            class="btn btn-outline-primary {% if filtro_actual == valor %}active{% endif %}">
+                            {{ etiqueta }}
+                        </button>
+                        {% endfor %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Ranking -->
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th class="ps-4 text-center" style="width: 80px;">Pos</th>
+                                    <th>Jugador</th>
+                                    <th class="text-center">Categoría</th>
+                                    <th class="text-center d-none d-md-table-cell">PJ</th>
+                                    <th class="text-center d-none d-md-table-cell">PG</th>
+                                    <th class="text-center d-none d-sm-table-cell">% Efectividad</th>
+                                    <th class="text-center">Puntos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for jugador in jugadores %}
+                                <tr class="{% if forloop.counter <= 3 %}table-light{% endif %}">
+                                    <td class="ps-4 text-center fw-bold fs-5">
+                                        {% if forloop.counter == 1 %}
+                                        🥇
+                                        {% elif forloop.counter == 2 %}
+                                        🥈
+                                        {% elif forloop.counter == 3 %}
+                                        🥉
+                                        {% else %}
+                                        {{ forloop.counter }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if jugador.foto %}
+                                            <img src="{{ jugador.foto.url }}" alt="{{ jugador.get_full_name }}"
+                                                class="rounded-circle me-3 border border-2 border-white shadow-sm"
+                                                style="width: 40px; height: 40px; object-fit: cover;">
+                                            {% else %}
+                                            <div class="rounded-circle me-3 bg-secondary text-white d-flex align-items-center justify-content-center shadow-sm"
+                                                style="width: 40px; height: 40px;">
+                                                {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="fw-bold">{{ jugador.get_full_name }}</div>
+                                                    <a href="{% url 'core:player_public_profile' jugador.id %}"
+                                                        style="background: red; color: white; padding: 5px; font-weight: bold; border: 2px solid black; z-index: 9999;">
+                                                        >>> CLICK AQUI <<< </a>
+                                                </div>
+                                                <small class="text-muted d-md-none">{{ jugador.get_categoria_display
+                                                    }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark border">
+                                            {{ jugador.get_categoria_display }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center d-none d-md-table-cell">
+                                        {{ jugador.stats_display.partidos_jugados|default:"0" }}
+                                    </td>
+                                    <td class="text-center d-none d-md-table-cell text-success fw-bold">
+                                        {{ jugador.stats_display.victorias|default:"0" }}
+                                    </td>
+                                    <td class="text-center d-none d-sm-table-cell">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-info" role="progressbar"
+                                                style="width: {{ jugador.stats_display.promedio_victorias|default:0 }}%"
+                                                aria-valuenow="{{ jugador.stats_display.promedio_victorias|default:0 }}"
+                                                aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <small class="text-muted">{{
+                                            jugador.stats_display.promedio_victorias|default:"0" }}%</small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill">
+                                            {{ jugador.ranking }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <h4 class="text-muted">No hay jugadores registrados aún</h4>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

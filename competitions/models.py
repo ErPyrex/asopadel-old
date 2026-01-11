@@ -58,12 +58,20 @@ class EstadisticaJugador(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
     partidos_jugados = models.PositiveIntegerField(default=0)
     victorias = models.PositiveIntegerField(default=0)
+    derrotas = models.PositiveIntegerField(default=0)
 
     @property
     def promedio_victorias(self):
         if self.partidos_jugados == 0:
             return 0
         return round((self.victorias / self.partidos_jugados) * 100, 2)
+    
+    @property
+    def ratio_victorias(self):
+        """Calcula el ratio victorias/derrotas"""
+        if self.derrotas == 0:
+            return self.victorias if self.victorias > 0 else 0
+        return round(self.victorias / self.derrotas, 2)
 
     def __str__(self):
         return f"{self.jugador.cedula} - {self.promedio_victorias}%"

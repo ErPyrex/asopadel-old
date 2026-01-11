@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Mis Reservas{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">🎾 Mis Reservas</h2>
+
+    <ul class="nav nav-tabs mb-4" id="reservasTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="activas-tab" data-bs-toggle="tab" data-bs-target="#activas"
+                type="button" role="tab">
+                Próximas Reservas
+                {% if activas %}
+                <span class="badge bg-primary ms-2">{{ activas.count }}</span>
+                {% endif %}
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="historial-tab" data-bs-toggle="tab" data-bs-target="#historial" type="button"
+                role="tab">
+                Historial
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="reservasTabContent">
+        <!-- Tab Activas -->
+        <div class="tab-pane fade show active" id="activas" role="tabpanel">
+            {% if activas %}
+            <div class="row">
+                {% for reserva in activas %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-primary">
+                        <div
+                            class="card-header bg-transparent border-primary d-flex justify-content-between align-items-center">
+                            <strong class="text-primary">{{ reserva.cancha.nombre }}</strong>
+                            <span
+                                class="badge {% if reserva.estado == 'confirmada' %}bg-info{% else %}bg-warning text-dark{% endif %}">
+                                {{ reserva.get_estado_display }}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ reserva.fecha|date:"l d M, Y" }}</h5>
+                            <p class="card-text fs-4 text-center my-3">
+                                {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}
+                            </p>
+                            <div class="alert alert-light border">
+                                <small><i class="bi bi-geo-alt"></i> {{ reserva.cancha.ubicacion }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0 d-grid">
+                            <a href="{% url 'core:player_cancel_reservation' reserva.id %}"
+                                class="btn btn-outline-danger btn-sm">
+                                Cancelar Reserva
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center py-5">
+                <i class="bi bi-calendar-x fs-1"></i>
+                <h4 class="mt-3">No tienes reservas próximas</h4>
+                <p>¿Quieres jugar un partido?</p>
+                <a href="{% url 'core:player_reserve_court' %}" class="btn btn-primary mt-2">Reservar Cancha</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Tab Historial -->
+        <div class="tab-pane fade" id="historial" role="tabpanel">
+            {% if historial %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Cancha</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reserva in historial %}
+                        <tr class="{% if reserva.estado == 'cancelada' %}table-secondary text-muted{% endif %}">
+                            <td>{{ reserva.fecha|date:"d/m/Y" }}</td>
+                            <td>{{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}</td>
+                            <td>{{ reserva.cancha.nombre }}</td>
+                            <td>
+                                {% if reserva.estado == 'cancelada' %}
+                                <span class="badge bg-secondary">Cancelada</span>
+                                {% elif reserva.estado == 'finalizado' %}
+                                <span class="badge bg-success">Completada</span>
+                                {% else %}
+                                <span class="badge bg-light text-dark border">{{ reserva.get_estado_display }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <p>No tienes historial de reservas antiguas.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

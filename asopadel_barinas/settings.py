@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     # Apps personalizadas
     'users.apps.UsersConfig',
     'core.apps.CoreConfig',
-    'competitions',
+    'competitions.apps.CompetitionsConfig',
     'facilities',
     'store',
     'blog',

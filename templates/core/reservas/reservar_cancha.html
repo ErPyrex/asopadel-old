@@ -1,88 +1,202 @@
 {% extends 'base.html' %}
-{% block title %}Reservar Cancha - ASOPADEL BARINAS{% endblock %}
+{% block title %}Reservar Cancha{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-body p-5">
-                    <h2 class="card-title text-center mb-4">Reservar Cancha</h2>
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Columna Izquierda: Formulario -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">📝 Nueva Reserva</h4>
+                </div>
+                <div class="card-body">
                     {% if cancha %}
-                    <div class="alert alert-info">
-                        <h5>{{ cancha.nombre }}</h5>
-                        <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
+                    <div class="alert alert-info py-2">
+                        <small>Reservando en:</small><br>
+                        <strong>{{ cancha.nombre }}</strong>
                     </div>
                     {% endif %}
-                    <div id="availability-section" class="mb-4" style="display:none;">
-                        <h5>Disponibilidad para <span id="selected-date-display"></span></h5>
-                        <ul id="slots-list" class="list-group">
-                            <!-- Slots will be populated here -->
-                        </ul>
-                        <small class="text-muted">Horario de atención: 08:00 - 22:00</small>
-                    </div>
 
-                    <form method="post">
+                    <form method="POST" id="reservaForm">
                         {% csrf_token %}
-                        {{ form.as_p }}
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Confirmar Reserva</button>
+
+                        <!-- Campo Cancha (Oculto o Select) -->
+                        <div class="mb-3">
+                            <label class="form-label">Cancha</label>
+                            {{ form.cancha }}
+                        </div>
+
+                        <!-- Campo Fecha -->
+                        <div class="mb-3">
+                            <label class="form-label">Fecha</label>
+                            {{ form.fecha }}
+                        </div>
+
+                        <div class="row">
+                            <!-- Hora Inicio -->
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Inicio</label>
+                                {{ form.hora_inicio }}
+                            </div>
+                            <!-- Hora Fin -->
+                            <div class="col-6 mb-3">
+                                <label class="form-label">Fin</label>
+                                {{ form.hora_fin }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-success">Reservar Ahora</button>
+                            <a href="{% url 'core:player_reservations' %}" class="btn btn-outline-secondary mt-2">Mis
+                                Reservas</a>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <div class="card mt-3 shadow-sm border-info">
+                <div class="card-body">
+                    <h6 class="text-info"><i class="bi bi-info-circle"></i> Instrucciones</h6>
+                    <small>
+                        <ol class="ps-3 mb-0">
+                            <li>Selecciona un <strong>espacio vacío</strong> en el calendario.</li>
+                            <li>Verifica la fecha y horas en el formulario.</li>
+                            <li>Haz clic en <strong>Reservar Ahora</strong>.</li>
+                        </ol>
+                        <hr class="my-2">
+                        <span class="badge bg-warning text-dark">Amarillo</span> Pendiente (Otros)<br>
+                        <span class="badge bg-danger">Rojo</span> Ocupado<br>
+                        <span class="badge bg-success">Verde</span> Mi Reserva
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Calendario -->
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body p-2">
+                    <div id='calendar'></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dateInput = document.getElementById('id_fecha');
-    const canchaInput = document.getElementById('id_cancha');
-    const availabilitySection = document.getElementById('availability-section');
-    const slotsList = document.getElementById('slots-list');
-    const dateDisplay = document.getElementById('selected-date-display');
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+        var canchaSelect = document.getElementById('id_cancha'); // ID por defecto de Django
+        var fechaInput = document.getElementById('id_fecha');
+        var horaInicioInput = document.getElementById('id_hora_inicio');
+        var horaFinInput = document.getElementById('id_hora_fin');
 
-    function fetchAvailability() {
-        const date = dateInput.value;
-        const cancha = canchaInput.value;
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            locale: 'es',
+            buttonText: {
+                today: 'Hoy',
+                month: 'Mes',
+                week: 'Semana',
+                day: 'Día',
+                list: 'Lista'
+            },
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridWeek,timeGridDay'
+            },
+            slotMinTime: '08:00:00', // Horario apertura
+            slotMaxTime: '22:00:00', // Horario cierre
+            allDaySlot: false,
+            expandRows: true,
+            height: 'auto',
+            navLinks: true, // clic en día va a vista día
+            selectable: true,
+            selectMirror: true,
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                meridiem: false,
+                hour12: false
+            },
 
-        if (date && cancha) {
-            dateDisplay.textContent = date;
-            
-            fetch(`{% url 'core:get_court_availability' %}?date=${date}&court_id=${cancha}`)
-                .then(response => response.json())
-                .then(data => {
-                    slotsList.innerHTML = ''; // Clear previous
-                    availabilitySection.style.display = 'block';
+            // Cargar eventos (reservas existentes)
+            events: function (info, successCallback, failureCallback) {
+                var canchaId = canchaSelect.value;
+                if (!canchaId) return successCallback([]); // Si no hay cancha seleccionada
 
-                    if (data.occupied_slots && data.occupied_slots.length > 0) {
-                        data.occupied_slots.forEach(slot => {
-                            const li = document.createElement('li');
-                            li.className = 'list-group-item list-group-item-danger';
-                            li.textContent = `🚫 Ocupado: ${slot.start} - ${slot.end} (${slot.status})`;
-                            slotsList.appendChild(li);
-                        });
-                    } else {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item list-group-item-success';
-                        li.textContent = '✅ Todo el día disponible (08:00 - 22:00)';
-                        slotsList.appendChild(li);
+                // Construir URL dinámicamente usando el patrón definido en urls.py
+                // Usamos un ID dummy '0' para que Django genere la base, y luego lo reemplazamos por el ID real
+                var baseUrl = "{% url 'core:api_court_availability' 0 %}";
+                var url = baseUrl.replace('/0/', '/' + canchaId + '/') +
+                    "?start=" + info.startStr +
+                    "&end=" + info.endStr;
+
+                fetch(url)
+                    .then(response => response.json())
+                    .then(data => successCallback(data))
+                    .catch(error => failureCallback(error));
+            },
+
+            slotDuration: '02:00:00', // Slots de 2 horas (cuadros visuales)
+            slotLabelInterval: '02:00', // Etiquetas cada 2 horas
+            snapDuration: '02:00:00', // Forzar selección en bloques de 2h
+
+            // Al seleccionar un rango vacío en el calendario
+            select: function (info) {
+                fechaInput.value = info.startStr.split('T')[0];
+
+                var start = info.start;
+                var end = info.end;
+
+                // Calcular duración seleccionada manualmente
+                var durationHours = (end - start) / (1000 * 60 * 60);
+
+                // Si la selección es pequeña (ej: clic simple de 30 min), forzar 2 horas por defecto
+                // Un partido de pádel dura tipicamente 1.5 - 2 horas
+                if (durationHours <= 0.5) {
+                    end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2 horas
+
+                    // Validar límite de cierre (22:00 según modelo)
+                    var limitHour = 22;
+                    if (end.getHours() > limitHour || (end.getHours() === limitHour && end.getMinutes() > 0)) {
+                        end.setHours(limitHour, 0, 0); // Capar a las 22:00
                     }
-                })
-                .catch(err => console.error('Error fetching availability:', err));
-        } else {
-            availabilitySection.style.display = 'none';
-        }
-    }
+                }
 
-    if (dateInput) dateInput.addEventListener('change', fetchAvailability);
-    if (canchaInput) canchaInput.addEventListener('change', fetchAvailability);
-    
-    // Initial fetch if values are present (e.g. on validation error)
-    if (dateInput.value && canchaInput.value) {
-        fetchAvailability();
-    }
-});
+                horaInicioInput.value = start.toTimeString().split(' ')[0].substring(0, 5);
+                horaFinInput.value = end.toTimeString().split(' ')[0].substring(0, 5);
+
+                // Efecto visual (opcional)
+                horaInicioInput.classList.add('bg-light', 'border-success');
+                horaFinInput.classList.add('bg-light', 'border-success');
+                setTimeout(() => {
+                    horaInicioInput.classList.remove('bg-light', 'border-success');
+                    horaFinInput.classList.remove('bg-light', 'border-success');
+                }, 500);
+            },
+
+            // Re-renderizar si cambia la ventana
+            windowResize: function (view) {
+                calendar.render();
+            }
+        });
+
+        calendar.render();
+
+        // Recargar calendario cuando cambie el select de cancha
+        if (canchaSelect) {
+            canchaSelect.addEventListener('change', function () {
+                calendar.refetchEvents();
+            });
+        }
+    });
 </script>
 {% endblock %}

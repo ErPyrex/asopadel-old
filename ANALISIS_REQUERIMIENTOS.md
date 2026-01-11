@@ -917,3 +917,72 @@ El proyecto tiene una **base sólida** (60% completado) con los fundamentos bien
 
 ---
 
+🟢 PRIORIDAD ALTA (Funcionalidades Críticas)
+1. Sistema de Notificaciones (0% implementado)
+❌ Notificaciones personalizadas para usuarios
+❌ Notificaciones por email
+❌ Centro de notificaciones en el panel
+❌ Notificaciones de confirmación de reserva
+❌ Notificaciones de cambios en torneos
+❌ Recordatorios de partidos próximos
+2. Sistema de Ranking Funcional (100% implementado)
+✅ Campo de ranking existe
+✅ Cálculo automático de ranking basado en resultados (ELO)
+✅ Actualización automática tras cada partido
+✅ Vista de ranking con datos reales
+✅ Filtros por categoría
+✅ Algoritmo de puntuación (ELO)
+3. Sistema de Estadísticas Completo (100% implementado)
+✅ Modelo básico existe
+✅ Campo de partidos perdidos
+✅ Actualización automática tras cada partido
+✅ Cálculo de ratio ganados/perdidos
+✅ Señales para actualización post-partido
+4. Validación de Reservas de Canchas (80% implementado)
+✅ Sistema de reservas básico funciona
+❌ Validación de conflictos de horarios (evitar reservas superpuestas)
+❌ Calendario visual de disponibilidad
+❌ Cancelación de reservas por jugador
+❌ Historial de reservas
+5. Gestión Completa de Partidos (Solo 25% implementado)
+✅ Crear partido funciona
+❌ Listar partidos
+❌ Editar partido
+❌ Eliminar partido
+❌ Ver detalles de partido
+🟡 PRIORIDAD MEDIA (Funcionalidades Importantes)
+6. Sistema de Brackets/Llaves de Torneo (0% implementado)
+❌ Generación automática de llaves
+❌ Visualización de brackets
+❌ Avance automático de ganadores
+❌ Sistema de eliminación simple/doble
+7. Inscripción Automática a Torneos (50% implementado)
+✅ Admin puede inscribir jugadores
+❌ Jugadores pueden auto-inscribirse
+❌ Límite de participantes
+❌ Confirmación/cancelación de inscripción
+8. Calendario de Eventos (0% implementado)
+❌ Vista de calendario
+❌ Filtros por tipo de evento
+❌ Recordatorios de eventos
+9. Recuperación de Contraseña (0% implementado)
+❌ Vista "Olvidé mi contraseña"
+❌ Envío de email con token
+❌ Reset de contraseña
+10. Gestión Avanzada de Canchas (0% implementado)
+❌ Horarios de apertura/cierre por cancha
+❌ Mantenimiento programado
+❌ Disponibilidad por días de la semana
+🔴 PRIORIDAD BAJA (Mejoras Opcionales)
+11. Sistema de Mensajería (0% implementado)
+❌ Chat entre usuarios
+❌ Mensajes privados
+❌ Notificaciones de mensajes
+12. Autenticación de Dos Factores (2FA) (0% implementado)
+❌ Configuración 2FA
+❌ QR code para apps
+13. Sistema de Pagos (0% implementado)
+❌ Integración con pasarela de pagos
+❌ Pagos de reservas
+❌ Inscripciones a torneos de pago
+14. Estadísticas Avanzadas (0% implementado)
