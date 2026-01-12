@@ -30,7 +30,7 @@ class Torneo(models.Model):
         verbose_name_plural = "Torneos"
 
 class Partido(models.Model):
-    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='partidos')
+    torneo = models.ForeignKey(Torneo, on_delete=models.CASCADE, related_name='partidos', null=True, blank=True)
     # Cancha will be imported from facilities app, but to avoid circular imports we might use string reference if possible or just import.
     # Since facilities depends on nothing, we can import it. But wait, Partido depends on Cancha.
     cancha = models.ForeignKey('facilities.Cancha', on_delete=models.SET_NULL, null=True)

@@ -207,9 +207,15 @@ class CanchaForm(forms.ModelForm):
         return nombre
 
 class PartidoForm(forms.ModelForm):
+    es_casual = forms.BooleanField(
+        required=False, 
+        label="¿Es partido casual/amistoso?",
+        help_text="Marque esta casilla si el partido no pertenece a ningún torneo."
+    )
+
     class Meta:
         model = Partido
-        fields = ['torneo', 'cancha', 'fecha', 'hora', 'jugadores', 'arbitro', 'marcador', 'estado']
+        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'jugadores', 'arbitro', 'marcador', 'estado']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'title': 'Selecciona una fecha válida (no pasada)'}),
             'hora': forms.TimeInput(attrs={
@@ -230,6 +236,7 @@ class PartidoForm(forms.ModelForm):
                 'placeholder': 'Ej: 6-4, 6-3',
                 'class': 'form-control'
             }),
+            'torneo': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def clean_marcador(self):
@@ -248,10 +255,30 @@ class PartidoForm(forms.ModelForm):
         self.fields['jugadores'].queryset = Usuario.objects.filter(es_jugador=True)
         self.fields['arbitro'].queryset = Usuario.objects.filter(es_arbitro=True)
         
+        # Restaurar etiqueta por defecto y hacer requerido inicialmente (se valida en clean)
+        self.fields['torneo'].required = False  # False para manejarlo manualmente en clean()
+        self.fields['torneo'].empty_label = "--------- Seleccione un Torneo ---------"
+        self.fields['torneo'].help_text = "Seleccione el torneo al que pertenece el partido."
+        
         # Validación HTML5: Bloquear fechas pasadas
         today_str = timezone.now().date().isoformat()
         if 'fecha' in self.fields:
             self.fields['fecha'].widget.attrs['min'] = today_str
+
+    def clean(self):
+        cleaned_data = super().clean()
+        es_casual = cleaned_data.get('es_casual')
+        torneo = cleaned_data.get('torneo')
+
+        if es_casual:
+            # Si es casual, limpiamos el torneo para que sea NULL
+            cleaned_data['torneo'] = None
+        else:
+            # Si NO es casual, el torneo es obligatorio
+            if not torneo:
+                self.add_error('torneo', "Debe seleccionar un torneo o marcar la opción de 'Partido Casual'.")
+        
+        return cleaned_data
 
     def clean_fecha(self):
         fecha = self.cleaned_data.get('fecha')

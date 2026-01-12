@@ -17,7 +17,7 @@
                     <!-- Detalles del partido -->
                     <div class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">{{ partido.torneo.nombre }}</h5>
+                            <h5 class="card-title">{{ partido.torneo.nombre|default:"Partido Amistoso / Casual" }}</h5>
                             <p class="mb-1"><strong>Cancha:</strong> {{ partido.cancha.nombre|default:"No asignada" }}
                             </p>
                             <p class="mb-1"><strong>Fecha:</strong> {{ partido.fecha }} a las {{ partido.hora }}</p>

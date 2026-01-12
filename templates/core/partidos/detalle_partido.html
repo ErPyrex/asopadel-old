@@ -13,9 +13,17 @@
                     <!-- Torneo -->
                     <div class="mb-4">
                         <h5 class="text-primary">Torneo</h5>
+                        {% if partido.torneo %}
                         <p class="fs-5"><strong>{{ partido.torneo.nombre }}</strong></p>
+                        {% else %}
+                        <p class="fs-5"><strong>Amistoso / Casual</strong></p>
+                        {% endif %}
                         {% if partido.torneo.categoria %}
+                        {% if partido.torneo and partido.torneo.categoria %}
                         <p class="text-muted">Categoría: {{ partido.torneo.categoria.nombre }}</p>
+                        {% else %}
+                        <p class="text-muted">Categoría: Libre</p>
+                        {% endif %}
                         {% endif %}
                     </div>
 

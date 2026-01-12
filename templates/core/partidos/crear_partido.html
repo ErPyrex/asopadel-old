@@ -23,4 +23,29 @@
         </div>
     </div>
 </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkbox = document.getElementById('id_es_casual');
+        const torneoSelect = document.getElementById('id_torneo');
+
+        function toggleTorneo() {
+            if (checkbox.checked) {
+                torneoSelect.disabled = true;
+                torneoSelect.required = false;
+                torneoSelect.value = ''; // Limpiar selección
+            } else {
+                torneoSelect.disabled = false;
+                torneoSelect.required = true;
+            }
+        }
+
+        // Event listener
+        checkbox.addEventListener('change', toggleTorneo);
+
+        // Estado inicial
+        toggleTorneo();
+    });
+</script>
 {% endblock %}

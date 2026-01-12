@@ -946,10 +946,10 @@ El proyecto tiene una **base sólida** (60% completado) con los fundamentos bien
 ✅ Historial de reservas
 5. Gestión Completa de Partidos (Solo 25% implementado)
 ✅ Crear partido funciona
-❌ Listar partidos
-❌ Editar partido
-❌ Eliminar partido
-❌ Ver detalles de partido
+✅ Listar partidos
+✅ Editar partido
+✅ Eliminar partido
+✅ Ver detalles de partido
 🟡 PRIORIDAD MEDIA (Funcionalidades Importantes)
 6. Sistema de Brackets/Llaves de Torneo (0% implementado)
 ❌ Generación automática de llaves

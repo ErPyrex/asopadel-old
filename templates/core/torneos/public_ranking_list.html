@@ -50,13 +50,15 @@
                     </td>
                     <td>
                         <div class="d-flex align-items-center">
-                            <strong>{{ jugador.get_full_name }}</strong>
+                            <div class="d-flex flex-column">
+                                <strong>{{ jugador.get_full_name }}</strong>
+                                <small class="text-muted">{{ jugador.cedula }}</small>
+                            </div>
                             <a href="{% url 'core:player_public_profile' jugador.id %}"
                                 class="btn btn-sm btn-primary py-0 px-2 ms-4" title="Ver Estadísticas">
                                 📊 Estadísticas
                             </a>
                         </div>
-                        <small class="text-muted">{{ jugador.cedula }}</small>
                     </td>
                     <td class="text-center">
                         {% if jugador.categoria_jugador %}
