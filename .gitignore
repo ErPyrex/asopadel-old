@@ -25,9 +25,9 @@ venv.bak/
 .vscode/
 *.swp
 *.swo
+.DS_Store
 
 # OS specific
-.DS_Store
 Thumbs.db
 
 # Project specific
