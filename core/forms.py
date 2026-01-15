@@ -228,10 +228,32 @@ class PartidoSchedulingForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     
-    jugadores = UsuarioMultipleChoiceField(
+    # Team 1 Players
+    equipo1_jugador1 = UsuarioChoiceField(
         queryset=Usuario.objects.filter(es_jugador=True),
-        label="Jugadores",
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label="Equipo 1 - Jugador 1",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    equipo1_jugador2 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 1 - Jugador 2 (Opcional para dobles)",
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    # Team 2 Players
+    equipo2_jugador1 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 2 - Jugador 1",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    equipo2_jugador2 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 2 - Jugador 2 (Opcional para dobles)",
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     HORARIOS_DISPONIBLES = [
@@ -252,7 +274,7 @@ class PartidoSchedulingForm(forms.ModelForm):
 
     class Meta:
         model = Partido
-        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'jugadores', 'arbitro']
+        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'arbitro']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'title': 'Selecciona una fecha válida (no pasada)'}),
             'torneo': forms.Select(attrs={'class': 'form-control'}),
@@ -260,29 +282,83 @@ class PartidoSchedulingForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # self.fields['jugadores'].queryset = Usuario.objects.filter(es_jugador=True) # Ya definido en el campo custom
-        # self.fields['arbitro'].queryset = Usuario.objects.filter(es_arbitro=True) # Ya definido en el campo custom
         
         # Restaurar etiqueta por defecto y hacer requerido inicialmente
         self.fields['torneo'].required = False  
         self.fields['torneo'].empty_label = "--------- Seleccione un Torneo ---------"
         self.fields['torneo'].help_text = "Seleccione el torneo al que pertenece el partido."
         
+        # Add empty option for optional players
+        self.fields['equipo1_jugador2'].empty_label = "--------- Sin segundo jugador (individuales) ---------"
+        self.fields['equipo2_jugador2'].empty_label = "--------- Sin segundo jugador (individuales) ---------"
+        
+        # Load existing team data when editing
+        if self.instance and self.instance.pk:
+            equipo1_jugadores = list(self.instance.equipo1.all())
+            equipo2_jugadores = list(self.instance.equipo2.all())
+            
+            # Populate equipo1 fields
+            if len(equipo1_jugadores) >= 1:
+                self.fields['equipo1_jugador1'].initial = equipo1_jugadores[0]
+            if len(equipo1_jugadores) >= 2:
+                self.fields['equipo1_jugador2'].initial = equipo1_jugadores[1]
+            
+            # Populate equipo2 fields
+            if len(equipo2_jugadores) >= 1:
+                self.fields['equipo2_jugador1'].initial = equipo2_jugadores[0]
+            if len(equipo2_jugadores) >= 2:
+                self.fields['equipo2_jugador2'].initial = equipo2_jugadores[1]
+        
         # Validación HTML5: Bloquear fechas pasadas
         today_str = timezone.now().date().isoformat()
         if 'fecha' in self.fields:
             self.fields['fecha'].widget.attrs['min'] = today_str
 
+
     def clean(self):
         cleaned_data = super().clean()
         es_casual = cleaned_data.get('es_casual')
         torneo = cleaned_data.get('torneo')
-
+        
+        # Validate tournament
         if es_casual:
             cleaned_data['torneo'] = None
         else:
             if not torneo:
                 self.add_error('torneo', "Debe seleccionar un torneo o marcar la opción de 'Partido Casual'.")
+        
+        # Get players
+        eq1_j1 = cleaned_data.get('equipo1_jugador1')
+        eq1_j2 = cleaned_data.get('equipo1_jugador2')
+        eq2_j1 = cleaned_data.get('equipo2_jugador1')
+        eq2_j2 = cleaned_data.get('equipo2_jugador2')
+        
+        # Collect all selected players (excluding None)
+        all_players = [p for p in [eq1_j1, eq1_j2, eq2_j1, eq2_j2] if p]
+        
+        # Validate: At least 2 players total
+        if len(all_players) < 2:
+            raise forms.ValidationError("Debe seleccionar al menos 2 jugadores (1 por equipo)")
+        
+        # Validate: No duplicate players
+        if len(all_players) != len(set(all_players)):
+            raise forms.ValidationError("No puede seleccionar el mismo jugador en múltiples posiciones")
+        
+        # Validate: Both teams must have at least 1 player
+        if not eq1_j1:
+            self.add_error('equipo1_jugador1', "El Equipo 1 debe tener al menos un jugador")
+        if not eq2_j1:
+            self.add_error('equipo2_jugador1', "El Equipo 2 debe tener al menos un jugador")
+        
+        # Validate: Team balance (both teams should have same number of players)
+        equipo1_count = sum([1 for p in [eq1_j1, eq1_j2] if p])
+        equipo2_count = sum([1 for p in [eq2_j1, eq2_j2] if p])
+        
+        if equipo1_count != equipo2_count:
+            raise forms.ValidationError(
+                f"Ambos equipos deben tener la misma cantidad de jugadores. "
+                f"Equipo 1: {equipo1_count}, Equipo 2: {equipo2_count}"
+            )
         
         return cleaned_data
 
@@ -293,22 +369,42 @@ class PartidoSchedulingForm(forms.ModelForm):
         if fecha < timezone.now().date():
             raise forms.ValidationError("La fecha del partido no puede estar en el pasado")
         return fecha
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+        
+        # Clear and populate team fields
+        instance.equipo1.clear()
+        instance.equipo2.clear()
+        
+        # Add team 1 players
+        if self.cleaned_data.get('equipo1_jugador1'):
+            instance.equipo1.add(self.cleaned_data['equipo1_jugador1'])
+        if self.cleaned_data.get('equipo1_jugador2'):
+            instance.equipo1.add(self.cleaned_data['equipo1_jugador2'])
+        
+        # Add team 2 players
+        if self.cleaned_data.get('equipo2_jugador1'):
+            instance.equipo2.add(self.cleaned_data['equipo2_jugador1'])
+        if self.cleaned_data.get('equipo2_jugador2'):
+            instance.equipo2.add(self.cleaned_data['equipo2_jugador2'])
+        
+        return instance
 
 
 class PartidoResultForm(forms.ModelForm):
-    ganador = forms.ModelChoiceField(
-        queryset=Usuario.objects.none(),
-        label="Ganador del Partido",
-        widget=forms.Select(attrs={
-            'class': 'form-select',
-            'required': 'required'
-        }),
-        help_text="Seleccione el jugador que ganó el partido"
+    equipo_ganador = forms.ChoiceField(
+        choices=[(1, 'Equipo 1'), (2, 'Equipo 2')],
+        label="Equipo Ganador",
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        help_text="Seleccione el equipo que ganó el partido"
     )
     
     class Meta:
         model = Partido
-        fields = ['marcador', 'ganador']
+        fields = ['marcador', 'equipo_ganador']
         widgets = {
             'marcador': forms.TextInput(attrs={
                 'pattern': r'^(\d+-\d+)(,?\s*\d+-\d+)*$', 
@@ -321,16 +417,7 @@ class PartidoResultForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Populate ganador choices with the match players
-        if self.instance and self.instance.pk:
-            jugadores = self.instance.jugadores.all()
-            self.fields['ganador'].queryset = jugadores
-            
-            # Customize the display of each player option
-            def label_from_instance(obj):
-                return f"{obj.get_full_name()} (C.I: {obj.cedula})"
-            
-            self.fields['ganador'].label_from_instance = label_from_instance
+        # No need to populate choices dynamically, they're static (1 or 2)
 
     def clean_marcador(self):
         marcador = self.cleaned_data.get('marcador')
@@ -344,20 +431,26 @@ class PartidoResultForm(forms.ModelForm):
     
     def clean(self):
         cleaned_data = super().clean()
-        ganador = cleaned_data.get('ganador')
+        equipo_ganador = cleaned_data.get('equipo_ganador')
         
         if self.instance and self.instance.pk:
-            jugadores = list(self.instance.jugadores.all())
+            equipo1_jugadores = list(self.instance.equipo1.all())
+            equipo2_jugadores = list(self.instance.equipo2.all())
             
-            # Validate exactly 2 players
-            if len(jugadores) != 2:
-                raise forms.ValidationError("El partido debe tener exactamente 2 jugadores para registrar el resultado")
+            # Validate teams exist
+            if not equipo1_jugadores and not equipo2_jugadores:
+                raise forms.ValidationError(
+                    "El partido no tiene equipos configurados. "
+                    "Asegúrese de que el partido tenga jugadores asignados a cada equipo."
+                )
             
-            # Validate winner is one of the players
-            if ganador and ganador not in jugadores:
-                raise forms.ValidationError("El ganador debe ser uno de los jugadores del partido")
+            # Validate at least 2 players total
+            total_players = len(equipo1_jugadores) + len(equipo2_jugadores)
+            if total_players < 2:
+                raise forms.ValidationError("El partido debe tener al menos 2 jugadores para registrar el resultado")
         
         return cleaned_data
+
 
 
 
