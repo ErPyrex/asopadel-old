@@ -9,6 +9,7 @@ def actualizar_ranking_tras_partido(sender, instance, created, **kwargs):
     Señal que se ejecuta cuando se guarda un Partido.
     Actualiza las estadísticas y el ranking de los jugadores cuando el partido finaliza.
     
+    Prioriza el campo 'ganador' si está disponible, de lo contrario parsea el marcador.
     Formato esperado del marcador: "2-1" (sets ganados por jugador1 - sets ganados por jugador2)
     """
     # Solo procesar si el partido está finalizado
@@ -20,34 +21,46 @@ def actualizar_ranking_tras_partido(sender, instance, created, **kwargs):
     if len(jugadores) != 2:
         return
     
-    # Solo procesar si hay un marcador válido
-    if not instance.marcador or not instance.marcador.strip():
-        return
-    
-    # Parsear el marcador (formato: "2-1" o "2 - 1")
-    try:
-        marcador_limpio = instance.marcador.strip().replace(' ', '')
-        partes = marcador_limpio.split('-')
-        
-        if len(partes) != 2:
-            return
-        
-        sets_jugador1 = int(partes[0])
-        sets_jugador2 = int(partes[1])
-        
-    except (ValueError, IndexError):
-        # Si el marcador no es válido, no hacer nada
-        return
-    
     # Determinar ganador y perdedor
-    if sets_jugador1 > sets_jugador2:
-        ganador = jugadores[0]
-        perdedor = jugadores[1]
-    elif sets_jugador2 > sets_jugador1:
-        ganador = jugadores[1]
-        perdedor = jugadores[0]
-    else:
-        # Empate - no actualizar ranking
+    ganador = None
+    perdedor = None
+    
+    # Opción 1: Usar el campo ganador explícito si está disponible
+    if instance.ganador:
+        if instance.ganador in jugadores:
+            ganador = instance.ganador
+            perdedor = jugadores[0] if jugadores[1] == ganador else jugadores[1]
+    
+    # Opción 2: Parsear el marcador si no hay ganador explícito
+    if not ganador and instance.marcador and instance.marcador.strip():
+        # Parsear el marcador (formato: "2-1" o "2 - 1")
+        try:
+            marcador_limpio = instance.marcador.strip().replace(' ', '')
+            partes = marcador_limpio.split('-')
+            
+            if len(partes) != 2:
+                return
+            
+            sets_jugador1 = int(partes[0])
+            sets_jugador2 = int(partes[1])
+            
+            # Determinar ganador y perdedor
+            if sets_jugador1 > sets_jugador2:
+                ganador = jugadores[0]
+                perdedor = jugadores[1]
+            elif sets_jugador2 > sets_jugador1:
+                ganador = jugadores[1]
+                perdedor = jugadores[0]
+            else:
+                # Empate - no actualizar ranking
+                return
+                
+        except (ValueError, IndexError):
+            # Si el marcador no es válido, no hacer nada
+            return
+    
+    # Si no pudimos determinar un ganador, salir
+    if not ganador or not perdedor:
         return
     
     # Actualizar estadísticas del ganador

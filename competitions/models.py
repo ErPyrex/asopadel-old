@@ -39,6 +39,7 @@ class Partido(models.Model):
     jugadores = models.ManyToManyField(Usuario, related_name='partidos_jugados')
     arbitro = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='partidos_arbitrados')
     marcador = models.CharField(max_length=100, blank=True)
+    ganador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='partidos_ganados', verbose_name='Ganador')
     estado = models.CharField(max_length=50, choices=[
         ('pendiente', 'Pendiente'),
         ('confirmado', 'Confirmado'),

@@ -40,7 +40,7 @@
     <!-- Grid de Estadísticas -->
     <div class="row mb-4 g-3">
         <!-- Partidos -->
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-3 col-lg">
             <div class="card h-100 shadow-sm border-0 text-center py-3">
                 <div class="card-body">
                     <h3 class="display-6 fw-bold mb-0">{{ total_jugados }}</h3>
@@ -49,7 +49,7 @@
             </div>
         </div>
         <!-- Victorias -->
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-3 col-lg">
             <div class="card h-100 shadow-sm border-0 text-center py-3">
                 <div class="card-body">
                     <h3 class="display-6 fw-bold text-success mb-0">{{ total_victorias }}</h3>
@@ -57,8 +57,17 @@
                 </div>
             </div>
         </div>
+        <!-- Derrotas -->
+        <div class="col-6 col-md-3 col-lg">
+            <div class="card h-100 shadow-sm border-0 text-center py-3">
+                <div class="card-body">
+                    <h3 class="display-6 fw-bold text-danger mb-0">{{ total_derrotas }}</h3>
+                    <small class="text-muted">Derrotas</small>
+                </div>
+            </div>
+        </div>
         <!-- Efectividad -->
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-3 col-lg">
             <div class="card h-100 shadow-sm border-0 text-center py-3">
                 <div class="card-body">
                     <h3 class="display-6 fw-bold text-info mb-0">{{ efectividad }}%</h3>
@@ -67,7 +76,7 @@
             </div>
         </div>
         <!-- Ratio -->
-        <div class="col-6 col-md-3">
+        <div class="col-6 col-md-3 col-lg">
             <div class="card h-100 shadow-sm border-0 text-center py-3">
                 <div class="card-body">
                     <h3 class="display-6 fw-bold text-warning mb-0">{{ ratio }}</h3>

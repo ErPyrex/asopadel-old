@@ -26,13 +26,13 @@
                         <div class="card-body">
                             <h5 class="card-title">Torneos asignados</h5>
                             {% if torneos %}
-                                <ul class="list-group">
-                                    {% for torneo in torneos %}
-                                        <li class="list-group-item">{{ torneo.nombre }}</li>
-                                    {% endfor %}
-                                </ul>
+                            <ul class="list-group">
+                                {% for torneo in torneos %}
+                                <li class="list-group-item">{{ torneo.nombre }}</li>
+                                {% endfor %}
+                            </ul>
                             {% else %}
-                                <p>No tienes torneos asignados.</p>
+                            <p>No tienes torneos asignados.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -41,9 +41,17 @@
                 <div class="col-md-6">
                     <div class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Registrar resultados</h5>
-                            <p>Carga los resultados de los partidos.</p>
-                            <a href="{% url 'core:admin_create_match' %}" class="btn btn-success">Registrar Partido</a>
+                            <h5 class="card-title">Gestión de Partidos</h5>
+                            <p>Agenda nuevos encuentros o registra los marcadores finales.</p>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'core:admin_create_match' %}" class="btn btn-primary">
+                                    <i class="fas fa-calendar-plus me-2"></i>Agendar Partido
+                                </a>
+                                <a href="{% url 'core:admin_pending_results_list' %}"
+                                    class="btn btn-warning text-white">
+                                    <i class="fas fa-check-square me-2"></i>Cargar Resultados
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -53,13 +61,13 @@
                 <div class="card-body">
                     <h5 class="card-title">Estado de canchas</h5>
                     {% if canchas %}
-                        <ul class="list-group">
-                            {% for cancha in canchas %}
-                                <li class="list-group-item">{{ cancha.nombre }} - {{ cancha.estado }}</li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="list-group">
+                        {% for cancha in canchas %}
+                        <li class="list-group-item">{{ cancha.nombre }} - {{ cancha.estado }}</li>
+                        {% endfor %}
+                    </ul>
                     {% else %}
-                        <p>No hay canchas registradas.</p>
+                    <p>No hay canchas registradas.</p>
                     {% endif %}
                 </div>
             </div>

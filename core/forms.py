@@ -206,57 +206,65 @@ class CanchaForm(forms.ModelForm):
             
         return nombre
 
-class PartidoForm(forms.ModelForm):
+class UsuarioChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.first_name} {obj.last_name} (C.I-{obj.cedula})"
+
+class UsuarioMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.first_name} {obj.last_name} (C.I-{obj.cedula})"
+
+class PartidoSchedulingForm(forms.ModelForm):
     es_casual = forms.BooleanField(
         required=False, 
         label="¿Es partido casual/amistoso?",
         help_text="Marque esta casilla si el partido no pertenece a ningún torneo."
     )
+    
+    arbitro = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_arbitro=True),
+        required=False,
+        label="Árbitro",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    jugadores = UsuarioMultipleChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Jugadores",
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+    )
+
+    HORARIOS_DISPONIBLES = [
+        ('08:00', '08:00 AM - 10:00 AM'),
+        ('10:00', '10:00 AM - 12:00 PM'),
+        ('12:00', '12:00 PM - 02:00 PM'),
+        ('14:00', '02:00 PM - 04:00 PM'),
+        ('16:00', '04:00 PM - 06:00 PM'),
+        ('18:00', '06:00 PM - 08:00 PM'),
+        ('20:00', '08:00 PM - 10:00 PM'),
+    ]
+
+    hora = forms.ChoiceField(
+        choices=HORARIOS_DISPONIBLES,
+        label="Horario",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
 
     class Meta:
         model = Partido
-        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'jugadores', 'arbitro', 'marcador', 'estado']
+        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'jugadores', 'arbitro']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'title': 'Selecciona una fecha válida (no pasada)'}),
-            'hora': forms.TimeInput(attrs={
-                'type': 'time',
-                'class': 'form-control',
-                'style': 'width: auto; max-width: 200px; display: inline-block;',
-                'min': '08:00',
-                'max': '22:00',
-                'title': 'El horario de partidos es de 8:00 AM a 10:00 PM',
-                'oninvalid': "this.setCustomValidity('El horario de partidos es de 8:00 AM a 10:00 PM')",
-                'oninput': "this.setCustomValidity('')"
-            }),
-            'jugadores': forms.SelectMultiple(attrs={'class': 'form-control'}),
-            'estado': forms.Select(attrs={'class': 'form-control'}),
-            'marcador': forms.TextInput(attrs={
-                'pattern': r'^(\d-\d)(,?\s*\d-\d)*$', 
-                'title': 'Formato: Sets separados por coma o espacio (Ej: 6-4, 6-3)',
-                'placeholder': 'Ej: 6-4, 6-3',
-                'class': 'form-control'
-            }),
             'torneo': forms.Select(attrs={'class': 'form-control'}),
         }
 
-    def clean_marcador(self):
-        marcador = self.cleaned_data.get('marcador')
-        if not marcador:
-            return marcador
-            
-        import re
-        # Validar formato: "6-4" o "6-4, 6-3"
-        if not re.match(r'^(\d-\d)(,?\s*\d-\d)*$', marcador):
-             raise forms.ValidationError("Formato inválido. Use formato de sets: 6-4, 6-3")
-        return marcador
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['jugadores'].queryset = Usuario.objects.filter(es_jugador=True)
-        self.fields['arbitro'].queryset = Usuario.objects.filter(es_arbitro=True)
+        # self.fields['jugadores'].queryset = Usuario.objects.filter(es_jugador=True) # Ya definido en el campo custom
+        # self.fields['arbitro'].queryset = Usuario.objects.filter(es_arbitro=True) # Ya definido en el campo custom
         
-        # Restaurar etiqueta por defecto y hacer requerido inicialmente (se valida en clean)
-        self.fields['torneo'].required = False  # False para manejarlo manualmente en clean()
+        # Restaurar etiqueta por defecto y hacer requerido inicialmente
+        self.fields['torneo'].required = False  
         self.fields['torneo'].empty_label = "--------- Seleccione un Torneo ---------"
         self.fields['torneo'].help_text = "Seleccione el torneo al que pertenece el partido."
         
@@ -271,10 +279,8 @@ class PartidoForm(forms.ModelForm):
         torneo = cleaned_data.get('torneo')
 
         if es_casual:
-            # Si es casual, limpiamos el torneo para que sea NULL
             cleaned_data['torneo'] = None
         else:
-            # Si NO es casual, el torneo es obligatorio
             if not torneo:
                 self.add_error('torneo', "Debe seleccionar un torneo o marcar la opción de 'Partido Casual'.")
         
@@ -284,23 +290,75 @@ class PartidoForm(forms.ModelForm):
         fecha = self.cleaned_data.get('fecha')
         if not fecha:
             return fecha
-            
         if fecha < timezone.now().date():
             raise forms.ValidationError("La fecha del partido no puede estar en el pasado")
         return fecha
 
-    def clean_hora(self):
-        hora = self.cleaned_data.get('hora')
-        if not hora:
-            return hora
+
+class PartidoResultForm(forms.ModelForm):
+    ganador = forms.ModelChoiceField(
+        queryset=Usuario.objects.none(),
+        label="Ganador del Partido",
+        widget=forms.Select(attrs={
+            'class': 'form-select',
+            'required': 'required'
+        }),
+        help_text="Seleccione el jugador que ganó el partido"
+    )
+    
+    class Meta:
+        model = Partido
+        fields = ['marcador', 'ganador']
+        widgets = {
+            'marcador': forms.TextInput(attrs={
+                'pattern': r'^(\d+-\d+)(,?\s*\d+-\d+)*$', 
+                'title': 'Formato: Sets separados por coma (Ej: 6-4, 6-3) o conteo simple de sets ganados (Ej: 2-1)',
+                'placeholder': 'Ej: 6-4, 6-3 o 2-1',
+                'class': 'form-control',
+                'required': 'required'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate ganador choices with the match players
+        if self.instance and self.instance.pk:
+            jugadores = self.instance.jugadores.all()
+            self.fields['ganador'].queryset = jugadores
             
-        import datetime
-        limit_start = datetime.time(8, 0)
-        limit_end = datetime.time(22, 0)
+            # Customize the display of each player option
+            def label_from_instance(obj):
+                return f"{obj.get_full_name()} (C.I: {obj.cedula})"
+            
+            self.fields['ganador'].label_from_instance = label_from_instance
+
+    def clean_marcador(self):
+        marcador = self.cleaned_data.get('marcador')
+        if not marcador:
+            raise forms.ValidationError("El marcador es obligatorio")
+            
+        import re
+        if not re.match(r'^(\d+-\d+)(,?\s*\d+-\d+)*$', marcador):
+             raise forms.ValidationError("Formato inválido. Use formato de sets: 6-4, 6-3 o conteo simple: 2-1")
+        return marcador
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        ganador = cleaned_data.get('ganador')
         
-        if hora < limit_start or hora > limit_end:
-            raise forms.ValidationError("El partido debe ser entre 8:00 AM y 10:00 PM")
-        return hora
+        if self.instance and self.instance.pk:
+            jugadores = list(self.instance.jugadores.all())
+            
+            # Validate exactly 2 players
+            if len(jugadores) != 2:
+                raise forms.ValidationError("El partido debe tener exactamente 2 jugadores para registrar el resultado")
+            
+            # Validate winner is one of the players
+            if ganador and ganador not in jugadores:
+                raise forms.ValidationError("El ganador debe ser uno de los jugadores del partido")
+        
+        return cleaned_data
+
 
 
 class ReservaCanchaForm(forms.ModelForm):

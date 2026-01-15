@@ -36,8 +36,10 @@
                 <div class="card-body">
                     <h5 class="card-title text-primary"><i class="bi bi-clock"></i> Horario y Tarifas</h5>
                     <ul class="list-unstyled mt-3">
-                        <li class="mb-2"><strong><i class="bi bi-cash-coin"></i> Precio por hora:</strong> ${{ cancha.precio_hora }}</li>
-                        <li class="mb-2"><strong><i class="bi bi-hourglass-split"></i> Horario:</strong> {{ cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</li>
+                        <li class="mb-2"><strong><i class="bi bi-cash-coin"></i> Precio por hora:</strong> ${{
+                            cancha.precio_hora }}</li>
+                        <li class="mb-2"><strong><i class="bi bi-hourglass-split"></i> Horario:</strong> {{
+                            cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</li>
 
                     </ul>
                 </div>
@@ -45,7 +47,8 @@
 
             <div class="mb-5">
                 <h5>Descripción</h5>
-                <p class="lead fs-6">{{ cancha.descripcion|default:"No hay descripción disponible para esta cancha."|linebreaks }}</p>
+                <p class="lead fs-6">{{ cancha.descripcion|default:"No hay descripción disponible para esta
+                    cancha."|linebreaks }}</p>
             </div>
 
             <div class="d-grid gap-2">

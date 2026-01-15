@@ -44,10 +44,13 @@ urlpatterns = [
     path('admin-gestion/arbitros/<int:arbitro_id>/eliminar/', views.admin_delete_referee, name='admin_delete_arbitro'),
 
     # 🗓️ Partidos (Admin)
+    # 🗓️ Partidos (Admin)
     path('admin-gestion/partidos/', views.admin_match_list, name='admin_partidos_list'),
     path('admin-gestion/partidos/crear/', views.admin_create_match, name='admin_create_match'),
+    path('admin-gestion/partidos/pendientes/', views.admin_pending_results_list, name='admin_pending_results_list'), # Nueva ruta
     path('admin-gestion/partidos/<int:partido_id>/', views.admin_match_detail, name='admin_match_detail'),
     path('admin-gestion/partidos/<int:partido_id>/editar/', views.admin_edit_match, name='admin_edit_match'),
+    path('admin-gestion/partidos/<int:partido_id>/resultado/', views.admin_record_result, name='admin_record_result'), # Nueva ruta
     path('admin-gestion/partidos/<int:partido_id>/eliminar/', views.admin_delete_match, name='admin_delete_match'),
 
     # 🧑‍🎾 Reservas (Jugador)

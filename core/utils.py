@@ -41,3 +41,17 @@ def IsJugador(User):
         bool: True if user is authenticated and is a player
     """
     return User.is_authenticated and User.es_jugador
+
+
+def IsAdminOrArbitro(User):
+    """
+    Check if a user is either an admin or a referee.
+    
+    Args:
+        User: The user object to check
+        
+    Returns:
+        bool: True if user is authenticated and is an admin OR a referee
+    """
+    return User.is_authenticated and (User.es_admin_aso or User.es_arbitro)
+
