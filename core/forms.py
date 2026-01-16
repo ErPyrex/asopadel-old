@@ -372,24 +372,29 @@ class PartidoSchedulingForm(forms.ModelForm):
     
     def save(self, commit=True):
         instance = super().save(commit=False)
+
+        def save_m2m():
+            # Clear and populate team fields
+            instance.equipo1.clear()
+            instance.equipo2.clear()
+            
+            # Add team 1 players
+            if self.cleaned_data.get('equipo1_jugador1'):
+                instance.equipo1.add(self.cleaned_data['equipo1_jugador1'])
+            if self.cleaned_data.get('equipo1_jugador2'):
+                instance.equipo1.add(self.cleaned_data['equipo1_jugador2'])
+            
+            # Add team 2 players
+            if self.cleaned_data.get('equipo2_jugador1'):
+                instance.equipo2.add(self.cleaned_data['equipo2_jugador1'])
+            if self.cleaned_data.get('equipo2_jugador2'):
+                instance.equipo2.add(self.cleaned_data['equipo2_jugador2'])
+
         if commit:
             instance.save()
-        
-        # Clear and populate team fields
-        instance.equipo1.clear()
-        instance.equipo2.clear()
-        
-        # Add team 1 players
-        if self.cleaned_data.get('equipo1_jugador1'):
-            instance.equipo1.add(self.cleaned_data['equipo1_jugador1'])
-        if self.cleaned_data.get('equipo1_jugador2'):
-            instance.equipo1.add(self.cleaned_data['equipo1_jugador2'])
-        
-        # Add team 2 players
-        if self.cleaned_data.get('equipo2_jugador1'):
-            instance.equipo2.add(self.cleaned_data['equipo2_jugador1'])
-        if self.cleaned_data.get('equipo2_jugador2'):
-            instance.equipo2.add(self.cleaned_data['equipo2_jugador2'])
+            save_m2m()
+        else:
+            self.save_m2m = save_m2m
         
         return instance
 

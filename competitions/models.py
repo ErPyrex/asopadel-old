@@ -61,7 +61,8 @@ class Partido(models.Model):
     ], default='pendiente')
 
     def __str__(self):
-        return f"{self.torneo.nombre} - {self.fecha} {self.hora}"
+        torneo_nombre = self.torneo.nombre if self.torneo else "Partido Casual"
+        return f"{torneo_nombre} - {self.fecha} {self.hora}"
 
     class Meta:
         ordering = ['fecha', 'hora']
