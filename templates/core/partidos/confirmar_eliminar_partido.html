@@ -22,14 +22,27 @@
                             </p>
                             <p class="mb-1"><strong>Fecha:</strong> {{ partido.fecha }} a las {{ partido.hora }}</p>
                             <p class="mb-1"><strong>Jugadores:</strong>
+                                {% if partido.equipo1.exists %}
+                                <br>
+                                <small class="text-muted ms-2">Equipo 1:</small>
+                                {% for jugador in partido.equipo1.all %}
+                                {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                                <br>
+                                <small class="text-muted ms-2">Equipo 2:</small>
+                                {% for jugador in partido.equipo2.all %}
+                                {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                {# Fallback para partidos viejos #}
                                 {% for jugador in partido.jugadores.all %}
                                 {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
                                 {% empty %}
                                 Sin jugadores
                                 {% endfor %}
+                                {% endif %}
                             </p>
-                            <p class="mb-1"><strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No
-                                asignado" }}</p>
+                            <p class="mb-1"><strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No asignado" }}</p>
                             <p class="mb-1"><strong>Estado:</strong>
                                 <span class="badge 
                                     {% if partido.estado == 'pendiente' %}bg-warning text-dark

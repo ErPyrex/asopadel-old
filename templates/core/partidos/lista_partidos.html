@@ -71,11 +71,18 @@
                     <td>{{ partido.fecha }}</td>
                     <td>{{ partido.hora }}</td>
                     <td>
-                        {% for jugador in partido.jugadores.all %}
-                        {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
-                        {% empty %}
-                        <span class="text-muted">Sin jugadores</span>
+                        {% if partido.equipo1.exists or partido.equipo2.exists %}
+                        <small class="d-block text-primary fw-bold">E1:</small>
+                        {% for j in partido.equipo1.all %}
+                        <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
                         {% endfor %}
+                        <small class="d-block text-danger fw-bold mt-1">E2:</small>
+                        {% for j in partido.equipo2.all %}
+                        <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
+                        {% endfor %}
+                        {% else %}
+                        <span class="text-muted">Sin jugadores</span>
+                        {% endif %}
                     </td>
                     <td>{{ partido.arbitro.get_full_name|default:"-" }}</td>
                     <td>
