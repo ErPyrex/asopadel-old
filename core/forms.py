@@ -206,77 +206,159 @@ class CanchaForm(forms.ModelForm):
             
         return nombre
 
-class PartidoForm(forms.ModelForm):
+class UsuarioChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.first_name} {obj.last_name} (C.I-{obj.cedula})"
+
+class UsuarioMultipleChoiceField(forms.ModelMultipleChoiceField):
+    def label_from_instance(self, obj):
+        return f"{obj.first_name} {obj.last_name} (C.I-{obj.cedula})"
+
+class PartidoSchedulingForm(forms.ModelForm):
     es_casual = forms.BooleanField(
         required=False, 
         label="¿Es partido casual/amistoso?",
         help_text="Marque esta casilla si el partido no pertenece a ningún torneo."
     )
+    
+    arbitro = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_arbitro=True),
+        required=False,
+        label="Árbitro",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    # Team 1 Players
+    equipo1_jugador1 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 1 - Jugador 1",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    equipo1_jugador2 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 1 - Jugador 2 (Opcional para dobles)",
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    # Team 2 Players
+    equipo2_jugador1 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 2 - Jugador 1",
+        required=True,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    equipo2_jugador2 = UsuarioChoiceField(
+        queryset=Usuario.objects.filter(es_jugador=True),
+        label="Equipo 2 - Jugador 2 (Opcional para dobles)",
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    HORARIOS_DISPONIBLES = [
+        ('08:00', '08:00 AM - 10:00 AM'),
+        ('10:00', '10:00 AM - 12:00 PM'),
+        ('12:00', '12:00 PM - 02:00 PM'),
+        ('14:00', '02:00 PM - 04:00 PM'),
+        ('16:00', '04:00 PM - 06:00 PM'),
+        ('18:00', '06:00 PM - 08:00 PM'),
+        ('20:00', '08:00 PM - 10:00 PM'),
+    ]
+
+    hora = forms.ChoiceField(
+        choices=HORARIOS_DISPONIBLES,
+        label="Horario",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
 
     class Meta:
         model = Partido
-        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'jugadores', 'arbitro', 'marcador', 'estado']
+        fields = ['torneo', 'es_casual', 'cancha', 'fecha', 'hora', 'arbitro']
         widgets = {
             'fecha': forms.DateInput(attrs={'type': 'date', 'title': 'Selecciona una fecha válida (no pasada)'}),
-            'hora': forms.TimeInput(attrs={
-                'type': 'time',
-                'class': 'form-control',
-                'style': 'width: auto; max-width: 200px; display: inline-block;',
-                'min': '08:00',
-                'max': '22:00',
-                'title': 'El horario de partidos es de 8:00 AM a 10:00 PM',
-                'oninvalid': "this.setCustomValidity('El horario de partidos es de 8:00 AM a 10:00 PM')",
-                'oninput': "this.setCustomValidity('')"
-            }),
-            'jugadores': forms.SelectMultiple(attrs={'class': 'form-control'}),
-            'estado': forms.Select(attrs={'class': 'form-control'}),
-            'marcador': forms.TextInput(attrs={
-                'pattern': r'^(\d-\d)(,?\s*\d-\d)*$', 
-                'title': 'Formato: Sets separados por coma o espacio (Ej: 6-4, 6-3)',
-                'placeholder': 'Ej: 6-4, 6-3',
-                'class': 'form-control'
-            }),
             'torneo': forms.Select(attrs={'class': 'form-control'}),
         }
 
-    def clean_marcador(self):
-        marcador = self.cleaned_data.get('marcador')
-        if not marcador:
-            return marcador
-            
-        import re
-        # Validar formato: "6-4" o "6-4, 6-3"
-        if not re.match(r'^(\d-\d)(,?\s*\d-\d)*$', marcador):
-             raise forms.ValidationError("Formato inválido. Use formato de sets: 6-4, 6-3")
-        return marcador
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['jugadores'].queryset = Usuario.objects.filter(es_jugador=True)
-        self.fields['arbitro'].queryset = Usuario.objects.filter(es_arbitro=True)
         
-        # Restaurar etiqueta por defecto y hacer requerido inicialmente (se valida en clean)
-        self.fields['torneo'].required = False  # False para manejarlo manualmente en clean()
+        # Restaurar etiqueta por defecto y hacer requerido inicialmente
+        self.fields['torneo'].required = False  
         self.fields['torneo'].empty_label = "--------- Seleccione un Torneo ---------"
         self.fields['torneo'].help_text = "Seleccione el torneo al que pertenece el partido."
+        
+        # Add empty option for optional players
+        self.fields['equipo1_jugador2'].empty_label = "--------- Sin segundo jugador (individuales) ---------"
+        self.fields['equipo2_jugador2'].empty_label = "--------- Sin segundo jugador (individuales) ---------"
+        
+        # Load existing team data when editing
+        if self.instance and self.instance.pk:
+            equipo1_jugadores = list(self.instance.equipo1.all())
+            equipo2_jugadores = list(self.instance.equipo2.all())
+            
+            # Populate equipo1 fields
+            if len(equipo1_jugadores) >= 1:
+                self.fields['equipo1_jugador1'].initial = equipo1_jugadores[0]
+            if len(equipo1_jugadores) >= 2:
+                self.fields['equipo1_jugador2'].initial = equipo1_jugadores[1]
+            
+            # Populate equipo2 fields
+            if len(equipo2_jugadores) >= 1:
+                self.fields['equipo2_jugador1'].initial = equipo2_jugadores[0]
+            if len(equipo2_jugadores) >= 2:
+                self.fields['equipo2_jugador2'].initial = equipo2_jugadores[1]
         
         # Validación HTML5: Bloquear fechas pasadas
         today_str = timezone.now().date().isoformat()
         if 'fecha' in self.fields:
             self.fields['fecha'].widget.attrs['min'] = today_str
 
+
     def clean(self):
         cleaned_data = super().clean()
         es_casual = cleaned_data.get('es_casual')
         torneo = cleaned_data.get('torneo')
-
+        
+        # Validate tournament
         if es_casual:
-            # Si es casual, limpiamos el torneo para que sea NULL
             cleaned_data['torneo'] = None
         else:
-            # Si NO es casual, el torneo es obligatorio
             if not torneo:
                 self.add_error('torneo', "Debe seleccionar un torneo o marcar la opción de 'Partido Casual'.")
+        
+        # Get players
+        eq1_j1 = cleaned_data.get('equipo1_jugador1')
+        eq1_j2 = cleaned_data.get('equipo1_jugador2')
+        eq2_j1 = cleaned_data.get('equipo2_jugador1')
+        eq2_j2 = cleaned_data.get('equipo2_jugador2')
+        
+        # Collect all selected players (excluding None)
+        all_players = [p for p in [eq1_j1, eq1_j2, eq2_j1, eq2_j2] if p]
+        
+        # Validate: At least 2 players total
+        if len(all_players) < 2:
+            raise forms.ValidationError("Debe seleccionar al menos 2 jugadores (1 por equipo)")
+        
+        # Validate: No duplicate players
+        if len(all_players) != len(set(all_players)):
+            raise forms.ValidationError("No puede seleccionar el mismo jugador en múltiples posiciones")
+        
+        # Validate: Both teams must have at least 1 player
+        if not eq1_j1:
+            self.add_error('equipo1_jugador1', "El Equipo 1 debe tener al menos un jugador")
+        if not eq2_j1:
+            self.add_error('equipo2_jugador1', "El Equipo 2 debe tener al menos un jugador")
+        
+        # Validate: Team balance (both teams should have same number of players)
+        equipo1_count = sum([1 for p in [eq1_j1, eq1_j2] if p])
+        equipo2_count = sum([1 for p in [eq2_j1, eq2_j2] if p])
+        
+        if equipo1_count != equipo2_count:
+            raise forms.ValidationError(
+                f"Ambos equipos deben tener la misma cantidad de jugadores. "
+                f"Equipo 1: {equipo1_count}, Equipo 2: {equipo2_count}"
+            )
         
         return cleaned_data
 
@@ -284,23 +366,92 @@ class PartidoForm(forms.ModelForm):
         fecha = self.cleaned_data.get('fecha')
         if not fecha:
             return fecha
-            
         if fecha < timezone.now().date():
             raise forms.ValidationError("La fecha del partido no puede estar en el pasado")
         return fecha
-
-    def clean_hora(self):
-        hora = self.cleaned_data.get('hora')
-        if not hora:
-            return hora
-            
-        import datetime
-        limit_start = datetime.time(8, 0)
-        limit_end = datetime.time(22, 0)
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
         
-        if hora < limit_start or hora > limit_end:
-            raise forms.ValidationError("El partido debe ser entre 8:00 AM y 10:00 PM")
-        return hora
+        # Clear and populate team fields
+        instance.equipo1.clear()
+        instance.equipo2.clear()
+        
+        # Add team 1 players
+        if self.cleaned_data.get('equipo1_jugador1'):
+            instance.equipo1.add(self.cleaned_data['equipo1_jugador1'])
+        if self.cleaned_data.get('equipo1_jugador2'):
+            instance.equipo1.add(self.cleaned_data['equipo1_jugador2'])
+        
+        # Add team 2 players
+        if self.cleaned_data.get('equipo2_jugador1'):
+            instance.equipo2.add(self.cleaned_data['equipo2_jugador1'])
+        if self.cleaned_data.get('equipo2_jugador2'):
+            instance.equipo2.add(self.cleaned_data['equipo2_jugador2'])
+        
+        return instance
+
+
+class PartidoResultForm(forms.ModelForm):
+    equipo_ganador = forms.ChoiceField(
+        choices=[(1, 'Equipo 1'), (2, 'Equipo 2')],
+        label="Equipo Ganador",
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        help_text="Seleccione el equipo que ganó el partido"
+    )
+    
+    class Meta:
+        model = Partido
+        fields = ['marcador', 'equipo_ganador']
+        widgets = {
+            'marcador': forms.TextInput(attrs={
+                'pattern': r'^(\d+-\d+)(,?\s*\d+-\d+)*$', 
+                'title': 'Formato: Sets separados por coma (Ej: 6-4, 6-3) o conteo simple de sets ganados (Ej: 2-1)',
+                'placeholder': 'Ej: 6-4, 6-3 o 2-1',
+                'class': 'form-control',
+                'required': 'required'
+            }),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # No need to populate choices dynamically, they're static (1 or 2)
+
+    def clean_marcador(self):
+        marcador = self.cleaned_data.get('marcador')
+        if not marcador:
+            raise forms.ValidationError("El marcador es obligatorio")
+            
+        import re
+        if not re.match(r'^(\d+-\d+)(,?\s*\d+-\d+)*$', marcador):
+             raise forms.ValidationError("Formato inválido. Use formato de sets: 6-4, 6-3 o conteo simple: 2-1")
+        return marcador
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        equipo_ganador = cleaned_data.get('equipo_ganador')
+        
+        if self.instance and self.instance.pk:
+            equipo1_jugadores = list(self.instance.equipo1.all())
+            equipo2_jugadores = list(self.instance.equipo2.all())
+            
+            # Validate teams exist
+            if not equipo1_jugadores and not equipo2_jugadores:
+                raise forms.ValidationError(
+                    "El partido no tiene equipos configurados. "
+                    "Asegúrese de que el partido tenga jugadores asignados a cada equipo."
+                )
+            
+            # Validate at least 2 players total
+            total_players = len(equipo1_jugadores) + len(equipo2_jugadores)
+            if total_players < 2:
+                raise forms.ValidationError("El partido debe tener al menos 2 jugadores para registrar el resultado")
+        
+        return cleaned_data
+
+
 
 
 class ReservaCanchaForm(forms.ModelForm):

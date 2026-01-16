@@ -36,7 +36,21 @@ class Partido(models.Model):
     cancha = models.ForeignKey('facilities.Cancha', on_delete=models.SET_NULL, null=True)
     fecha = models.DateField()
     hora = models.TimeField()
-    jugadores = models.ManyToManyField(Usuario, related_name='partidos_jugados')
+    
+    # NEW: Team-based fields (Padel: 1v1 or 2v2)
+    equipo1 = models.ManyToManyField(Usuario, related_name='partidos_equipo1', blank=True, verbose_name='Equipo 1')
+    equipo2 = models.ManyToManyField(Usuario, related_name='partidos_equipo2', blank=True, verbose_name='Equipo 2')
+    equipo_ganador = models.PositiveSmallIntegerField(
+        choices=[(1, 'Equipo 1'), (2, 'Equipo 2')],
+        null=True, 
+        blank=True,
+        verbose_name='Equipo Ganador'
+    )
+    
+    # OLD: Kept for backward compatibility (will be migrated)
+    jugadores = models.ManyToManyField(Usuario, related_name='partidos_jugados', blank=True)
+    ganador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='partidos_ganados', verbose_name='Ganador')
+    
     arbitro = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='partidos_arbitrados')
     marcador = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=50, choices=[

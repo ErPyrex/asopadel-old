@@ -9,16 +9,17 @@ from blog.models import Noticia
 from competitions.models import Torneo, Partido
 from facilities.models import Cancha, ReservaCancha
 from users.models import Usuario
-from .forms import NoticiaForm, TorneoForm, CanchaForm, PartidoForm, ReservaCanchaForm
+from .forms import NoticiaForm, TorneoForm, CanchaForm, PartidoSchedulingForm, PartidoResultForm, ReservaCanchaForm
 from users.forms import CustomUsuarioCreationForm
 from users.forms_admin import AdminUsuarioChangeForm
 from .forms import JugadorForm, ArbitroForm
-from .utils import IsAdmin, IsArbitro, IsJugador
+from .utils import IsAdmin, IsArbitro, IsJugador, IsAdminOrArbitro
 
 # Aliases for backward compatibility with existing code
 is_admin = IsAdmin
 is_arbitro = IsArbitro
 is_jugador = IsJugador
+is_admin_or_arbitro = IsAdminOrArbitro
 
 # 🧭 Redirección por rol
 @login_required
@@ -286,25 +287,39 @@ def admin_delete_referee(request, arbitro_id):
 def arbitro_dashboard(request):
     """
     Dashboard view for referees (arbitros).
+    Show assigned tournaments and court status.
     """
-    return render(request, 'users/panel_arbitro.html')
+    torneos = Torneo.objects.filter(arbitro=request.user)
+    canchas = Cancha.objects.all()
+    
+    return render(request, 'users/panel_arbitro.html', {
+        'torneos': torneos,
+        'canchas': canchas,
+    })
 
 
 # ====================================================================================
 # 🗓️ Crear partido
 # ====================================================================================
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_arbitro)
 def admin_create_match(request):
-    form = PartidoForm(request.POST or None)
+    """
+    Vista para agendar un partido (sin resultado).
+    Estado inicial: 'pendiente'.
+    """
+    form = PartidoSchedulingForm(request.POST or None)
     if form.is_valid():
-        form.save()
-        messages.success(request, "Partido registrado exitosamente.")
+        partido = form.save(commit=False)
+        partido.estado = 'pendiente'  # Force pending state
+        partido.save()
+        form.save_m2m() # Save ManyToMany (jugadores)
+        messages.success(request, "Partido agendado exitosamente.")
         return redirect('core:admin_partidos_list')
     return render(request, 'core/partidos/crear_partido.html', {'form': form})
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_arbitro)
 def admin_match_list(request):
     """Lista todos los partidos con filtros opcionales"""
     partidos = Partido.objects.all().select_related('torneo', 'cancha', 'arbitro').prefetch_related('jugadores')
@@ -357,7 +372,7 @@ def admin_match_list(request):
     return render(request, 'core/partidos/lista_partidos.html', context)
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_arbitro)
 def admin_match_detail(request, partido_id):
     """Muestra los detalles de un partido específico"""
     partido = get_object_or_404(Partido, id=partido_id)
@@ -369,19 +384,19 @@ def admin_match_detail(request, partido_id):
     return render(request, 'core/partidos/detalle_partido.html', context)
 
 @login_required
-@user_passes_test(is_admin)
+@user_passes_test(is_admin_or_arbitro)
 def admin_edit_match(request, partido_id):
-    """Edita un partido existente"""
+    """Edita los detalles de agenda de un partido existente"""
     partido = get_object_or_404(Partido, id=partido_id)
     
     if request.method == 'POST':
-        form = PartidoForm(request.POST, instance=partido)
+        form = PartidoSchedulingForm(request.POST, instance=partido)
         if form.is_valid():
             form.save()
-            messages.success(request, "Partido actualizado exitosamente.")
+            messages.success(request, "Detalles del partido actualizados exitosamente.")
             return redirect('core:admin_partidos_list')
     else:
-        form = PartidoForm(instance=partido)
+        form = PartidoSchedulingForm(instance=partido)
     
     context = {
         'form': form,
@@ -389,6 +404,39 @@ def admin_edit_match(request, partido_id):
     }
     
     return render(request, 'core/partidos/editar_partido.html', context)
+
+
+@login_required
+@user_passes_test(is_admin_or_arbitro)
+def admin_pending_results_list(request):
+    """
+    Lista de partidos pendientes o confirmados que necesitan carga de resultados.
+    """
+    partidos = Partido.objects.filter(estado__in=['pendiente', 'confirmado']).order_by('fecha', 'hora')
+    return render(request, 'core/partidos/lista_pendientes_resultados.html', {'partidos': partidos})
+
+
+@login_required
+@user_passes_test(is_admin_or_arbitro)
+def admin_record_result(request, partido_id):
+    """
+    Vista para cargar el resultado de un partido.
+    Cambia el estado a 'finalizado'.
+    """
+    partido = get_object_or_404(Partido, id=partido_id)
+    
+    if request.method == 'POST':
+        form = PartidoResultForm(request.POST, instance=partido)
+        if form.is_valid():
+            partido = form.save(commit=False)
+            partido.estado = 'finalizado'
+            partido.save()
+            messages.success(request, "Resultado cargado y partido finalizado.")
+            return redirect('core:admin_pending_results_list')
+    else:
+        form = PartidoResultForm(instance=partido)
+    
+    return render(request, 'core/partidos/cargar_resultado.html', {'form': form, 'partido': partido})
 
 @login_required
 @user_passes_test(is_admin)

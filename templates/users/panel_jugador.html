@@ -26,13 +26,13 @@
                         <div class="card-body">
                             <h5 class="card-title">Torneos inscritos</h5>
                             {% if torneos %}
-                                <ul class="list-group">
-                                    {% for torneo in torneos %}
-                                        <li class="list-group-item">{{ torneo.nombre }}</li>
-                                    {% endfor %}
-                                </ul>
+                            <ul class="list-group">
+                                {% for torneo in torneos %}
+                                <li class="list-group-item">{{ torneo.nombre }}</li>
+                                {% endfor %}
+                            </ul>
                             {% else %}
-                                <p>No estás inscrito en ningún torneo.</p>
+                            <p>No estás inscrito en ningún torneo.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -50,13 +50,13 @@
                         <div class="card-body">
                             <h5 class="card-title">Reservas activas</h5>
                             {% if reservas %}
-                                <ul class="list-group">
-                                    {% for reserva in reservas %}
-                                        <li class="list-group-item">{{ reserva.cancha.nombre }} - {{ reserva.fecha }}</li>
-                                    {% endfor %}
-                                </ul>
+                            <ul class="list-group">
+                                {% for reserva in reservas %}
+                                <li class="list-group-item">{{ reserva.cancha.nombre }} - {{ reserva.fecha }}</li>
+                                {% endfor %}
+                            </ul>
                             {% else %}
-                                <p>No tienes reservas activas.</p>
+                            <p>No tienes reservas activas.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -64,12 +64,12 @@
                         <div class="card-body">
                             <h5 class="card-title">Estadísticas personales</h5>
                             {% if estadisticas %}
-                                <ul class="list-group">
-                                    <li class="list-group-item">Partidos jugados: {{ estadisticas.partidos_jugados }}</li>
-                                    <li class="list-group-item">Victorias: {{ estadisticas.victorias }}</li>
-                                </ul>
+                            <ul class="list-group">
+                                <li class="list-group-item">Partidos jugados: {{ estadisticas.partidos_jugados }}</li>
+                                <li class="list-group-item">Victorias: {{ estadisticas.victorias }}</li>
+                            </ul>
                             {% else %}
-                                <p>No tienes estadísticas registradas.</p>
+                            <p>No tienes estadísticas registradas.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -80,13 +80,13 @@
                 <div class="card-body">
                     <h5 class="card-title">Historial de Partidos</h5>
                     {% if partidos %}
-                        <ul class="list-group">
-                            {% for partido in partidos %}
-                                <li class="list-group-item">{{ partido.torneo.nombre }} - {{ partido.fecha }}</li>
-                            {% endfor %}
-                        </ul>
+                    <ul class="list-group">
+                        {% for partido in partidos %}
+                        <li class="list-group-item">{{ partido.torneo.nombre }} - {{ partido.fecha }}</li>
+                        {% endfor %}
+                    </ul>
                     {% else %}
-                        <p>No has jugado partidos registrados.</p>
+                    <p>No has jugado partidos registrados.</p>
                     {% endif %}
                 </div>
             </div>

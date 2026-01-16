@@ -231,7 +231,7 @@ a:hover {
 /* Sidebar */
 .sidebar-rounded {
     border-radius: var(--border-radius-lg);
-    height: 52.5vh;
+    height: 58.5vh;
     border: 2px solid var(--color-primary);
     overflow-y: auto;
     /*box-shadow: var(--shadow-base);*/
@@ -288,7 +288,7 @@ a:hover {
 
     .sidebar-rounded {
 
-        height: 52.5vh;
+        height: 58.5vh;
         max-height: initial;
     }
 

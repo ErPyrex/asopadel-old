@@ -23,8 +23,17 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ cancha.nombre }}</h5>
                     <p class="card-text"><i class="bi bi-geo-alt-fill text-danger"></i> {{ cancha.ubicacion }}</p>
-                    <p class="card-text"><strong>Estado:</strong> <span class="badge bg-{{ cancha.estado|lower }}">{{
-                            cancha.estado|title }}</span></p>
+                    <p class="card-text"><strong>Estado:</strong>
+                        {% if cancha.estado == 'disponible' %}
+                        <span class="badge bg-success">Disponible</span>
+                        {% elif cancha.estado == 'ocupada' or cancha.estado == 'reservada' %}
+                        <span class="badge bg-danger">Ocupada</span>
+                        {% elif cancha.estado == 'mantenimiento' %}
+                        <span class="badge bg-warning text-dark">Mantenimiento</span>
+                        {% else %}
+                        <span class="badge bg-secondary">{{ cancha.estado|title }}</span>
+                        {% endif %}
+                    </p>
                 </div>
                 <div class="card-footer">
                     <a href="{% url 'core:admin_edit_court' cancha.id %}"
