@@ -619,10 +619,14 @@ def home(request):
     # Obtener Top 10 del ranking
     ranking = Usuario.objects.filter(es_jugador=True).order_by('-ranking')[:10]
 
+    # Obtener últimos partidos
+    partidos = Partido.objects.all().select_related('torneo', 'cancha').prefetch_related('equipo1', 'equipo2').order_by('-fecha', '-hora')[:10]
+
     context = {
         'noticias': noticias,
         'canchas': canchas,
         'torneos': torneos,
         'ranking': ranking,
+        'partidos': partidos,
     }
     return render(request, 'home.html', context)

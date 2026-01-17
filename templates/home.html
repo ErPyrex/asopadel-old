@@ -2,140 +2,207 @@
 {% block title %}ASOPADEL BARINAS{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container py-5">
 
-  <div class="row justify-content-center mt-5">
-    <div class="col-md-8">
-      <div class="card text-center shadow-sm mb-5">
-        <div class="card-body">
-          <h3 class="card-title">Accede a tu panel</h3>
-          {% if user.is_authenticated %}
-          <p>Tu sesión está activa. Accede a tu panel personalizado.</p>
-          <a href="{% url 'core:dashboard_by_role' %}" class="btn btn-primary">Ir a mi panel</a>
-          <form method="POST" action="{% url 'users:logout' %}" class="d-inline">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger ms-2">Cerrar sesión</button>
-          </form>
-          {% else %}
-          <p>Inicia sesión para acceder a tu panel personalizado.</p>
-          <a href="{% url 'users:login' %}" class="btn btn-primary">Iniciar sesión</a>
-          {% endif %}
+  <div class="row g-5">
+    <!-- Columna Izquierda: Torneos -->
+    <div class="col-lg-4">
+      <div class="d-flex align-items-baseline gap-2 mb-4">
+        <h2 class="section-title h4 mb-0">🏆 Torneos</h2>
+        <span class="text-muted small">Temporada 2026</span>
+      </div>
+
+      {% if torneos %}
+      {% for torneo in torneos %}
+      <div class="card mb-3 border-0 shadow-sm">
+        <div class="card-body p-3">
+          <h5 class="h6 fw-bold mb-1">{{ torneo.nombre }}</h5>
+          <p class="text-muted small mb-2">{{ torneo.descripcion|truncatechars:60 }}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="badge bg-primary bg-opacity-10 text-primary small">{{ torneo.fecha_inicio|date:"d M" }}</span>
+            <a href="{% url 'core:public_torneos_list' %}"
+              class="btn btn-sm btn-link text-primary text-decoration-none fw-bold p-0">Ver detalles →</a>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-lg-6 mb-5">
-      <section class="tournaments-section">
-        <h3 class="text-center mb-4">Torneos Recientes</h3>
-        {% if torneos %}
-        <div class="list-group">
-          {% for torneo in torneos %}
-          <a href="{% url 'core:public_torneos_list' %}" class="list-group-item list-group-item-action">
-            <h5>{{ torneo.nombre }}</h5>
-            <p class="mb-1"><strong>Ubicación:</strong> {{ torneo.ubicacion }}</p>
-            <small>Fecha de inicio: {{ torneo.fecha_inicio }}</small>
-          </a>
-          {% endfor %}
+      {% endfor %}
+      {% else %}
+      <div class="card border-0 bg-transparent opacity-75">
+        <div class="card-body text-center py-4">
+          <p class="text-muted small mb-0">No hay torneos activos</p>
         </div>
-        {% else %}
-        <p class="text-center">No hay torneos registrados aún.</p>
-        {% endif %}
-      </section>
+      </div>
+      {% endif %}
     </div>
 
-    <div class="col-lg-6 mb-5">
-      <section class="ranking-section">
-        <h3 class="text-center mb-4">Top 10 del Ranking</h3>
-        {% if ranking %}
-        <ul class="list-group">
-          {% for jugador in ranking %}
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>{{ forloop.counter }}. {{ jugador.get_full_name }}</strong>
-              {% if jugador.categoria_jugador %}
-              <br><small class="text-muted">{{ jugador.get_categoria_jugador_display }}</small>
+    <!-- Columna Derecha: Partidos -->
+    <div class="col-lg-8">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <h2 class="section-title h4 mb-0">📅 Últimos Partidos</h2>
+        <div class="filter-tags">
+          <button class="tag-filter active" onclick="filterMatches('all', this)">Todos</button>
+          <button class="tag-filter" onclick="filterMatches('finalizado', this)">Resultados</button>
+          <button class="tag-filter" onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
+        </div>
+      </div>
+
+      <div class="match-list">
+        {% if partidos %}
+        {% for partido in partidos %}
+        <div class="match-card mb-3 show" data-status="{{ partido.estado }}">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small fw-bold text-uppercase">{{ partido.fecha|date:"d M Y" }}</span>
+            <span
+              class="badge {% if partido.estado == 'finalizado' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% else %}text-primary{% endif %} small">
+              {{ partido.get_estado_display }}
+            </span>
+          </div>
+
+          <div class="d-flex align-items-center justify-content-between text-center">
+            <div class="flex-1">
+              <div class="fw-bold h6 mb-0">
+                {% for j in partido.equipo1.all %}
+                {{ j.first_name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                Equipo 1
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="px-3">
+              {% if partido.estado == 'finalizado' %}
+              <div class="match-score h5 mb-0 px-3">{{ partido.marcador|default:"0-0" }}</div>
+              {% else %}
+              <div class="text-muted small fw-bold px-3 py-1 border rounded-pill">VS</div>
               {% endif %}
             </div>
-            <span class="badge bg-primary rounded-pill">{{ jugador.ranking|default:0 }} pts</span>
-          </li>
-          {% endfor %}
-        </ul>
-        <div class="text-center mt-3">
-          <a href="{% url 'core:public_ranking_list' %}" class="btn btn-secondary">Ver Ranking Completo</a>
+
+            <div class="flex-1">
+              <div class="fw-bold h6 mb-0">
+                {% for j in partido.equipo2.all %}
+                {{ j.first_name }}{% if not forloop.last %}, {% endif %}
+                {% empty %}
+                Equipo 2
+                {% endfor %}
+              </div>
+            </div>
+          </div>
         </div>
+        {% endfor %}
         {% else %}
-        <p class="text-center">No hay jugadores en el ranking aún.</p>
-        <p class="text-center text-muted">Los jugadores aparecerán aquí cuando finalicen partidos.</p>
+        <div class="card border-0 bg-transparent opacity-75">
+          <div class="card-body text-center py-5">
+            <p class="text-muted mb-0">No hay partidos programados próximamente.</p>
+          </div>
+        </div>
         {% endif %}
-      </section>
+      </div>
     </div>
   </div>
 
-  <section class="courts-section mb-5">
-    <h3 class="text-center mb-4">Actualidad de las Canchas</h3>
-    <div class="row">
-      {% for cancha in canchas %}
-      <div class="col-md-4 mb-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">
-              <a href="{% url 'core:public_court_detail' cancha.id %}"
-                class="text-decoration-none text-dark stretched-link">
-                {{ cancha.nombre }}
-              </a>
-            </h5>
-            <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
-            <p><strong>Estado:</strong>
-              {% if cancha.estado == 'disponible' %}
-              <span class="badge bg-success">Disponible</span>
-              {% elif cancha.estado == 'reservada' %}
-              <span class="badge bg-danger">Ocupada</span>
-              {% else %}
-              <span class="badge bg-warning text-dark">Mantenimiento</span>
-              {% endif %}
-            </p>
-            {% if user.is_authenticated and user.es_jugador and cancha.estado == 'disponible' %}
-            <form method="get" action="{% url 'core:player_reserve_court' %}">
-              <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
-              <button type="submit" class="btn btn-primary">Reservar</button>
-            </form>
-            {% endif %}
+  <div class="row g-5 mt-4">
+    <!-- Ranking -->
+    <div class="col-lg-5">
+      <h3 class="h5 fw-bold mb-4">⭐ Top Ranking</h3>
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          {% if ranking %}
+          {% for jugador in ranking %}
+          <div
+            class="d-flex align-items-center justify-content-between p-3 {% if not forloop.last %}border-bottom{% endif %}">
+            <div class="d-flex align-items-center">
+              <span class="text-muted me-3 fw-bold small">{{ forloop.counter }}.</span>
+              <div>
+                <div class="fw-bold small">{{ jugador.get_full_name }}</div>
+                <small class="text-muted text-uppercase" style="font-size:10px">
+                  {% if jugador.get_categoria_jugador_display %}{{ jugador.get_categoria_jugador_display }}{% else %}Sin
+                  Categoría{% endif %}
+                </small>
+              </div>
+            </div>
+            <span class="badge bg-primary bg-opacity-10 text-primary">{{ jugador.ranking|default:0 }} pts</span>
           </div>
-        </div>
-      </div>
-      {% empty %}
-      <p class="text-center">No hay canchas disponibles.</p>
-      {% endfor %}
-    </div>
-    <div class="text-center mt-3">
-      <a href="{% url 'core:public_canchas_list' %}" class="btn btn-secondary">Ver Todas las Canchas</a>
-    </div>
-  </section>
-
-  <section class="news-section">
-    <h3 class="text-center mb-4">Noticias Recientes</h3>
-    <div class="row">
-      {% for noticia in noticias %}
-      <div class="col-md-4 mb-4">
-        <div class="card h-100">
-          {% if noticia.imagen %}
-          <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}"
-            style="height: 200px; object-fit: cover;">
+          {% endfor %}
+          <div class="p-3 text-center border-top">
+            <a href="{% url 'core:public_ranking_list' %}" class="btn btn-primary w-100 py-2 fw-bold">Ver Ranking
+              Completo →</a>
+          </div>
           {% endif %}
-          <div class="card-body">
-            <h5 class="card-title">{{ noticia.titulo }}</h5>
-            <p class="card-text">{{ noticia.cuerpo|truncatewords:20 }}</p>
-            <small class="text-muted">Publicado el {{ noticia.fecha_publicacion }}</small>
-          </div>
         </div>
       </div>
-      {% empty %}
-      <p class="text-center">No hay noticias publicadas aún.</p>
-      {% endfor %}
     </div>
-  </section>
+
+    <!-- Canchas -->
+    <div class="col-lg-7">
+      <h3 class="h5 fw-bold mb-4">🎾 Estado de Canchas</h3>
+      <div class="row g-3">
+        {% for cancha in canchas|slice:":4" %}
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h6 class="fw-bold mb-0">{{ cancha.nombre }}</h6>
+                <div class="d-flex align-items-center gap-1">
+                  <span
+                    class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %}"></span>
+                  <small
+                    class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold"
+                    style="font-size: 0.7rem;">
+                    {{ cancha.get_estado_display }}
+                  </small>
+                </div>
+              </div>
+              <small class="text-muted d-block">{{ cancha.ubicacion }}</small>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="mt-4">
+        <a href="{% url 'core:public_canchas_list' %}"
+          class="btn btn-primary w-100 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+          <span>Consultar Disponibilidad de Canchas</span>
+          <i class="bi bi-arrow-right"></i>
+          →
+        </a>
+      </div>
+    </div>
+  </div>
 
 </div>
+
+<script>
+  function filterMatches(filter, btn) {
+    document.querySelectorAll('.tag-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const targets = filter.split(',');
+    document.querySelectorAll('.match-card').forEach(match => {
+      const status = match.getAttribute('data-status');
+      if (filter === 'all' || targets.includes(status)) {
+        match.style.display = 'block';
+        setTimeout(() => match.style.opacity = '1', 10);
+      } else {
+        match.style.opacity = '0';
+        setTimeout(() => match.style.display = 'none', 300);
+      }
+    });
+  }
+</script>
+
+<style>
+  .match-card {
+    transition: opacity 0.3s ease;
+  }
+
+  .status-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+</style>
 {% endblock %}

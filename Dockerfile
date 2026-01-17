@@ -1,19 +1,35 @@
-# Use an official Python runtime as a parent image
+# === Build Stage ===
 FROM python:3.10-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PORT=8000
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+# Install system dependencies (essential for psycopg2 and other tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the project code into the container
+# Install Python dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy project files
+# Note: .dockerignore takes care of what NOT to copy
 COPY . /app/
 
-# Expose the port the app runs on
+# Make scripts executable
+RUN chmod +x /app/entrypoint.sh /app/build.sh
+
+# Entrypoint will handle migrations and starting the server
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# Default port for the app
 EXPOSE 8000

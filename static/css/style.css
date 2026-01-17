@@ -1,59 +1,76 @@
 :root {
-    --color-primary: #1FC7D4;
-    /* Cyan vibrante */
-    --color-secondary: #7645D9;
-    /* Púrpura */
-    --color-accent: #ED4B9E;
-    /* Rosa/Magenta */
-    --color-light: #F4EEFF;
-    /* Lavanda claro */
-    --color-light-alt: #E7E3EB;
-    --color-dark: #280D5F;
-    /* Púrpura oscuro */
-    --color-text: #280D5F;
-    --color-success: #31D0AA;
-    /* Verde menta */
-    --color-warning: #FFB237;
-    /* Naranja dorado */
+    /* Paleta Premium - Refinada y Moderna */
+    --color-primary: #0EA5E9;
+    --color-secondary: #6366F1;
+    --color-accent: #F43F5E;
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
 
-    /* Gradientes - Cyan Oscuro a Morado Oscuro */
-    --gradient-primary: linear-gradient(135deg, #17A2B8 0%, #7C3AED 100%);
-    --gradient-secondary: linear-gradient(135deg, #7645D9 0%, #ED4B9E 100%);
-    --gradient-accent: linear-gradient(135deg, #ED4B9E 0%, #bd872f 100%);
+    --color-dark: #0F172A;
+    --color-text: #334155;
+    --color-text-muted: #64748B;
+    --color-light: #F8FAFC;
+    --color-white: #FFFFFF;
+    --color-border: #E2E8F0;
 
-    /* Tipografía */
+    /* Variables de UI semánticas */
+    --ui-icon-bg: rgba(14, 165, 233, 0.12);
+    /* Opacidad mejorada para light mode */
+
+    --bg-body: linear-gradient(180deg, #F1F5F9 0%, #F8FAFC 100%);
+    --bg-card: #FFFFFF;
+    --bg-navbar: #FFFFFF;
+    --color-heading: #0F172A;
+
+    --gradient-primary: linear-gradient(135deg, #0EA5E9 0%, #6366F1 100%);
+    --gradient-surface: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+
     --font-family-base: 'Poppins', sans-serif;
+    --border-radius-sm: 8px;
+    --border-radius: 16px;
+    --border-radius-lg: 24px;
 
-    /* Bordes redondeados - Más pronunciados */
-    --border-radius-sm: 12px;
-    --border-radius: 20px;
-    --border-radius-lg: 32px;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-base: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-    /* Sombras */
-    --shadow-base: 0 6px 20px rgba(0, 0, 0, 0.07);
-    --shadow-hover: 0 12px 32px rgba(31, 199, 212, 0.2);
-    --shadow-glow: 0 0 20px rgba(31, 199, 212, 0.3);
+    /* Nuevo efecto de enfoque para botones */
+    --btn-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+    --btn-focus-glow: 0 0 0 2px var(--bg-body), 0 0 0 4px var(--color-primary);
 }
 
-/* Reset y estilos base */
-*,
-*::before,
-*::after {
+[data-bs-theme="dark"],
+.dark-mode {
+    --bg-body: #020617;
+    --bg-card: #0F172A;
+    --bg-navbar: #0F172A;
+    --color-text: #E2E8F0;
+    --color-text-muted: #94A3B8;
+    --color-heading: #F8FAFC;
+    --color-border: #1E293B;
+    --color-white: #0F172A;
+    --color-light: #1E293B;
+    --color-dark: #F8FAFC;
+
+    --ui-icon-bg: rgba(56, 189, 248, 0.18);
+    /* Más visible en dark mode */
+}
+
+/* Reset y Base */
+* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* Modo Claro */
 body {
     font-family: var(--font-family-base);
-    background-color: #FAF9FA;
-    background-image:
-        radial-gradient(at 0% 0%, rgba(31, 199, 212, 0.05) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(118, 69, 217, 0.05) 0px, transparent 50%);
+    background: var(--bg-body) !important;
+    background-image: var(--bg-body) !important;
     color: var(--color-text);
-    line-height: 1.7;
+    line-height: 1.6;
     transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
     min-height: 100vh;
 }
 
@@ -63,422 +80,353 @@ h3,
 h4,
 h5,
 h6 {
-    color: var(--color-dark);
+    color: var(--color-heading);
     font-weight: 700;
     margin-bottom: 1rem;
-}
-
-.h2 {
-    font-weight: bold;
 }
 
 a {
     color: var(--color-primary);
     text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 a:hover {
     color: var(--color-secondary);
-    transform: translateY(-1px);
 }
 
-/* Navbar - Gradiente Cyan Oscuro a Morado Oscuro */
 .navbar {
-    background: var(--gradient-primary);
-    box-shadow: var(--shadow-base);
+    background-color: var(--bg-navbar) !important;
+    border-bottom: 1px solid var(--color-border);
     padding: 1rem 0;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
     position: sticky;
     top: 0;
     z-index: 1000;
+    box-shadow: var(--shadow-sm);
 }
 
 .navbar-brand {
-    color: white !important;
-    font-weight: 700;
-    font-size: 1.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--color-heading) !important;
+    letter-spacing: -0.5px;
 }
 
 .nav-link {
-    color: rgba(255, 255, 255, 0.9) !important;
+    color: var(--color-text) !important;
     font-weight: 600;
-    margin-left: 1.5rem;
-    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    margin-left: 1rem;
+    padding: 0.5rem 1rem !important;
     border-radius: var(--border-radius-sm);
-    padding: 0.5rem 1rem;
 }
 
 .nav-link:hover {
-    color: white !important;
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
+    color: var(--color-primary) !important;
+    background-color: var(--color-light);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+    transform: none;
 }
 
-
-
-/* Tarjetas (Cards) - Modo Claro */
+/* Cards */
 .card {
-    border: 2px solid rgba(231, 227, 235, 0.8);
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-base);
-    transition: all 0.3s ease;
-    overflow: hidden;
-    background: var(--gradient-secondary);
-    border-color: #877676;
-}
-
-.card:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(31, 199, 212, 0.3);
+    background: var(--bg-card) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: var(--border-radius);
+    color: var(--color-text);
 }
 
 .card-header {
-    background: var(--gradient-secondary);
-    color: rgb(255, 255, 255);
-    border-top-left-radius: var(--border-radius-lg);
-    border-top-right-radius: var(--border-radius-lg);
-    padding: 1.25rem 1.75rem;
-    font-size: 1.2rem;
-    font-weight: 600;
+    background-color: var(--color-light);
+    border-bottom: 1px solid var(--color-border);
+    padding: 1.25rem;
+    font-weight: 700;
 }
 
 .card-body {
-    padding: 1.75rem;
-    background: rgb(63, 242, 233);
-    color: rgb(113, 8, 173);
-}
-
-/* Botones - Mejorados para mejor legibilidad */
-.btn {
-    border-radius: var(--border-radius);
-    font-weight: 600;
-    padding: 0.8rem 1.8rem;
-    transition: all 0.3s ease;
-    text-transform: none;
-    letter-spacing: 0.3px;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-size: 1rem;
-
-}
-
-.btn-success:hover {
-    background-color: #218838;
-    border-color: #17772d;
-}
-
-/* Personalizar botón primary */
-.btn-primary {
-    background-color: #007bff;
-    /* o el color que prefieras */
-    border-color: #007bff;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #004085;
-}
-
-
-
-.btn-primary {
-    background: var(--gradient-primary);
-    border: none;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--gradient-secondary);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-}
-
-.btn-danger {
-    background-color: #c0392b;
-    border-color: #c0392b;
-    color: white;
-}
-
-/* Formularios - Bordes negros en modo claro */
-.form-control {
-    border-radius: var(--border-radius);
-    padding: 0.8rem 1rem;
-    border: 2px solid #000000;
-    transition: all 0.3s ease;
-    background-color: white;
-}
-
-.form-control:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 0.2rem rgba(31, 199, 212, 0.25);
-    background-color: var(--color-light);
-}
-
-/* Footer - Gradiente Cyan Oscuro a Morado Oscuro */
-.footer {
-    background: var(--gradient-primary);
-    color: rgb(0, 2, 4);
-    padding: 2.5rem 0;
-    margin-top: 4rem;
-    text-align: center;
-}
-
-/* Sidebar */
-.sidebar-rounded {
-    border-radius: var(--border-radius-lg);
-    height: 58.5vh;
-    border: 2px solid var(--color-primary);
-    overflow-y: auto;
-    /*box-shadow: var(--shadow-base);*/
-    transition: all 0.3s ease;
-    background: rgb(255, 255, 255);
-}
-
-.sidebar-rounded a {
-    color: var(--color-text) !important;
-    font-weight: 600;
-    display: block;
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius-sm);
-    text-decoration: none;
-}
-
-.sidebar-rounded a:hover {
-    background-color: var(--color-light);
-    color: var(--color-primary) !important;
-    transform: translateX(5px);
-}
-
-.sidebar-rounded:hover {
-    border-color: var(--color-secondary);
-    /*box-shadow: var(--shadow-hover);*/
-}
-
-/*Responsive*/
-/* --- Tablet Pequeña y Móviles Grandes (a partir de 576px) --- */
-@media (min-width: 576px) {
-    body {
-        font-size: 16px;
-    }
-}
-
-/* --- Tablet (a partir de 768px) --- */
-@media (min-width: 768px) {
-
-
-    .card-body {
-        padding: 1.75rem;
-    }
-
-    .card-header {
-        padding: 1.25rem 1.75rem;
-    }
-}
-
-/* --- Desktop (a partir de 992px) --- */
-@media (min-width: 992px) {
-    .nav-link {
-        margin-left: 1.5rem;
-    }
-
-    .sidebar-rounded {
-
-        height: 58.5vh;
-        max-height: initial;
-    }
-
-}
-
-
-/*modo oscuro-claro*/
-:root[data-bs-theme="dark"] {
-    --bs-body-color: #f0f0f0;
-    --bs-body-bg: #0B0E11;
-}
-
-body.dark-mode {
-    background: linear-gradient(180deg, #0B0E11 0%, #1a1d29 100%) !important;
-    background-attachment: fixed;
-    color: #F4EEFF !important;
-}
-
-/* Títulos en modo oscuro - Color sólido vibrante */
-.dark-mode h1,
-.dark-mode h2,
-.dark-mode h3,
-.dark-mode h4,
-.dark-mode h5,
-.dark-mode h6 {
-    color: #1FC7D4 !important;
-    font-weight: 700 !important;
-    text-shadow: 0 2px 8px rgba(31, 199, 212, 0.3);
-}
-
-/* Enlaces en modo oscuro */
-.dark-mode a {
-    color: var(--color-primary) !important;
-    transition: all 0.3s ease;
-}
-
-.dark-mode a:hover {
-    color: var(--color-accent) !important;
-    text-shadow: 0 0 10px rgba(31, 199, 212, 0.5);
-}
-
-/* Tarjetas en modo oscuro con glassmorphism */
-.dark-mode .card {
-    background: rgba(40, 13, 95, 0.4) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(31, 199, 212, 0.2) !important;
-    /*box-shadow: 0 8px 32px rgba(31, 199, 212, 0.15) !important;*/
-}
-
-.dark-mode .card:hover {
-    border-color: rgba(31, 199, 212, 0.5) !important;
-    box-shadow: 0 12px 40px rgba(31, 199, 212, 0.3) !important;
-}
-
-.dark-mode .card-body,
-.dark-mode .card p,
-.dark-mode .card li {
+    padding: 1.5rem;
     background-color: transparent !important;
-    color: #F4EEFF !important;
 }
 
-/* Header de tarjetas con gradiente vibrante */
-.dark-mode .card-header {
-    background: var(--gradient-secondary) !important;
-    color: white !important;
-    border-bottom: 1px solid rgba(31, 199, 212, 0.3);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+/* Las tarjetas son estáticas por defecto */
+.card:not(.card-static) {
+    border-top: 1px solid var(--color-border) !important;
 }
 
-/* Navbar en modo oscuro - Gradiente Cyan Oscuro a Morado Oscuro */
-.dark-mode .navbar {
-    background: var(--gradient-primary) !important;
-    box-shadow: 0 4px 20px rgba(23, 162, 184, 0.3) !important;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+/* Buttons - Standard Styles (Light Mode) */
+.btn {
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
 }
 
-.dark-mode .nav-link,
-.dark-mode .navbar-brand {
-    color: white !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.dark-mode .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 0 15px rgba(23, 162, 184, 0.4);
-}
-
-/* Footer en modo oscuro - Gradiente Cyan Oscuro a Morado Oscuro */
-.dark-mode .footer {
-    background: var(--gradient-primary) !important;
-    color: white !important;
-    box-shadow: 0 -4px 20px rgba(124, 58, 237, 0.3);
-}
-
-/* Botones en modo oscuro - Texto oscuro para mejor legibilidad */
-.dark-mode .btn-primary {
-    background: var(--gradient-accent) !important;
-    box-shadow: 0 4px 15px rgba(237, 75, 158, 0.4) !important;
-    color: #280D5F !important;
-    font-weight: 700;
-}
-
-.dark-mode .btn-primary:hover {
-    box-shadow: 0 6px 25px rgba(237, 75, 158, 0.6) !important;
-    transform: translateY(-3px) scale(1.05);
-    color: #280D5F !important;
-}
-
-/* Botón success en modo oscuro */
-.dark-mode .btn-success {
-    background: linear-gradient(135deg, #31D0AA 0%, #1FC7D4 100%) !important;
-    box-shadow: 0 4px 15px rgba(49, 208, 170, 0.4) !important;
-    color: #280D5F !important;
-    font-weight: 700;
-    border: none;
-}
-
-.dark-mode .btn-success:hover {
-    box-shadow: 0 6px 25px rgba(49, 208, 170, 0.6) !important;
-    transform: translateY(-3px) scale(1.05);
-    color: #280D5F !important;
-}
-
-/* Formularios en modo oscuro */
-.dark-mode .form-control {
-    background-color: rgba(40, 13, 95, 0.3) !important;
-    border: 2px solid rgba(31, 199, 212, 0.3) !important;
-    color: #F4EEFF !important;
-}
-
-.dark-mode .form-control:focus {
-    background-color: rgba(40, 13, 95, 0.5) !important;
+.btn-primary {
+    background-color: var(--color-primary) !important;
     border-color: var(--color-primary) !important;
-    box-shadow: 0 0 0 0.2rem rgba(31, 199, 212, 0.25),
-        0 0 20px rgba(31, 199, 212, 0.3) !important;
+    color: white !important;
 }
 
-.dark-mode .form-control::placeholder {
-    color: rgba(244, 238, 255, 0.5) !important;
-}
-
-/* Sidebar en modo oscuro */
-.dark-mode .sidebar-rounded {
-    background: rgba(40, 13, 95, 0.3) !important;
-    backdrop-filter: blur(10px);
-    border-color: rgba(31, 199, 212, 0.4) !important;
-    /*box-shadow: 0 8px 32px rgba(31, 199, 212, 0.2) !important;*/
-}
-
-.dark-mode .sidebar-rounded:hover {
-    border-color: var(--color-accent) !important;
-    /*box-shadow: 0 12px 40px rgba(237, 75, 158, 0.3) !important;*/
-}
-
-/* Personalizar botón success  */
 .btn-success {
-    background-color: #21a540;
-    /* o el color que prefieras */
-    border-color: #17772d;
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success) !important;
+    color: white !important;
 }
 
-/* Botón Atrás personalizado */
-.btn-back-custom {
-    width: 60px;
-    height: 60px;
-    border: 4px solid #8c2497 !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 1px 1px 32px rgb(255, 255, 255) !important;
+.btn-warning {
+    background-color: var(--color-warning) !important;
+    border-color: var(--color-warning) !important;
+    color: white !important;
+}
 
+/* Hover effects for Light Mode */
+.btn-primary:hover,
+.btn-success:hover,
+.btn-warning:hover {
+    filter: brightness(1.1);
+    box-shadow: var(--btn-shadow-hover), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--color-primary) !important;
+    background-color: transparent !important;
+    color: var(--color-primary) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+}
+
+.btn-outline-dark {
+    border: 2px solid var(--color-border) !important;
+    background-color: transparent !important;
+    color: var(--color-text) !important;
+}
+
+.btn-outline-dark:hover {
+    border-color: var(--color-primary) !important;
+    color: var(--color-primary) !important;
+    box-shadow: var(--btn-shadow-hover), inset 0 0 0 1px var(--color-primary);
+}
+
+/* --- Buttons - Dark Mode Adaptation (The "Crear Torneo" effect) --- */
+.dark-mode .btn-primary,
+[data-bs-theme="dark"] .btn-primary,
+.dark-mode .btn-success,
+[data-bs-theme="dark"] .btn-success,
+.dark-mode .btn-warning,
+[data-bs-theme="dark"] .btn-warning {
+    background-color: #020617 !important;
+    /* Fondo oscuro en reposo solo para Dark Mode */
+}
+
+.dark-mode .btn-primary:hover,
+[data-bs-theme="dark"] .btn-primary:hover {
+    background-color: var(--color-primary) !important;
+}
+
+.dark-mode .btn-success:hover,
+[data-bs-theme="dark"] .btn-success:hover {
+    background-color: var(--color-success) !important;
+}
+
+.dark-mode .btn-warning:hover,
+[data-bs-theme="dark"] .btn-warning:hover {
+    background-color: var(--color-warning) !important;
+}
+
+/* Outline adjustments for Dark Mode */
+.dark-mode .btn-outline-dark,
+[data-bs-theme="dark"] .btn-outline-dark {
+    border-color: var(--color-border) !important;
+    color: #F8FAFC !important;
+}
+
+.dark-mode .btn-outline-primary,
+[data-bs-theme="dark"] .btn-outline-primary {
+    border-color: var(--color-primary) !important;
+}
+
+/* Home Section Titles */
+.section-title {
+    font-size: 1.75rem;
+    color: var(--color-heading);
+    position: relative;
+    padding-bottom: 8px;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: var(--color-primary);
+    border-radius: 2px;
+}
+
+/* Match Cards */
+.match-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+}
+
+/* Footer */
+.footer {
+    background-color: var(--bg-navbar);
+    border-top: 1px solid var(--color-border);
+    padding: 3rem 0;
+    margin-top: 4rem;
+    color: var(--color-text-muted);
+}
+
+/* Utils */
+.bg-white {
+    background-color: var(--bg-card) !important;
+}
+
+.bg-light {
+    background-color: var(--color-light) !important;
+}
+
+.text-muted {
+    color: var(--color-text-muted) !important;
+}
+
+/* Fix global para opacidad de fondos de iconos en modo claro */
+.bg-opacity-10 {
+    background-color: var(--ui-icon-bg) !important;
+}
+
+.bg-primary.bg-opacity-10 {
+    background-color: rgba(14, 165, 233, 0.15) !important;
+}
+
+.bg-success.bg-opacity-10 {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.bg-warning.bg-opacity-10 {
+    background-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+.bg-secondary.bg-opacity-10 {
+    background-color: rgba(99, 102, 241, 0.15) !important;
+}
+
+.bg-info.bg-opacity-10 {
+    background-color: rgba(6, 182, 212, 0.15) !important;
+}
+
+[data-bs-theme="dark"] .bg-opacity-10,
+.dark-mode .bg-opacity-10 {
+    background-color: var(--ui-icon-bg) !important;
+}
+
+/* Metric Cards */
+.metric-card {
+    border-top: 4px solid var(--color-primary) !important;
+    background: var(--bg-card) !important;
+}
+
+.metric-card .metric-label {
+    color: var(--color-text-muted);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.metric-card .metric-value {
+    color: var(--color-heading);
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+/* Sidebar Fixes */
+.dark-mode #sidebar,
+[data-bs-theme="dark"] #sidebar {
+    background-color: var(--bg-card) !important;
+}
+
+/* Tag Filters */
+.tag-filter {
+    border: 1px solid var(--color-border);
+    background: var(--bg-card);
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: all 0.2s ease;
+}
+
+.tag-filter.active {
+    background: var(--color-dark);
+    color: var(--color-white);
+    border-color: var(--color-dark);
+}
+
+.tag-filter:hover:not(.active) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    box-shadow: var(--btn-shadow-hover), inset 0 0 0 1px var(--color-primary);
+    background: var(--bg-card);
+}
+
+/* Match Score */
+.match-score {
+    background: var(--color-dark);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 800;
+}
+
+/* Back Button */
+.btn-back-custom {
+    width: 36px;
+    height: 36px;
+    background: var(--bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    border-radius: 50%;
+    margin-right: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .btn-back-custom:hover {
-    transform: translateY(-3px);
+    background: var(--bg-card);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: var(--btn-shadow-hover), inset 0 0 0 1px var(--color-primary);
+    transform: none;
 }
 
-.btn-back-custom svg {
-    width: 35px;
-    height: 35px;
-    transform: scaleY(-1);
-    transform-origin: center;
+/* Form Controls Focus */
+.form-control {
+    background-color: var(--color-light);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
 }
 
-/* Admin Panel Header Line */
-.admin-header-line {
-    border-bottom-color: rgb(27, 24, 24) !important;
+.form-control:focus {
+    background-color: var(--bg-card);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    outline: none;
 }
-
-body.dark-mode .admin-header-line,
-:root[data-bs-theme="dark"] .admin-header-line {
-    border-bottom-color: rgba(255, 255, 255, 0.2) !important;
+/* Global Text contrast fixes for Dark Mode */
+.dark-mode .text-dark, [data-bs-theme="dark"] .text-dark {
+    color: var(--color-heading) !important;
 }
