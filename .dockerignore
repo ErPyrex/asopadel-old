@@ -8,8 +8,8 @@ __pycache__
 *.pyo
 *.pyd
 .Python
-env
-venv
+env/
+venv/
 pip-log.txt
 pip-delete-this-directory.txt
 
@@ -17,13 +17,16 @@ pip-delete-this-directory.txt
 *.log
 local_settings.py
 db.sqlite3
-media/
-staticfiles/
+/media/
+/staticfiles/
+/logs/
 
 # IDEs
-.idea
-.vscode
+.idea/
+.vscode/
+.DS_Store
 *.swp
+*.swo
 
 # Docker
 .dockerignore
@@ -35,3 +38,4 @@ tests/
 backup_data.json
 users_backup.json
 users_only.json
+DOCUMENTACION_TECNICA.md
