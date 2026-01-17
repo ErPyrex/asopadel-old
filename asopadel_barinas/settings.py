@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'competitions.apps.CompetitionsConfig',
     'facilities',
-    'store',
     'blog',
 ]
 
