@@ -62,18 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
         counterObserver.observe(counter);
     });
 
-    // --- Efecto Hover con JavaScript (Opcional, CSS ya hace mucho) ---
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-3px)';
-            card.style.boxShadow = 'var(--shadow-hover)';
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-            card.style.boxShadow = 'var(--shadow-base)';
-        });
-    });
+
 
 });
 
@@ -83,97 +72,97 @@ document.addEventListener("DOMContentLoaded", () => {
 // =======================================================
 
 (() => {
- "use strict";
+    "use strict";
 
- const storedTheme = localStorage.getItem("theme");
+    const storedTheme = localStorage.getItem("theme");
 
- const getPreferredTheme = () => {
-  if (storedTheme) {
-   return storedTheme;
-  }
+    const getPreferredTheme = () => {
+        if (storedTheme) {
+            return storedTheme;
+        }
 
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-   ? "dark"
-   : "light";
- };
+        return window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light";
+    };
 
- const setTheme = function (theme) {
-  let themeToApply = theme;
+    const setTheme = function (theme) {
+        let themeToApply = theme;
 
-  // Determinar el tema final a aplicar, manejando el caso 'auto'
-  if (
-   theme === "auto" &&
-   window.matchMedia("(prefers-color-scheme: dark)").matches
-  ) {
-   themeToApply = "dark";
-  } else if (theme === "auto") {
-        themeToApply = "light";
-    }
+        // Determinar el tema final a aplicar, manejando el caso 'auto'
+        if (
+            theme === "auto" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+            themeToApply = "dark";
+        } else if (theme === "auto") {
+            themeToApply = "light";
+        }
 
-    // 1. Aplicar el atributo de Bootstrap al HTML (Controla estilos de componentes de Bootstrap)
-  document.documentElement.setAttribute("data-bs-theme", themeToApply);
+        // 1. Aplicar el atributo de Bootstrap al HTML (Controla estilos de componentes de Bootstrap)
+        document.documentElement.setAttribute("data-bs-theme", themeToApply);
 
-    // 2. ADAPTACIÓN CRÍTICA PARA TU CSS:
-    // Añadir/Quitar la clase 'dark-mode' del <body> (Necesario para tu fondo y estilos personalizados)
-    if (themeToApply === "dark") {
-        document.body.classList.add('dark-mode');
-    } else {
-        document.body.classList.remove('dark-mode');
-    }
- };
+        // 2. ADAPTACIÓN CRÍTICA PARA TU CSS:
+        // Añadir/Quitar la clase 'dark-mode' del root (Necesario para tu fondo y estilos personalizados)
+        if (themeToApply === "dark") {
+            document.documentElement.classList.add('dark-mode');
+        } else {
+            document.documentElement.classList.remove('dark-mode');
+        }
+    };
 
- setTheme(getPreferredTheme());
-
- const showActiveTheme = (theme) => {
-  const activeThemeIcon = document.querySelector(".theme-icon-active use");
-    // Usamos document.documentElement para buscar el tema si está en 'auto' y no en 'light' o 'dark'
-    const currentTheme = document.documentElement.getAttribute('data-bs-theme') || theme;
-
-  // Determinar el icono a mostrar en el botón principal
-    let svgIconHref;
-    if (currentTheme === 'light') {
-        svgIconHref = '#sun-fill';
-    } else if (currentTheme === 'dark') {
-        svgIconHref = '#moon-stars-fill';
-    } else {
-        svgIconHref = '#circle-half';
-    }
-    
-    if (activeThemeIcon) {
-        activeThemeIcon.setAttribute("href", svgIconHref);
-    }
-    
-    // Marcar el botón correcto como 'active' en el menú desplegable
-  document.querySelectorAll("[data-bs-theme-value]").forEach((element) => {
-   element.classList.remove("active");
-  });
-    
-    const btnToActive = document.querySelector(
-   `[data-bs-theme-value="${theme}"]`
-  );
-    if (btnToActive) {
-        btnToActive.classList.add("active");
-    }
- };
-
- window
-  .matchMedia("(prefers-color-scheme: dark)")
-  .addEventListener("change", () => {
-   if (storedTheme !== "light" || storedTheme !== "dark") {
     setTheme(getPreferredTheme());
-   }
-  });
 
- window.addEventListener("DOMContentLoaded", () => {
-  showActiveTheme(getPreferredTheme());
+    const showActiveTheme = (theme) => {
+        const activeThemeIcon = document.querySelector(".theme-icon-active use");
+        // Usamos document.documentElement para buscar el tema si está en 'auto' y no en 'light' o 'dark'
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || theme;
 
-  document.querySelectorAll("[data-bs-theme-value]").forEach((toggle) => {
-   toggle.addEventListener("click", () => {
-    const theme = toggle.getAttribute("data-bs-theme-value");
-    localStorage.setItem("theme", theme);
-    setTheme(theme);
-    showActiveTheme(theme);
-   });
-  });
- });
+        // Determinar el icono a mostrar en el botón principal
+        let svgIconHref;
+        if (currentTheme === 'light') {
+            svgIconHref = '#sun-fill';
+        } else if (currentTheme === 'dark') {
+            svgIconHref = '#moon-stars-fill';
+        } else {
+            svgIconHref = '#circle-half';
+        }
+
+        if (activeThemeIcon) {
+            activeThemeIcon.setAttribute("href", svgIconHref);
+        }
+
+        // Marcar el botón correcto como 'active' en el menú desplegable
+        document.querySelectorAll("[data-bs-theme-value]").forEach((element) => {
+            element.classList.remove("active");
+        });
+
+        const btnToActive = document.querySelector(
+            `[data-bs-theme-value="${theme}"]`
+        );
+        if (btnToActive) {
+            btnToActive.classList.add("active");
+        }
+    };
+
+    window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .addEventListener("change", () => {
+            if (storedTheme !== "light" || storedTheme !== "dark") {
+                setTheme(getPreferredTheme());
+            }
+        });
+
+    window.addEventListener("DOMContentLoaded", () => {
+        showActiveTheme(getPreferredTheme());
+
+        document.querySelectorAll("[data-bs-theme-value]").forEach((toggle) => {
+            toggle.addEventListener("click", () => {
+                const theme = toggle.getAttribute("data-bs-theme-value");
+                localStorage.setItem("theme", theme);
+                setTheme(theme);
+                showActiveTheme(theme);
+            });
+        });
+    });
 })();
