@@ -32,6 +32,36 @@ def actualizar_ranking_tras_partido(sender, instance, created, **kwargs):
             ganadores = equipo2_jugadores
             perdedores = equipo1_jugadores
     
+    # OPCIÓN 2: Fallback para compatibilidad con partidos antiguos
+    if not ganadores:
+        # Intentar con campo ganador individual (legacy)
+        if instance.ganador:
+            jugadores_legacy = list(instance.jugadores.all())
+            if len(jugadores_legacy) == 2 and instance.ganador in jugadores_legacy:
+                ganadores = [instance.ganador]
+                perdedores = [j for j in jugadores_legacy if j != instance.ganador]
+        
+        # Último recurso: parsear marcador
+        elif instance.marcador and instance.marcador.strip():
+            jugadores_legacy = list(instance.jugadores.all())
+            if len(jugadores_legacy) == 2:
+                try:
+                    marcador_limpio = instance.marcador.strip().replace(' ', '')
+                    partes = marcador_limpio.split('-')
+                    
+                    if len(partes) == 2:
+                        sets_jugador1 = int(partes[0])
+                        sets_jugador2 = int(partes[1])
+                        
+                        if sets_jugador1 > sets_jugador2:
+                            ganadores = [jugadores_legacy[0]]
+                            perdedores = [jugadores_legacy[1]]
+                        elif sets_jugador2 > sets_jugador1:
+                            ganadores = [jugadores_legacy[1]]
+                            perdedores = [jugadores_legacy[0]]
+                except (ValueError, IndexError):
+                    pass
+    
     # Si no pudimos determinar ganadores, salir
     if not ganadores or not perdedores:
         return

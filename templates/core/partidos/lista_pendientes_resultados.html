@@ -49,19 +49,12 @@
                             {% endif %}
                         </td>
                         <td>
-                            <div class="d-flex flex-column gap-1">
-                                <div>
-                                    <small class="text-primary fw-bold">E1:</small>
-                                    {% for j in partido.equipo1.all %}
-                                    <span class="badge bg-light text-dark border small">{{ j.first_name }}</span>
-                                    {% endfor %}
-                                </div>
-                                <div>
-                                    <small class="text-danger fw-bold">E2:</small>
-                                    {% for j in partido.equipo2.all %}
-                                    <span class="badge bg-light text-dark border small">{{ j.first_name }}</span>
-                                    {% endfor %}
-                                </div>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for jugador in partido.jugadores.all %}
+                                <span class="badge bg-light text-dark border">
+                                    {{ jugador.get_full_name }}
+                                </span>
+                                {% endfor %}
                             </div>
                         </td>
                         <td>

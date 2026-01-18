@@ -1,63 +1,41 @@
-# === Git ===
+# Git
 .git
 .gitignore
 
-# === Python & Bytecode ===
-__pycache__/
-*.py[cod]
+# Python
+__pycache__
+*.pyc
 *.pyo
 *.pyd
 .Python
 env/
 venv/
-.venv/
-*.so
+pip-log.txt
+pip-delete-this-directory.txt
 
-# === Django ===
+# Django
 *.log
+local_settings.py
 db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
-logs/
+/media/
+/staticfiles/
+/logs/
 
-# === Environment & Secrets ===
-.env
-*.env
-.secrets
-
-# === IDEs, Editor & OS ===
+# IDEs
 .idea/
 .vscode/
 .DS_Store
 *.swp
 *.swo
 
-# === Docker (Excluding self and other container files) ===
+# Docker
+.dockerignore
 Dockerfile
 docker-compose.yml
-.dockerignore
 
-# === Testing ===
-.pytest_cache/
-.coverage
-htmlcov/
+# Project Specific
 tests/
-run_tests.sh
-
-# === Documentation & Metadata ===
-README.md
+backup_data.json
+users_backup.json
+users_only.json
 DOCUMENTACION_TECNICA.md
-*.md
-LICENSE
-docs/
-
-# === Project Specific (Clean up leftovers) ===
-fix_*.py
-backup_*.json
-users_*.json
-*.bak
-*.old
-*.tmp
-/media/*
-!/media/.gitkeep
