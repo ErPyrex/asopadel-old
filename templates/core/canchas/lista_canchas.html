@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <!-- Filtros Rápidos (Opcional, pero da sensación premium) -->
+    <!-- Filtros Rápidos -->
     <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
         <button class="btn btn-light rounded-pill px-4 fw-bold active border shadow-sm">Todas</button>
         <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Disponibles</button>
@@ -29,10 +29,10 @@
     <!-- Lista de canchas -->
     <div class="row g-4">
         {% for cancha in canchas %}
-        <div class="col-md-6 col-lg-4 col-xl-3">
+        <div class="col-md-6 col-lg-4">
             <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card transition-hover">
                 <!-- Imagen con Badge de Estado -->
-                <div class="position-relative" style="height: 180px;">
+                <div class="position-relative" style="height: 200px;">
                     {% if cancha.imagen %}
                     <img src="{{ cancha.imagen.url }}" class="w-100 h-100" style="object-fit: cover;"
                         alt="{{ cancha.nombre }}">
@@ -58,26 +58,25 @@
 
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-2">{{ cancha.nombre }}</h5>
-                    <div class="d-flex align-items-center gap-2 text-muted small mb-3">
-                        <i class="ti ti-map-pin text-primary"></i> {{ cancha.ubicacion }}
+                    <div class="d-flex align-items-center gap-2 text-muted small mb-4">
+                        <i class="ti ti-map-pin text-primary"></i> <span class="text-truncate">{{ cancha.ubicacion }}</span>
                     </div>
-
                     <div class="row g-2 mb-4">
-                        <div class="col-6">
-                            <div class="bg-light rounded-3 p-2 text-center">
+                        <div class="col-5">
+                            <div
+                                class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
                                 <span class="d-block text-muted tiny text-uppercase fw-bold">Precio</span>
                                 <span class="fw-bold text-primary">${{ cancha.precio_hora }}</span>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="bg-light rounded-3 p-2 text-center">
+                        <div class="col-7">
+                            <div
+                                class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
                                 <span class="d-block text-muted tiny text-uppercase fw-bold">Horario</span>
-                                <span class="fw-bold small">{{ cancha.horario_apertura|time:"H:i" }} - {{
-                                    cancha.horario_cierre|time:"H:i" }}</span>
-                            </div>
+                                <span class="fw-bold small">{{ cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</span>
                         </div>
                     </div>
-
+                    </div>
                     <div class="d-flex gap-2">
                         <a href="{% url 'core:admin_edit_court' cancha.id %}"
                             class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-grow-1">
@@ -103,7 +102,6 @@
                         <h5 class="fw-bold">¿Eliminar cancha?</h5>
                         <p class="text-muted small">Esta acción no se puede deshacer. Se eliminarán los datos de
                             <strong>{{ cancha.nombre }}</strong>.</p>
-
                         <div class="d-grid gap-2 mt-4">
                             <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST">
                                 {% csrf_token %}
@@ -119,9 +117,7 @@
         </div>
         {% empty %}
         <div class="col-12 text-center py-5">
-            <div class="mb-4">
-                <i class="ti ti-ball-tennis fs-display-1 text-muted opacity-10"></i>
-            </div>
+            <div class="mb-4"><i class="ti ti-ball-tennis fs-display-1 text-muted opacity-10"></i></div>
             <h3 class="text-muted fw-bold">No hay canchas registradas</h3>
             <p class="text-muted">Comienza registrando tu primera instalación deportiva.</p>
         </div>
