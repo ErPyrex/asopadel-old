@@ -24,6 +24,9 @@
                         </a>
                     </div>
                     <h5 class="card-title">Bienvenido, {{ user.first_name }}</h5>
+                    {% if user.biografia %}
+                    <p class="card-text small text-muted fst-italic mt-2">"{{ user.biografia }}"</p>
+                    {% endif %}
                     <form method="POST" action="{% url 'users:logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger btn-sm mt-2">Cerrar sesión</button>
