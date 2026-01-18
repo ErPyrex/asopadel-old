@@ -1,12 +1,5 @@
-// Animación de entrada para el hero
+// Animación de entrada
 document.addEventListener("DOMContentLoaded", () => {
-    const hero = document.querySelector(".hero-home");
-    if (hero) {
-        hero.style.opacity = 0;
-        setTimeout(() => {
-            hero.style.opacity = 1;
-        }, 300);
-    }
 
     // Scroll suave a secciones con data-target
     document.querySelectorAll(".btn-scroll").forEach(btn => {

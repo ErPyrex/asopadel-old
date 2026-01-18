@@ -35,13 +35,6 @@ def dashboard_by_role(request):
 
 
 # ====================================================================================
-# 🏠 Vista pública del home
-# ====================================================================================
-def home_page(request):
-    canchas = Cancha.objects.all()
-    return render(request, 'home.html', {'canchas': canchas})
-
-# ====================================================================================
 # 🌐 Vistas públicas
 # ====================================================================================
 def public_tournament_list(request):
@@ -55,37 +48,6 @@ def public_court_list(request):
 def public_court_detail(request, cancha_id):
     cancha = get_object_or_404(Cancha, id=cancha_id)
     return render(request, 'core/canchas/detalle_cancha.html', {'cancha': cancha})
-
-def public_ranking_list(request):
-    """Vista pública del ranking de jugadores"""
-    # Obtener parámetro de categoría si existe
-    categoria_filtro = request.GET.get('categoria', None)
-    
-    # Obtener todos los jugadores
-    jugadores = Usuario.objects.filter(es_jugador=True)
-    
-    # Filtrar por categoría si se especifica
-    if categoria_filtro and categoria_filtro != 'todos':
-        jugadores = jugadores.filter(categoria_jugador=categoria_filtro)
-    
-    # Ordenar por ranking descendente y limitar a top 50
-    jugadores = jugadores.order_by('-ranking')[:50]
-    
-    # Obtener categorías disponibles para el filtro
-    categorias = [
-        ('todos', 'Todas las Categorías'),
-        ('juvenil', 'Juvenil'),
-        ('adulto', 'Adulto'),
-        ('senior', 'Senior'),
-    ]
-    
-    context = {
-        'jugadores': jugadores,
-        'categorias': categorias,
-        'categoria_actual': categoria_filtro or 'todos',
-    }
-    
-    return render(request, 'core/torneos/public_ranking_list.html', context)
 
 # ====================================================================================
 # 🧑‍💼 Dashboards por rol
@@ -323,7 +285,7 @@ def admin_create_match(request):
 @user_passes_test(is_admin_or_arbitro)
 def admin_match_list(request):
     """Lista todos los partidos con filtros opcionales"""
-    partidos = Partido.objects.all().select_related('torneo', 'cancha', 'arbitro').prefetch_related('jugadores')
+    partidos = Partido.objects.all().select_related('torneo', 'cancha', 'arbitro').prefetch_related('equipo1', 'equipo2')
     
     # Filtros opcionales
     torneo_id = request.GET.get('torneo')
@@ -563,9 +525,8 @@ def player_public_profile(request, player_id):
     ratio = round(total_victorias / total_derrotas, 2) if total_derrotas > 0 else total_victorias
     
     # Historial de partidos (donde sea jugador)
-    # Buscamos partidos donde el jugador esté en equipo1, equipo2 o el campo legacy jugadores
     ultimos_partidos = Partido.objects.filter(
-        Q(equipo1=jugador) | Q(equipo2=jugador) | Q(jugadores=jugador),
+        Q(equipo1=jugador) | Q(equipo2=jugador),
         estado='finalizado'
     ).distinct().order_by('-fecha')[:10]
     

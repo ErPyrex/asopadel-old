@@ -56,32 +56,46 @@
 
                     <!-- Jugadores -->
                     <div class="mb-4">
-                        <h6 class="text-secondary">🎾 Jugadores</h6>
-                        {% if partido.jugadores.all %}
+                        <h6 class="text-secondary mb-3">🎾 Jugadores</h6>
                         <div class="row">
-                            {% for jugador in partido.jugadores.all %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body">
-                                        {% if jugador.foto %}
-                                        <img src="{{ jugador.foto.url }}" alt="{{ jugador.get_full_name }}"
-                                            class="rounded-circle mb-2"
-                                            style="width: 60px; height: 60px; object-fit: cover;">
-                                        {% endif %}
-                                        <h6 class="mb-1">{{ jugador.get_full_name }}</h6>
-                                        <p class="text-muted mb-1">{{ jugador.cedula }}</p>
-                                        {% if jugador.categoria_jugador %}
-                                        <span class="badge bg-info">{{ jugador.get_categoria_jugador_display }}</span>
-                                        {% endif %}
-                                        <p class="mb-0"><small>Ranking: {{ jugador.ranking|default:0 }} pts</small></p>
+                            <!-- Equipo 1 -->
+                            <div class="col-md-6 border-end">
+                                <h6 class="small fw-bold text-primary text-uppercase mb-3">Equipo 1</h6>
+                                {% for jugador in partido.equipo1.all %}
+                                <div class="player-meta mb-3">
+                                    <div class="player-avatar">
+                                        {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="player-name">{{ jugador.get_full_name }}</span>
+                                        <span class="player-cedula small">Ranking: {{ jugador.ranking|default:0
+                                            }}</span>
                                     </div>
                                 </div>
+                                {% empty %}
+                                <p class="text-muted small">Sin jugadores asignados</p>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
+
+                            <!-- Equipo 2 -->
+                            <div class="col-md-6 ps-md-4">
+                                <h6 class="small fw-bold text-danger text-uppercase mb-3">Equipo 2</h6>
+                                {% for jugador in partido.equipo2.all %}
+                                <div class="player-meta mb-3">
+                                    <div class="player-avatar">
+                                        {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="player-name">{{ jugador.get_full_name }}</span>
+                                        <span class="player-cedula small">Ranking: {{ jugador.ranking|default:0
+                                            }}</span>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted small">Sin jugadores asignados</p>
+                                {% endfor %}
+                            </div>
                         </div>
-                        {% else %}
-                        <p class="text-muted">No hay jugadores asignados</p>
-                        {% endif %}
                     </div>
 
                     <hr>

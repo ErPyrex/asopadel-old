@@ -60,7 +60,7 @@
       <div class="match-list">
         {% if partidos %}
         {% for partido in partidos %}
-        <div class="match-card-modern mb-3 show" data-status="{{ partido.estado }}">
+        <div class="match-card-modern mb-3" data-status="{{ partido.estado }}">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
               <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }}
@@ -98,6 +98,14 @@
           </div>
         </div>
         {% endfor %}
+
+        <!-- Mensaje dinámico cuando el filtro no arroja resultados -->
+        <div id="no-matches-filtered" class="card border-0 p-5 text-center rounded-4 d-none"
+          style="background: var(--color-light);">
+          <i class="ti ti-search fs-1 text-muted mb-2"></i>
+          <p class="text-muted mb-0">No se encontraron partidos en esta categoría.</p>
+        </div>
+
         {% else %}
         <div class="card border-0 p-5 text-center rounded-4" style="background: var(--color-light);">
           <i class="ti ti-mood-empty fs-1 text-muted mb-2"></i>
@@ -138,7 +146,7 @@
           </div>
           {% endfor %}
           <div class="p-4 text-center">
-            <a href="{% url 'core:public_ranking_list' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
+            <a href="{% url 'core:ranking' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
               Ver Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
             </a>
           </div>
@@ -202,24 +210,22 @@
     const isActive = btn.classList.contains('active');
     const allBtn = document.querySelector('button[onclick*="all"]');
 
-    // Si pulsamos un filtro ya activo (que no sea 'Todos'), volvemos a 'Todos'
     if (isActive && filter !== 'all') {
-      if (allBtn) {
-        filterMatches('all', allBtn);
-      }
+      if (allBtn) filterMatches('all', allBtn);
       return;
     }
 
-    // Actualizar estados de los botones
     document.querySelectorAll('.tag-filter-modern').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
-    // Filtrar las tarjetas de partidos
     const targets = filter.split(',');
+    let visibleCount = 0;
+
     document.querySelectorAll('.match-card-modern').forEach(match => {
       const status = match.getAttribute('data-status');
       if (filter === 'all' || targets.includes(status)) {
-        match.style.display = 'block';
+        match.classList.remove('d-none');
+        visibleCount++;
         setTimeout(() => {
           match.style.opacity = '1';
           match.style.transform = 'translateY(0)';
@@ -228,10 +234,20 @@
         match.style.opacity = '0';
         match.style.transform = 'translateY(10px)';
         setTimeout(() => {
-          match.style.display = 'none';
+          match.classList.add('d-none');
         }, 300);
       }
     });
+
+    // Manejar mensaje de lista vacía
+    const noResults = document.getElementById('no-matches-filtered');
+    if (noResults) {
+      if (visibleCount === 0) {
+        noResults.classList.remove('d-none');
+      } else {
+        noResults.classList.add('d-none');
+      }
+    }
   }
 </script>
 
