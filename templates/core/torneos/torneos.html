@@ -1,58 +1,95 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>🏆 Torneos registrados</h2>
-<p>Cada torneo es una historia en juego. Diseña el desafío.</p>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="ti ti-trophy me-2 text-primary"></i>Torneos registrados</h2>
+      <p class="text-muted mb-0">Cada torneo es una historia en juego. Diseña el desafío.</p>
+    </div>
+    <a href="{% url 'core:admin_create_tournament' %}"
+      class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+      <i class="ti ti-plus"></i>
+      <span>Nuevo Torneo</span>
+    </a>
+  </div>
 
-<!-- 🔍 Filtros por tipo y estado -->
-<form method="get" class="filtros" style="margin-bottom: 20px;">
-  <label for="tipo">Tipo:</label>
-  <select name="tipo" id="tipo">
-    <option value="">Todos</option>
-    <option value="individual" {% if tipo_seleccionado == "individual" %}selected{% endif %}>Individual</option>
-    <option value="dobles" {% if tipo_seleccionado == "dobles" %}selected{% endif %}>Dobles</option>
-    <option value="mixto" {% if tipo_seleccionado == "mixto" %}selected{% endif %}>Mixto</option>
-  </select>
+  <!-- Filtros Modernos -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label for="tipo" class="form-label small fw-bold text-muted">Tipo de Torneo</label>
+          <select name="tipo" id="tipo" class="form-select">
+            <option value="">Todos los tipos</option>
+            <option value="individual" {% if tipo_seleccionado == "individual" %}selected{% endif %}>Individual</option>
+            <option value="dobles" {% if tipo_seleccionado == "dobles" %}selected{% endif %}>Dobles</option>
+            <option value="mixto" {% if tipo_seleccionado == "mixto" %}selected{% endif %}>Mixto</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="activo" class="form-label small fw-bold text-muted">Estado</label>
+          <select name="activo" id="activo" class="form-select">
+            <option value="">Todos los estados</option>
+            <option value="1" {% if estado_seleccionado == "1" %}selected{% endif %}>Activos</option>
+            <option value="0" {% if estado_seleccionado == "0" %}selected{% endif %}>Inactivos</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" class="btn btn-dark w-100 d-flex align-items-center justify-content-center gap-2">
+            <i class="ti ti-filter"></i> Filtrar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <label for="activo">Estado:</label>
-  <select name="activo" id="activo">
-    <option value="">Todos</option>
-    <option value="1" {% if estado_seleccionado == "1" %}selected{% endif %}>Activos</option>
-    <option value="0" {% if estado_seleccionado == "0" %}selected{% endif %}>Inactivos</option>
-  </select>
-
-  <button type="submit">Filtrar</button>
-</form>
-
-<!-- ➕ Botón para crear torneo -->
-<a href="{% url 'core:admin_create_tournament' %}" class="btn">➕ Crear nuevo torneo</a>
-
-<!-- 📊 Tabla de torneos -->
-<table class="tabla-torneos" style="width: 100%; margin-top: 20px; border-collapse: collapse;">
-  <thead>
-    <tr style="background-color: #5e2ca5; color: white;">
-      <th>Nombre</th>
-      <th>Tipo</th>
-      <th>Inicio</th>
-      <th>Fin</th>
-      <th>Estado</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for torneo in torneos %}
-    <tr style="border-bottom: 1px solid #ccc;">
-      <td>{{ torneo.nombre }}</td>
-      <td>{{ torneo.tipo|title }}</td>
-      <td>{{ torneo.fecha_inicio }}</td>
-      <td>{{ torneo.fecha_fin }}</td>
-      <td>{% if torneo.activo %}🟢 Activo{% else %}🔴 Inactivo{% endif %}</td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="5">No hay torneos registrados aún.</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <!-- Tabla de torneos Modernizada -->
+  <div class="card border-0 shadow-sm overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4">Nombre</th>
+            <th>Tipo</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th class="text-center">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for torneo in torneos %}
+          <tr>
+            <td class="ps-4 fw-bold text-heading">{{ torneo.nombre }}</td>
+            <td>
+              <span class="badge bg-light text-dark border">{{ torneo.tipo|title }}</span>
+            </td>
+            <td><i class="ti ti-calendar-event me-1 text-muted"></i> {{ torneo.fecha_inicio }}</td>
+            <td><i class="ti ti-calendar-check me-1 text-muted"></i> {{ torneo.fecha_fin }}</td>
+            <td class="text-center">
+              {% if torneo.activo %}
+              <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                <i class="ti ti-circle-check-filled me-1"></i> Activo
+              </span>
+              {% else %}
+              <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
+                <i class="ti ti-circle-x-filled me-1"></i> Inactivo
+              </span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="text-center py-5">
+              <i class="ti ti-database-off fs-1 text-muted mb-2"></i>
+              <p class="text-muted mb-0">No hay torneos registrados aún.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

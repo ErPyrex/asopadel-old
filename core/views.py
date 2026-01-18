@@ -1,5 +1,6 @@
 # core/views.py
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -34,13 +35,6 @@ def dashboard_by_role(request):
 
 
 # ====================================================================================
-# 🏠 Vista pública del home
-# ====================================================================================
-def home_page(request):
-    canchas = Cancha.objects.all()
-    return render(request, 'home.html', {'canchas': canchas})
-
-# ====================================================================================
 # 🌐 Vistas públicas
 # ====================================================================================
 def public_tournament_list(request):
@@ -55,36 +49,13 @@ def public_court_detail(request, cancha_id):
     cancha = get_object_or_404(Cancha, id=cancha_id)
     return render(request, 'core/canchas/detalle_cancha.html', {'cancha': cancha})
 
-def public_ranking_list(request):
-    """Vista pública del ranking de jugadores"""
-    # Obtener parámetro de categoría si existe
-    categoria_filtro = request.GET.get('categoria', None)
-    
-    # Obtener todos los jugadores
-    jugadores = Usuario.objects.filter(es_jugador=True)
-    
-    # Filtrar por categoría si se especifica
-    if categoria_filtro and categoria_filtro != 'todos':
-        jugadores = jugadores.filter(categoria_jugador=categoria_filtro)
-    
-    # Ordenar por ranking descendente y limitar a top 50
-    jugadores = jugadores.order_by('-ranking')[:50]
-    
-    # Obtener categorías disponibles para el filtro
-    categorias = [
-        ('todos', 'Todas las Categorías'),
-        ('juvenil', 'Juvenil'),
-        ('adulto', 'Adulto'),
-        ('senior', 'Senior'),
-    ]
-    
-    context = {
-        'jugadores': jugadores,
-        'categorias': categorias,
-        'categoria_actual': categoria_filtro or 'todos',
-    }
-    
-    return render(request, 'core/torneos/public_ranking_list.html', context)
+def public_noticias_list(request):
+    noticias = Noticia.objects.order_by('-fecha_publicacion')
+    return render(request, 'core/noticias/public_noticias_list.html', {'noticias': noticias})
+
+def public_noticia_detail(request, noticia_id):
+    noticia = get_object_or_404(Noticia, id=noticia_id)
+    return render(request, 'core/noticias/public_noticia_detail.html', {'noticia': noticia})
 
 # ====================================================================================
 # 🧑‍💼 Dashboards por rol
@@ -343,7 +314,7 @@ def admin_create_match(request):
 @user_passes_test(is_admin_or_arbitro)
 def admin_match_list(request):
     """Lista todos los partidos con filtros opcionales"""
-    partidos = Partido.objects.all().select_related('torneo', 'cancha', 'arbitro').prefetch_related('jugadores')
+    partidos = Partido.objects.all().select_related('torneo', 'cancha', 'arbitro').prefetch_related('equipo1', 'equipo2')
     
     # Filtros opcionales
     torneo_id = request.GET.get('torneo')
@@ -546,24 +517,20 @@ def ranking(request):
     categoria_filtro = request.GET.get('categoria')
     
     # Base query: Jugadores activos ordenados por ranking
-    # Nota: estadisticas es O2M, usamos prefetch
     jugadores = Usuario.objects.filter(es_jugador=True).prefetch_related('estadisticas').order_by('-ranking')
     
     if categoria_filtro:
-        jugadores = jugadores.filter(categoria=categoria_filtro)
+        jugadores = jugadores.filter(categoria_jugador=categoria_filtro)
     
-    # Inyectar estadística principal (la que coincide con su categoría actual)
+    # Inyectar estadística principal
     for jugador in jugadores:
-        # Buscar stats de su categoría
-        stats = next((s for s in jugador.estadisticas.all() if str(s.categoria_id) == str(jugador.categoria)), None)
-        # Si no tiene de su categoría, usar la primera que encuentre o crear una dummy
+        stats = next((s for s in jugador.estadisticas.all() if str(s.categoria_id) == str(jugador.categoria_jugador)), None)
         if not stats and jugador.estadisticas.exists():
             stats = jugador.estadisticas.first()
-            
         jugador.stats_display = stats
     
     # Obtener opciones de categoría desde el modelo
-    categorias = Usuario._meta.get_field('categoria').choices
+    categorias = Usuario._meta.get_field('categoria_jugador').choices
     
     context = {
         'jugadores': jugadores,
@@ -587,11 +554,10 @@ def player_public_profile(request, player_id):
     ratio = round(total_victorias / total_derrotas, 2) if total_derrotas > 0 else total_victorias
     
     # Historial de partidos (donde sea jugador)
-    # Buscamos partidos donde el jugador esté en la relación ManyToMany
     ultimos_partidos = Partido.objects.filter(
-        jugadores=jugador, 
+        Q(equipo1=jugador) | Q(equipo2=jugador),
         estado='finalizado'
-    ).order_by('-fecha')[:10]
+    ).distinct().order_by('-fecha')[:10]
     
     context = {
         'jugador': jugador,
@@ -633,17 +599,21 @@ from facilities.models import Cancha
 from competitions.models import Torneo
 
 def home(request):
-    noticias = Noticia.objects.order_by('-fecha_publicacion')[:3]  # solo las 3 más recientes
+    noticias = Noticia.objects.order_by('-fecha_publicacion')[:1]  # solo la más reciente
     canchas = Cancha.objects.all()
     torneos = Torneo.objects.order_by('-fecha_inicio')[:5]  # opcional si quieres mostrar torneos
     
     # Obtener Top 10 del ranking
     ranking = Usuario.objects.filter(es_jugador=True).order_by('-ranking')[:10]
 
+    # Obtener últimos partidos
+    partidos = Partido.objects.all().select_related('torneo', 'cancha').prefetch_related('equipo1', 'equipo2').order_by('-fecha', '-hora')[:10]
+
     context = {
         'noticias': noticias,
         'canchas': canchas,
         'torneos': torneos,
         'ranking': ranking,
+        'partidos': partidos,
     }
     return render(request, 'home.html', context)
