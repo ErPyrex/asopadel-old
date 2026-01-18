@@ -2,6 +2,12 @@
 {% load static %}
 {% block title %}Perfil de {{ jugador.get_full_name }}{% endblock %}
 
+{% block back_url %}
+<a href="{% url 'core:ranking' %}" class="btn-back-custom" aria-label="Volver">
+    <i class="ti ti-chevron-left"></i>
+</a>
+{% endblock %}
+
 {% block content %}
 <div class="container py-4">
     <!-- Header Perfil Premium -->
