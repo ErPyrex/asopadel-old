@@ -3,122 +3,143 @@
 {% block title %}Perfil de {{ jugador.get_full_name }}{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Header Perfil -->
-    <div class="card shadow-sm border-0 mb-4 overflow-hidden">
-        <div class="card-body p-0">
-            <div class="row g-0">
-                <div class="col-md-8 p-4 d-flex align-items-center">
-                    {% if jugador.foto %}
-                    <img src="{{ jugador.foto.url }}" alt="{{ jugador.get_full_name }}"
-                        class="rounded-circle border border-4 border-white shadow me-4"
-                        style="width: 120px; height: 120px; object-fit: cover;">
-                    {% else %}
-                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center shadow me-4"
-                        style="width: 120px; height: 120px; font-size: 3rem;">
-                        {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+<div class="container py-4">
+    <!-- Header Perfil Premium -->
+    <div class="profile-header-card">
+        <div class="row g-0">
+            <div class="col-md-8 p-5 d-flex flex-column flex-md-row align-items-center text-center text-md-start">
+                {% if jugador.foto %}
+                <img src="{{ jugador.foto.url }}" alt="{{ jugador.get_full_name }}"
+                    class="profile-avatar-large mb-4 mb-md-0 me-md-5">
+                {% else %}
+                <div class="profile-avatar-large mb-4 mb-md-0 me-md-5 bg-secondary text-white d-flex align-items-center justify-content-center"
+                    style="font-size: 3.5rem;">
+                    {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+                </div>
+                {% endif %}
+                <div>
+                    <h1 class="profile-name mb-2">{{ jugador.get_full_name }}</h1>
+                    <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
+                        <span class="badge bg-opacity-10 bg-primary text-primary category-tag">
+                            {{ jugador.get_categoria_jugador_display }}
+                        </span>
+                        {% if jugador.telefono %}
+                        <span class="text-muted small"><i class="ti ti-phone me-1"></i>{{ jugador.telefono }}</span>
+                        {% endif %}
                     </div>
+                    {% if jugador.biografia %}
+                    <p class="mt-3 text-muted">{{ jugador.biografia }}</p>
                     {% endif %}
-                    <div>
-                        <h2 class="mb-1 fw-bold">{{ jugador.get_full_name }}</h2>
-                        <span class="badge bg-primary fs-6">{{ jugador.get_categoria_display }}</span>
-                        <div class="mt-2 text-muted">
-                            <i class="bi bi-geo-alt"></i> {{ jugador.telefono|default:"Sin teléfono público" }}
-                        </div>
-                    </div>
                 </div>
-                <div
-                    class="col-md-4 bg-light p-4 d-flex flex-column justify-content-center align-items-center text-center border-start text-dark">
-                    <small class="text-uppercase fw-bold ls-1">Ranking ELO</small>
-                    <h1 class="display-3 fw-bold text-primary mb-0">{{ jugador.ranking }}</h1>
-                    <small class="fw-bold">Puntos</small>
-                </div>
+            </div>
+            <div class="col-md-4 profile-rank-card">
+                <span class="text-uppercase fw-bold text-muted small letter-spacing-1">Ranking ELO</span>
+                <h2 class="display-2 fw-bold text-primary my-2">{{ jugador.ranking }}</h2>
+                <span class="fw-bold text-muted">Puntos Acumulados</span>
             </div>
         </div>
     </div>
 
     <!-- Grid de Estadísticas -->
-    <div class="row mb-4 g-3">
-        <!-- Partidos -->
-        <div class="col-6 col-md-3 col-lg">
-            <div class="card h-100 shadow-sm border-0 text-center py-3">
-                <div class="card-body">
-                    <h3 class="display-6 fw-bold mb-0">{{ total_jugados }}</h3>
-                    <small class="text-muted">Partidos Jugados</small>
+    <div class="row mb-5 g-4">
+        <div class="col-6 col-lg-2">
+            <div class="stat-card-premium">
+                <span class="label">Partidos</span>
+                <span class="value">{{ total_jugados }}</span>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="stat-card-premium">
+                <span class="label">Victorias</span>
+                <span class="value text-success">{{ total_victorias }}</span>
+            </div>
+        </div>
+        <div class="col-6 col-lg-2">
+            <div class="stat-card-premium">
+                <span class="label">Derrotas</span>
+                <span class="value text-danger">{{ total_derrotas }}</span>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card-premium">
+                <span class="label">Efectividad</span>
+                <span class="value text-info">{{ efectividad }}%</span>
+                <div class="progress mt-2" style="height: 4px;">
+                    <div class="progress-bar bg-info" style="width: {{ efectividad }}%"></div>
                 </div>
             </div>
         </div>
-        <!-- Victorias -->
-        <div class="col-6 col-md-3 col-lg">
-            <div class="card h-100 shadow-sm border-0 text-center py-3">
-                <div class="card-body">
-                    <h3 class="display-6 fw-bold text-success mb-0">{{ total_victorias }}</h3>
-                    <small class="text-muted">Victorias</small>
-                </div>
-            </div>
-        </div>
-        <!-- Derrotas -->
-        <div class="col-6 col-md-3 col-lg">
-            <div class="card h-100 shadow-sm border-0 text-center py-3">
-                <div class="card-body">
-                    <h3 class="display-6 fw-bold text-danger mb-0">{{ total_derrotas }}</h3>
-                    <small class="text-muted">Derrotas</small>
-                </div>
-            </div>
-        </div>
-        <!-- Efectividad -->
-        <div class="col-6 col-md-3 col-lg">
-            <div class="card h-100 shadow-sm border-0 text-center py-3">
-                <div class="card-body">
-                    <h3 class="display-6 fw-bold text-info mb-0">{{ efectividad }}%</h3>
-                    <small class="text-muted">Efectividad</small>
-                </div>
-            </div>
-        </div>
-        <!-- Ratio -->
-        <div class="col-6 col-md-3 col-lg">
-            <div class="card h-100 shadow-sm border-0 text-center py-3">
-                <div class="card-body">
-                    <h3 class="display-6 fw-bold text-warning mb-0">{{ ratio }}</h3>
-                    <small class="text-muted">Ratio V/D</small>
-                </div>
+        <div class="col-12 col-lg-3">
+            <div class="stat-card-premium">
+                <span class="label">Ratio V/D</span>
+                <span class="value text-warning">{{ ratio }}</span>
             </div>
         </div>
     </div>
 
     <!-- Historial de Partidos -->
-    <div class="card shadow-sm border-0">
-        <div class="card-header bg-white py-3">
-            <h5 class="mb-0 fw-bold">📅 Últimos Partidos</h5>
+    <div class="card ranking-card">
+        <div class="card-header bg-white py-4 px-4 border-0">
+            <h5 class="mb-0 fw-bold d-flex align-items-center">
+                <i class="ti ti-history me-2 text-primary"></i> Últimos Partidos
+            </h5>
         </div>
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table table-premium align-middle">
+                <thead>
                     <tr>
-                        <th>Fecha</th>
-                        <th>Torneo</th>
-                        <th>Resultado</th>
-                        <th>Marcador</th>
+                        <th class="ps-4">Fecha</th>
+                        <th>Torneo / Encuentro</th>
+                        <th class="text-center">Resultado</th>
+                        <th class="text-center">Marcador</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for partido in ultimos_partidos %}
                     <tr>
-                        <td>{{ partido.fecha|date:"d M Y" }}</td>
-                        <td>{{ partido.torneo.nombre }}</td>
-                        <td>
-                            {# Lógica simple para ver si ganó o perdió (ya que no guardamos el resultado por jugador en
-                            el modelo partido directo, sino en signals) #}
-                            {# Aquí asumimos que signals actualizó ranking, pero para visualización visual rápida
-                            tocaría recalcular o asumir #}
-                            <span class="badge bg-secondary">Finalizado</span>
+                        <td class="ps-4">
+                            <span class="fw-bold">{{ partido.fecha|date:"d M, Y" }}</span>
                         </td>
-                        <td class="font-monospace">{{ partido.marcador }}</td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-heading">{{ partido.torneo.nombre|default:"Partido Casual"
+                                    }}</span>
+                                <small class="text-muted">{{ partido.cancha.nombre|default:"Sede ASOPADEL" }}</small>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            {% if partido.equipo_ganador %}
+                            {% if partido.equipo_ganador == 1 %}
+                            {% if jugador in partido.equipo1.all %}
+                            <span class="badge-win">Ganó</span>
+                            {% else %}
+                            <span class="badge-loss">Perdió</span>
+                            {% endif %}
+                            {% elif partido.equipo_ganador == 2 %}
+                            {% if jugador in partido.equipo2.all %}
+                            <span class="badge-win">Ganó</span>
+                            {% else %}
+                            <span class="badge-loss">Perdió</span>
+                            {% endif %}
+                            {% endif %}
+                            {% elif partido.ganador %}
+                            {% if partido.ganador == jugador %}
+                            <span class="badge-win">Ganó</span>
+                            {% else %}
+                            <span class="badge-loss">Perdió</span>
+                            {% endif %}
+                            {% else %}
+                            <span class="badge bg-light text-muted">Finalizado</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="font-monospace fw-bold fs-5">{{ partido.marcador|default:"- - -" }}</span>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="4" class="text-center py-5 text-muted">
-                            No hay partidos registrados.
+                        <td colspan="4" class="text-center py-5">
+                            <p class="text-muted mb-0">No hay partidos registrados recientemente.</p>
                         </td>
                     </tr>
                     {% endfor %}

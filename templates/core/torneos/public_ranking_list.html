@@ -1,114 +1,131 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}Ranking de jugadores{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">🏆 Ranking de Jugadores</h2>
+<div class="ranking-container">
+    <!-- Hero Section -->
+    <div class="ranking-hero">
+        <h1 class="ranking-title">Ranking de Jugadores</h1>
+        <p class="ranking-subtitle">Los mejores talentos de ASOPADEL Barinas</p>
+    </div>
 
     <!-- Filtros por categoría -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="btn-group d-flex justify-content-center" role="group">
-                {% for cat_value, cat_label in categorias %}
-                <a href="?categoria={{ cat_value }}"
-                    class="btn {% if categoria_actual == cat_value %}btn-primary{% else %}btn-outline-primary{% endif %}">
-                    {{ cat_label }}
-                </a>
-                {% endfor %}
-            </div>
-        </div>
+    <div class="category-nav">
+        {% for cat_value, cat_label in categorias %}
+        <a href="?categoria={{ cat_value }}"
+            class="category-link {% if categoria_actual == cat_value %}active{% endif %}">
+            {{ cat_label }}
+        </a>
+        {% endfor %}
     </div>
 
     <!-- Tabla de ranking -->
     {% if jugadores %}
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col" class="text-center">Posición</th>
-                    <th scope="col">Jugador</th>
-                    <th scope="col" class="text-center">Categoría</th>
-                    <th scope="col" class="text-center">Puntos</th>
-                    <th scope="col" class="text-center">Partidos</th>
-                    <th scope="col" class="text-center">Victorias</th>
-                    <th scope="col" class="text-center">Derrotas</th>
-                    <th scope="col" class="text-center">% Victorias</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for jugador in jugadores %}
-                <tr>
-                    <td class="text-center">
-                        {% if forloop.counter == 1 %}
-                        <span class="badge bg-warning text-dark fs-5">🥇 1</span>
-                        {% elif forloop.counter == 2 %}
-                        <span class="badge bg-secondary fs-5">🥈 2</span>
-                        {% elif forloop.counter == 3 %}
-                        <span class="badge bg-danger fs-5">🥉 3</span>
-                        {% else %}
-                        <span class="badge bg-light text-dark">{{ forloop.counter }}</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <div class="d-flex flex-column">
-                                <strong>{{ jugador.get_full_name }}</strong>
-                                <small class="text-muted">{{ jugador.cedula }}</small>
+    <div class="card ranking-card">
+        <div class="table-responsive">
+            <table class="table table-premium align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 100px;">Posición</th>
+                        <th>Jugador</th>
+                        <th class="text-center">Categoría</th>
+                        <th class="text-center">Puntos</th>
+                        <th class="text-center d-none d-md-table-cell">Partidos</th>
+                        <th class="text-center d-none d-md-table-cell">Victorias</th>
+                        <th class="text-center d-none d-md-table-cell">Derrotas</th>
+                        <th class="text-center">% Victorias</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for jugador in jugadores %}
+                    <tr>
+                        <td class="text-center">
+                            <div class="rank-badge-container">
+                                {% if forloop.counter == 1 %}
+                                <div class="rank-badge rank-1">1</div>
+                                {% elif forloop.counter == 2 %}
+                                <div class="rank-badge rank-2">2</div>
+                                {% elif forloop.counter == 3 %}
+                                <div class="rank-badge rank-3">3</div>
+                                {% else %}
+                                <div class="rank-badge rank-other">{{ forloop.counter }}</div>
+                                {% endif %}
                             </div>
+                        </td>
+                        <td>
                             <a href="{% url 'core:player_public_profile' jugador.id %}"
-                                class="btn btn-sm btn-primary py-0 px-2 ms-4" title="Ver Estadísticas">
-                                📊 Estadísticas
+                                class="text-decoration-none player-link">
+                                <div class="player-meta">
+                                    <div class="player-avatar">
+                                        {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="player-name">{{ jugador.get_full_name }}</span>
+                                        <span class="player-cedula">ID: {{ jugador.cedula }}</span>
+                                    </div>
+                                </div>
                             </a>
-                        </div>
-                    </td>
-                    <td class="text-center">
-                        {% if jugador.categoria_jugador %}
-                        <span class="badge bg-info">{{ jugador.get_categoria_jugador_display }}</span>
-                        {% else %}
-                        <span class="text-muted">-</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-center">
-                        <strong class="text-primary">{{ jugador.ranking|default:0 }}</strong>
-                    </td>
-                    <td class="text-center">
-                        {% with estadistica=jugador.estadisticas.first %}
-                        {{ estadistica.partidos_jugados|default:0 }}
-                        {% endwith %}
-                    </td>
-                    <td class="text-center text-success">
-                        {% with estadistica=jugador.estadisticas.first %}
-                        {{ estadistica.victorias|default:0 }}
-                        {% endwith %}
-                    </td>
-                    <td class="text-center text-danger">
-                        {% with estadistica=jugador.estadisticas.first %}
-                        {{ estadistica.derrotas|default:0 }}
-                        {% endwith %}
-                    </td>
-                    <td class="text-center">
-                        {% with estadistica=jugador.estadisticas.first %}
-                        {% if estadistica %}
-                        {{ estadistica.promedio_victorias }}%
-                        {% else %}
-                        0%
-                        {% endif %}
-                        {% endwith %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                        </td>
+                        <td class="text-center">
+                            {% if jugador.categoria_jugador %}
+                            <span class="badge bg-opacity-10 bg-primary text-primary category-tag">
+                                {{ jugador.get_categoria_jugador_display }}
+                            </span>
+                            {% else %}
+                            <span class="text-muted small">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="stat-value stat-puntos">{{ jugador.ranking|default:0 }}</span>
+                        </td>
+                        <td class="text-center d-none d-md-table-cell">
+                            {% with estadistica=jugador.estadisticas.first %}
+                            <span class="stat-value">{{ estadistica.partidos_jugados|default:0 }}</span>
+                            {% endwith %}
+                        </td>
+                        <td class="text-center d-none d-md-table-cell text-success">
+                            {% with estadistica=jugador.estadisticas.first %}
+                            <span class="stat-value text-success">{{ estadistica.victorias|default:0 }}</span>
+                            {% endwith %}
+                        </td>
+                        <td class="text-center d-none d-md-table-cell text-danger">
+                            {% with estadistica=jugador.estadisticas.first %}
+                            <span class="stat-value text-danger">{{ estadistica.derrotas|default:0 }}</span>
+                            {% endwith %}
+                        </td>
+                        <td class="text-center">
+                            {% with estadistica=jugador.estadisticas.first %}
+                            {% if estadistica %}
+                            <div class="d-flex flex-column align-items-center">
+                                <span class="stat-value">{{ estadistica.promedio_victorias }}%</span>
+                                <div class="progress mt-1" style="width: 50px; height: 4px;">
+                                    <div class="progress-bar bg-primary" role="progressbar"
+                                        style="width: {{ estadistica.promedio_victorias }}%"
+                                        aria-valuenow="{{ estadistica.promedio_victorias }}" aria-valuemin="0"
+                                        aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="stat-value">0%</span>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
     {% else %}
-    <div class="alert alert-info text-center" role="alert">
-        <h4>No hay jugadores en el ranking</h4>
-        <p>Aún no hay jugadores registrados o no hay partidos finalizados.</p>
+    <div class="card border-0 shadow-sm text-center py-5">
+        <div class="card-body">
+            <h4 class="text-muted mb-3">No hay jugadores en el ranking</h4>
+            <p class="text-muted">Aún no hay jugadores registrados o no hay partidos finalizados.</p>
+        </div>
     </div>
     {% endif %}
 
-    <!-- Botón para volver -->
-    <div class="text-center mt-4">
-        <a href="{% url 'core:home' %}" class="btn btn-secondary">Volver al Inicio</a>
-    </div>
 </div>
 {% endblock %}
