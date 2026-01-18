@@ -73,7 +73,8 @@
                                     {% endif %}
                                     <div class="d-flex flex-column">
                                         <span class="player-name">{{ jugador.get_full_name }}</span>
-                                        <small class="text-muted d-md-none">{{ jugador.get_categoria_display }}</small>
+                                        <small class="text-muted d-md-none">{{ jugador.get_categoria_jugador_display
+                                            }}</small>
                                     </div>
                                 </div>
                             </a>
@@ -81,7 +82,7 @@
 
                         <td class="text-center">
                             <span class="badge bg-opacity-10 bg-primary text-primary category-tag">
-                                {{ jugador.get_categoria_display }}
+                                {{ jugador.get_categoria_jugador_display }}
                             </span>
                         </td>
 

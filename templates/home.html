@@ -199,17 +199,37 @@
 
 <script>
   function filterMatches(filter, btn) {
-    document.querySelectorAll('.tag-filter').forEach(b => b.classList.remove('active'));
+    const isActive = btn.classList.contains('active');
+    const allBtn = document.querySelector('button[onclick*="all"]');
+
+    // Si pulsamos un filtro ya activo (que no sea 'Todos'), volvemos a 'Todos'
+    if (isActive && filter !== 'all') {
+      if (allBtn) {
+        filterMatches('all', allBtn);
+      }
+      return;
+    }
+
+    // Actualizar estados de los botones
+    document.querySelectorAll('.tag-filter-modern').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+
+    // Filtrar las tarjetas de partidos
     const targets = filter.split(',');
-    document.querySelectorAll('.match-card').forEach(match => {
+    document.querySelectorAll('.match-card-modern').forEach(match => {
       const status = match.getAttribute('data-status');
       if (filter === 'all' || targets.includes(status)) {
         match.style.display = 'block';
-        setTimeout(() => match.style.opacity = '1', 10);
+        setTimeout(() => {
+          match.style.opacity = '1';
+          match.style.transform = 'translateY(0)';
+        }, 10);
       } else {
         match.style.opacity = '0';
-        setTimeout(() => match.style.display = 'none', 300);
+        match.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          match.style.display = 'none';
+        }, 300);
       }
     });
   }
