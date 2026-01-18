@@ -464,18 +464,17 @@ class ReservaCanchaForm(forms.ModelForm):
         model = ReservaCancha
         fields = ['cancha', 'fecha', 'hora_inicio', 'hora_fin']
         widgets = {
-            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'title': 'Selecciona la fecha de reserva'}),
+            'cancha': forms.Select(attrs={'class': 'form-select bg-light border-0 py-2', 'id': 'id_cancha'}),
+            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'form-control bg-light border-0 py-2', 'id': 'id_fecha'}),
             'hora_inicio': forms.TimeInput(attrs={
                 'type': 'time', 
-                'class': 'form-control',
-                'style': 'width: auto; max-width: 200px; display: inline-block;',
-                'title': 'Hora de inicio de la reserva'
+                'class': 'form-control bg-light border-0 py-2',
+                'id': 'id_hora_inicio'
             }),
             'hora_fin': forms.TimeInput(attrs={
                 'type': 'time', 
-                'class': 'form-control',
-                'style': 'width: auto; max-width: 200px; display: inline-block;',
-                'title': 'Hora de fin de la reserva'
+                'class': 'form-control bg-light border-0 py-2',
+                'id': 'id_hora_fin'
             }),
         }
 

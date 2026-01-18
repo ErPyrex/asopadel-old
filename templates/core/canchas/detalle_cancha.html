@@ -1,76 +1,173 @@
 {% extends 'base.html' %}
-{% block title %}{{ cancha.nombre }} - Detalles{% endblock %}
+{% load static %}
+{% block title %}{{ cancha.nombre }} - ASOPADEL{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <!-- Court Image -->
-        <div class="col-md-6 mb-4">
-            {% if cancha.imagen %}
-            <img src="{{ cancha.imagen.url }}" class="img-fluid rounded shadow-lg" alt="{{ cancha.nombre }}"
-                style="width: 100%; height: 400px; object-fit: cover;">
-            {% else %}
-            <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded shadow-lg"
-                style="height: 400px;">
-                <h4>Sin Imagen Disponible</h4>
+<div class="container-fluid px-lg-5 py-5">
+    <!-- Breadcrumb o Header Retroceso -->
+    <div class="mb-4">
+        <a href="{% url 'core:public_court_list' %}"
+            class="btn btn-light rounded-pill px-4 fw-bold text-muted small shadow-sm">
+            <i class="ti ti-arrow-left me-2"></i>Volver a la lista
+        </a>
+    </div>
+
+    <div class="row g-5">
+        <!-- Columna Izquierda: Imagen del Recinto -->
+        <div class="col-lg-7">
+            <div class="position-relative overflow-hidden rounded-5 shadow-lg group">
+                {% if cancha.imagen %}
+                <img src="{{ cancha.imagen.url }}" class="img-fluid w-100 object-fit-cover shadow-lg transition-hover"
+                    alt="{{ cancha.nombre }}" style="height: 550px; transition: transform 0.5s ease;">
+                {% else %}
+                <div class="bg-light d-flex flex-column align-items-center justify-content-center text-muted"
+                    style="height: 550px;">
+                    <i class="ti ti-photo-off fs-display-1 opacity-25 mb-3"></i>
+                    <h5 class="fw-bold">Sin imagen disponible</h5>
+                </div>
+                {% endif %}
+
+                <!-- Overlay Informativo rápido si es necesario -->
+                <div class="position-absolute bottom-0 start-0 w-100 p-5 bg-gradient-dark text-white">
+                    <div class="d-flex align-items-center gap-3">
+                        <span
+                            class="badge {% if cancha.estado == 'disponible' %}bg-success{% elif cancha.estado == 'reservada' %}bg-info{% else %}bg-danger{% endif %} border-0 px-4 py-2 rounded-pill shadow-sm fs-6">
+                            {% if cancha.estado == 'reservada' %}
+                            <i class="ti ti-clock-check me-1"></i> Parcialmente Reservada
+                            {% else %}
+                            <i
+                                class="ti {% if cancha.estado == 'disponible' %}ti-circle-check{% else %}ti-tool{% endif %} me-1"></i>
+                            {{ cancha.get_estado_display }}
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
             </div>
-            {% endif %}
         </div>
 
-        <!-- Court Details -->
-        <div class="col-md-6">
-            <h1 class="display-4 fw-bold mb-3">{{ cancha.nombre }}</h1>
-
-            <div class="mb-4">
-                <span
-                    class="badge {% if cancha.estado == 'disponible' %}bg-success{% elif cancha.estado == 'reservada' %}bg-info text-dark{% else %}bg-danger{% endif %} p-2 fs-6">
-                    {% if cancha.estado == 'reservada' %}
-                    Parcialmente Reservada
-                    {% else %}
-                    {{ cancha.get_estado_display }}
-                    {% endif %}
-                </span>
-                <span class="text-muted ms-2"><i class="bi bi-geo-alt-fill"></i> {{ cancha.ubicacion }}</span>
-            </div>
-
-            <div class="card bg-light border-0 mb-4">
-                <div class="card-body">
-                    <h5 class="card-title text-primary"><i class="bi bi-clock"></i> Horario y Tarifas</h5>
-                    <ul class="list-unstyled mt-3">
-                        <li class="mb-2"><strong><i class="bi bi-cash-coin"></i> Precio por hora:</strong> ${{ cancha.precio_hora }}</li>
-                        <li class="mb-2"><strong><i class="bi bi-hourglass-split"></i> Horario:</strong> {{ cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</li>
-
-                    </ul>
+        <!-- Columna Derecha: Detalles y Reserva -->
+        <div class="col-lg-5">
+            <div class="p-lg-4">
+                <div class="mb-2">
+                    <small class="text-primary fw-bold text-uppercase letter-spacing-1">Detalles de Instalación</small>
                 </div>
-            </div>
+                <h1 class="display-4 fw-bold mb-4">{{ cancha.nombre }}</h1>
 
-            <div class="mb-5">
-                <h5>Descripción</h5>
-                <p class="lead fs-6">{{ cancha.descripcion|default:"No hay descripción disponible para esta cancha."|linebreaks }}</p>
-            </div>
-
-            <div class="d-grid gap-2">
-                {% if user.is_authenticated %}
-                {% if cancha.estado == 'disponible' or cancha.estado == 'reservada' %}
-                <!-- Permitir reservar incluso si está reservada parcialmente, la validación interna chequeará horarios -->
-                <form method="get" action="{% url 'core:player_reserve_court' %}">
-                    <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
-                    <button type="submit" class="btn btn-primary btn-lg w-100">
-                        <i class="bi bi-calendar-check"></i> Reservar Ahora
-                    </button>
-                </form>
-                {% else %}
-                <div class="alert alert-danger text-center mb-0">
-                    <strong><i class="bi bi-exclamation-triangle-fill"></i> No Disponible</strong><br>
-                    La cancha se encuentra en mantenimiento.
+                <div class="d-flex align-items-center gap-2 text-muted mb-5">
+                    <i class="ti ti-map-pin fs-4 text-primary"></i>
+                    <span class="fs-5">{{ cancha.ubicacion }}</span>
                 </div>
-                {% endif %}
-                {% else %}
-                <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-outline-primary btn-lg">
-                    <i class="bi bi-box-arrow-in-right"></i> Inicia sesión para reservar
-                </a>
-                {% endif %}
+
+                <!-- Cards de Información Rápida -->
+                <div class="row g-4 mb-5">
+                    <div class="col-sm-6">
+                        <div class="card border-0 bg-light rounded-4 p-4 h-100 shadow-sm ranking-card transition-hover">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-primary text-white rounded-circle p-3 shadow-sm">
+                                    <i class="ti ti-currency-dollar fs-4"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block fw-bold text-uppercase tiny">Precio Hora</small>
+                                    <span class="fs-4 fw-bold text-primary">${{ cancha.precio_hora }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="card border-0 bg-light rounded-4 p-4 h-100 shadow-sm ranking-card transition-hover">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-indigo-soft text-indigo rounded-circle p-3 shadow-sm"
+                                    style="background: rgba(99, 102, 241, 0.1); color: #6366F1;">
+                                    <i class="ti ti-clock-hour-4 fs-4"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block fw-bold text-uppercase tiny">Horario</small>
+                                    <span class="fw-bold fs-5">{{ cancha.horario_apertura|time:"H:i" }} - {{
+                                        cancha.horario_cierre|time:"H:i" }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-5">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center">
+                        <i class="ti ti-align-left text-primary me-2"></i>Descripción
+                    </h5>
+                    <div class="text-secondary lh-lg fs-5">
+                        {{ cancha.descripcion|default:"Experimenta el mejor juego en nuestras instalaciones de última
+                        generación. Piso mantenido y excelente iluminación."|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Acción Principal -->
+                <div class="card border-0 shadow-lg rounded-5 p-4 bg-white">
+                    <div class="card-body p-2">
+                        {% if user.is_authenticated %}
+                        {% if cancha.estado == 'disponible' or cancha.estado == 'reservada' %}
+                        <form method="get" action="{% url 'core:player_reserve_court' %}">
+                            <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
+                            <button type="submit"
+                                class="btn btn-primary btn-lg w-100 rounded-pill py-4 fw-bold shadow transition-hover">
+                                <i class="ti ti-calendar-check fs-4 me-2"></i>Reservar Esta Cancha
+                            </button>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-danger border-0 rounded-4 p-4 text-center mb-0">
+                            <i class="ti ti-alert-triangle fs-1 d-block mb-2"></i>
+                            <h5 class="fw-bold">No Disponible</h5>
+                            <p class="mb-0 small">Esta instalación se encuentra actualmente en mantenimiento. Disculpa
+                                las molestias.</p>
+                        </div>
+                        {% endif %}
+                        {% else %}
+                        <div class="text-center">
+                            <h5 class="fw-bold mb-3">¿Listo para jugar?</h5>
+                            <a href="{% url 'users:login' %}?next={{ request.path }}"
+                                class="btn btn-outline-primary btn-lg w-100 rounded-pill py-4 fw-bold">
+                                <i class="ti ti-login me-2"></i>Inicia sesión para reservar
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .bg-gradient-dark {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .letter-spacing-1 {
+        letter-spacing: 1.5px;
+    }
+
+    .tiny {
+        font-size: 0.65rem;
+    }
+
+    .fs-display-1 {
+        font-size: 5rem;
+    }
+
+    .transition-hover {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .group:hover .transition-hover {
+        transform: scale(1.03);
+    }
+
+    .bg-indigo-soft {
+        background: rgba(99, 102, 241, 0.1);
+    }
+
+    .text-indigo {
+        color: #6366F1;
+    }
+</style>
 {% endblock %}
