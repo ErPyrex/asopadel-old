@@ -1,42 +1,76 @@
-# General Python
+# === Python & Bytecode ===
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+bin/
+include/
+lib/
+share/
+pyvenv.cfg
 
-# Django
+# === Django & Web ===
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
 media/
 staticfiles/
+/static/CACHE/
+/static/root/
+.well-known/
 
-# Environment variables
+# === Testing & Quality ===
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# === Environment Variables & Secrets ===
 .env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+.env.*
+!.env.example
+*.env
+.secret
+.secrets
 
-# IDEs and Editors
+# === IDEs, Editors & OS ===
 .idea/
 .vscode/
 *.swp
 *.swo
 .DS_Store
-
-# OS specific
 Thumbs.db
+desktop.ini
+*.sublime-project
+*.sublime-workspace
 
-# Project specific
-logs/
-*.json
-backup_data.json
-users_backup.json
-users_only.json
+# === Project Clean up (Previously deleted or temp files) ===
+# Maintenance scripts and backups
+fix_*.py
+backup_*.json
+users_*.json
+players_list.txt
 css_fix_temp.txt
 filter_users.py
 setup_local.sh
 test_cedula_validation.py
+*.bak
+*.old
+*.tmp
