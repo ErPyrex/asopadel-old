@@ -198,8 +198,23 @@
     <script src="{% static 'js/main.js' %}"></script>
     <script>
         function handleSmartBack(fallbackUrl) {
-            if (document.referrer && document.referrer.includes(window.location.host)) {
-                window.history.back();
+            const currentPath = window.location.pathname;
+            const referrer = document.referrer;
+
+            if (referrer && referrer.includes(window.location.host)) {
+                try {
+                    const referrerPath = new URL(referrer).pathname;
+                    // Si el referrer es una subpágina (más larga y empieza por el path actual), usamos el fallback
+                    if (referrerPath.length > currentPath.length && referrerPath.startsWith(currentPath)) {
+                        window.location.href = fallbackUrl;
+                    } else if (referrerPath === currentPath) {
+                        window.location.href = fallbackUrl;
+                    } else {
+                        window.history.back();
+                    }
+                } catch (e) {
+                    window.location.href = fallbackUrl;
+                }
             } else {
                 window.location.href = fallbackUrl;
             }

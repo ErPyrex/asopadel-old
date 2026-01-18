@@ -113,7 +113,7 @@ class CanchaForm(forms.ModelForm):
                 'oninvalid': "this.setCustomValidity('El nombre de la cancha debe tener entre 3 y 50 caracteres')",
                 'oninput': "this.setCustomValidity('')"
             }),
-            'estado': forms.Select(attrs={'class': 'form-control'}),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
             'ubicacion': forms.TextInput(attrs={
                 'pattern': '.{10,200}',
                 'minlength': '10',

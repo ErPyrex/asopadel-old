@@ -72,6 +72,8 @@ def admin_dashboard(request):
         'total_arbitros': total_arbitros,
         'total_canchas': total_canchas,
         'total_torneos': total_torneos,
+        'form': CanchaForm(prefix='court'),
+        'noticia_form': NoticiaForm(prefix='news'),
     })
 
 
@@ -123,12 +125,16 @@ def admin_delete_tournament(request, torneo_id):
 @user_passes_test(is_admin)
 def admin_court_list(request):
     canchas = Cancha.objects.all()
-    return render(request, 'core/canchas/lista_canchas.html', {'canchas': canchas})
+    form = CanchaForm(prefix='court')
+    return render(request, 'core/canchas/lista_canchas.html', {
+        'canchas': canchas,
+        'form': form
+    })
 
 @login_required
 @user_passes_test(is_admin)
 def admin_create_court(request):
-    form = CanchaForm(request.POST or None, request.FILES or None)
+    form = CanchaForm(request.POST or None, request.FILES or None, prefix='court')
     if form.is_valid():
         form.save()
         messages.success(request, "Cancha creada exitosamente.")
@@ -579,12 +585,16 @@ def player_public_profile(request, player_id):
 @user_passes_test(is_admin)
 def admin_noticias_list(request):
     noticias = Noticia.objects.order_by('-fecha_publicacion')
-    return render(request, 'core/noticias/lista_noticias.html', {'noticias': noticias})
+    form = NoticiaForm(prefix='news')
+    return render(request, 'core/noticias/lista_noticias.html', {
+        'noticias': noticias,
+        'form': form
+    })
 
 @login_required
 @user_passes_test(is_admin)
 def admin_create_noticia(request):
-    form = NoticiaForm(request.POST or None, request.FILES or None)
+    form = NoticiaForm(request.POST or None, request.FILES or None, prefix='news')
     if form.is_valid():
         noticia = form.save(commit=False)
         noticia.autor = request.user
@@ -593,10 +603,26 @@ def admin_create_noticia(request):
         return redirect('core:admin_noticias_list')
     return render(request, 'core/noticias/crear_noticia.html', {'form': form})
 
-from django.shortcuts import render
-from blog.models import Noticia
-from facilities.models import Cancha
-from competitions.models import Torneo
+@login_required
+@user_passes_test(is_admin)
+def admin_edit_noticia(request, noticia_id):
+    noticia = get_object_or_404(Noticia, id=noticia_id)
+    form = NoticiaForm(request.POST or None, request.FILES or None, instance=noticia)
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Noticia actualizada exitosamente.")
+        return redirect('core:admin_noticias_list')
+    return render(request, 'core/noticias/crear_noticia.html', {'form': form, 'noticia': noticia})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_delete_noticia(request, noticia_id):
+    noticia = get_object_or_404(Noticia, id=noticia_id)
+    if request.method == 'POST':
+        noticia.delete()
+        messages.success(request, "Noticia eliminada exitosamente.")
+        return redirect('core:admin_noticias_list')
+    return render(request, 'core/noticias/confirmar_eliminar_noticia.html', {'noticia': noticia})
 
 def home(request):
     noticias = Noticia.objects.order_by('-fecha_publicacion')[:1]  # solo la más reciente

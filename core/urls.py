@@ -63,6 +63,8 @@ urlpatterns = [
     # 📰 Noticias
     path('admin-gestion/noticias/', views.admin_noticias_list, name='admin_noticias_list'),
     path('admin-gestion/noticias/crear/', views.admin_create_noticia, name='admin_create_noticia'),
+    path('admin-gestion/noticias/<int:noticia_id>/editar/', views.admin_edit_noticia, name='admin_edit_noticia'),
+    path('admin-gestion/noticias/<int:noticia_id>/eliminar/', views.admin_delete_noticia, name='admin_delete_noticia'),
 
     # 🔌 API (Internal)
     path('api/cancha/<int:cancha_id>/disponibilidad/', views_api.get_court_availability, name='api_court_availability'),
