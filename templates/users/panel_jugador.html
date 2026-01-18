@@ -7,6 +7,22 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body text-center">
+                    <div class="mb-3">
+                        {% if user.foto %}
+                        <img src="{{ user.foto.url }}" alt="Foto de perfil" class="rounded-circle img-thumbnail"
+                            style="width: 120px; height: 120px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-primary d-inline-flex align-items-center justify-content-center text-white mx-auto"
+                            style="width: 120px; height: 120px; font-size: 2.5rem;">
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <a href="{% url 'users:perfil' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit"></i> Editar Perfil
+                        </a>
+                    </div>
                     <h5 class="card-title">Bienvenido, {{ user.first_name }}</h5>
                     <form method="POST" action="{% url 'users:logout' %}">
                         {% csrf_token %}

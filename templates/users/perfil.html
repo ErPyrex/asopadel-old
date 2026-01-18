@@ -1,8 +1,131 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
 {% block content %}
-<h2>👤 Perfil de Usuario</h2>
-<p>Nombre: {{ usuario.first_name }} {{ usuario.last_name }}</p>
-<p>Usuario: {{ usuario.username }}</p>
-<p>Cédula: {{ usuario.cedula }}</p>
-<p>Correo: {{ usuario.email }}</p>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">EDITAR PERFIL</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="text-center mb-4">
+                            <img id="profile-preview"
+                                src="{% if usuario.foto %}{{ usuario.foto.url }}{% else %}#{% endif %}"
+                                alt="Foto de perfil"
+                                class="rounded-circle img-thumbnail {% if not usuario.foto %}d-none{% endif %}"
+                                style="width: 150px; height: 150px; object-fit: cover;">
+
+                            <div id="profile-placeholder"
+                                class="rounded-circle bg-secondary d-inline-flex align-items-center justify-content-center text-white {% if usuario.foto %}d-none{% endif %}"
+                                style="width: 150px; height: 150px; font-size: 3rem;">
+                                {{ usuario.first_name|slice:":1"|upper }}{{ usuario.last_name|slice:":1"|upper }}
+                            </div>
+                            <div class="mt-2">
+                                <label for="id_foto" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-camera"></i> Cambiar Foto
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                <div class="text-danger small">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Apellido</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                <div class="text-danger small">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Teléfono</label>
+                            {{ form.telefono }}
+                            {% if form.telefono.errors %}
+                            <div class="text-danger small">{{ form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3 d-none">
+                            <!-- El input de archivo real, oculto o estilizado -->
+                            {{ form.foto }}
+                            {% if form.foto.errors %}
+                            <div class="alert alert-danger mt-2">
+                                {{ form.foto.errors }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Biografía (Opcional)</label>
+                            {{ form.biografia }}
+                            {% if form.biografia.errors %}
+                            <div class="text-danger small">{{ form.biografia.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="alert alert-info">
+                            <strong>Datos de cuenta:</strong><br>
+                            Cédula: {{ usuario.cedula }}<br>
+                            Email: {{ usuario.email }}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                            <a href="{% url 'core:dashboard_by_role' %}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Activar input file al hacer clic en el botón
+    document.querySelector('label[for="id_foto"]').addEventListener('click', function (e) {
+        e.preventDefault();
+        const fileInput = document.querySelector('input[type="file"][name="foto"]');
+        if (fileInput) fileInput.click();
+    });
+
+    // Vista previa de la imagen
+    const fileInput = document.querySelector('input[type="file"][name="foto"]');
+    const previewImg = document.getElementById('profile-preview');
+    const placeholder = document.getElementById('profile-placeholder');
+
+    if (fileInput) {
+        fileInput.addEventListener('change', function (e) {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    if (previewImg) {
+                        previewImg.src = e.target.result;
+                        previewImg.classList.remove('d-none');
+                    }
+                    if (placeholder) {
+                        placeholder.classList.add('d-none');
+                    }
+                }
+
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+</script>
 {% endblock %}

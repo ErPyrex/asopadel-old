@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # Security: DEBUG should be False in production
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True
 
 # Security: ALLOWED_HOSTS must be explicitly configured
 # Format: comma-separated list like "example.com,www.example.com"

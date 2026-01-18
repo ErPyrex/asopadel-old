@@ -160,11 +160,10 @@
                 var durationHours = (end - start) / (1000 * 60 * 60);
 
                 // Si la selección es pequeña (ej: clic simple de 30 min), forzar 2 horas por defecto
-                // Un partido de pádel dura tipicamente 1.5 - 2 horas
                 if (durationHours <= 0.5) {
                     end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2 horas
 
-                    // Validar límite de cierre (22:00 según modelo)
+                    // Validar límite de cierre (22:00)
                     var limitHour = 22;
                     if (end.getHours() > limitHour || (end.getHours() === limitHour && end.getMinutes() > 0)) {
                         end.setHours(limitHour, 0, 0); // Capar a las 22:00
