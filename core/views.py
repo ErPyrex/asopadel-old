@@ -1,5 +1,6 @@
 # core/views.py
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -525,24 +526,20 @@ def ranking(request):
     categoria_filtro = request.GET.get('categoria')
     
     # Base query: Jugadores activos ordenados por ranking
-    # Nota: estadisticas es O2M, usamos prefetch
     jugadores = Usuario.objects.filter(es_jugador=True).prefetch_related('estadisticas').order_by('-ranking')
     
     if categoria_filtro:
-        jugadores = jugadores.filter(categoria=categoria_filtro)
+        jugadores = jugadores.filter(categoria_jugador=categoria_filtro)
     
-    # Inyectar estadística principal (la que coincide con su categoría actual)
+    # Inyectar estadística principal
     for jugador in jugadores:
-        # Buscar stats de su categoría
-        stats = next((s for s in jugador.estadisticas.all() if str(s.categoria_id) == str(jugador.categoria)), None)
-        # Si no tiene de su categoría, usar la primera que encuentre o crear una dummy
+        stats = next((s for s in jugador.estadisticas.all() if str(s.categoria_id) == str(jugador.categoria_jugador)), None)
         if not stats and jugador.estadisticas.exists():
             stats = jugador.estadisticas.first()
-            
         jugador.stats_display = stats
     
     # Obtener opciones de categoría desde el modelo
-    categorias = Usuario._meta.get_field('categoria').choices
+    categorias = Usuario._meta.get_field('categoria_jugador').choices
     
     context = {
         'jugadores': jugadores,
@@ -566,11 +563,11 @@ def player_public_profile(request, player_id):
     ratio = round(total_victorias / total_derrotas, 2) if total_derrotas > 0 else total_victorias
     
     # Historial de partidos (donde sea jugador)
-    # Buscamos partidos donde el jugador esté en la relación ManyToMany
+    # Buscamos partidos donde el jugador esté en equipo1, equipo2 o el campo legacy jugadores
     ultimos_partidos = Partido.objects.filter(
-        jugadores=jugador, 
+        Q(equipo1=jugador) | Q(equipo2=jugador) | Q(jugadores=jugador),
         estado='finalizado'
-    ).order_by('-fecha')[:10]
+    ).distinct().order_by('-fecha')[:10]
     
     context = {
         'jugador': jugador,

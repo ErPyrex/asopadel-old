@@ -2,35 +2,41 @@
 {% block title %}ASOPADEL BARINAS{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-
+<div class="container py-4">
   <div class="row g-5">
     <!-- Columna Izquierda: Torneos -->
     <div class="col-lg-4">
-      <div class="d-flex align-items-baseline gap-2 mb-4">
-        <h2 class="section-title h4 mb-0">🏆 Torneos</h2>
-        <span class="text-muted small">Temporada 2026</span>
+      <div class="home-section-header">
+        <div class="icon-holder">
+          <i class="ti ti-trophy fs-3"></i>
+        </div>
+        <div>
+          <h2 class="section-title-modern">Torneos</h2>
+          <span class="text-muted small">Temporada 2026</span>
+        </div>
       </div>
 
       {% if torneos %}
       {% for torneo in torneos %}
-      <div class="card mb-3 border-0 shadow-sm">
-        <div class="card-body p-3">
-          <h5 class="h6 fw-bold mb-1">{{ torneo.nombre }}</h5>
-          <p class="text-muted small mb-2">{{ torneo.descripcion|truncatechars:60 }}</p>
+      <div class="card mb-3 border-0 shadow-sm ranking-card">
+        <div class="card-body p-4">
+          <h5 class="h6 fw-bold mb-2">{{ torneo.nombre }}</h5>
+          <p class="text-muted small mb-3">{{ torneo.descripcion|truncatechars:100 }}</p>
           <div class="d-flex align-items-center justify-content-between">
-            <span class="badge bg-primary bg-opacity-10 text-primary small">{{ torneo.fecha_inicio|date:"d M" }}</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary small p-2">
+              <i class="ti ti-calendar-event me-1"></i> {{ torneo.fecha_inicio|date:"d M" }}
+            </span>
             <a href="{% url 'core:public_torneos_list' %}"
-              class="btn btn-sm btn-link text-primary text-decoration-none fw-bold p-0">Ver detalles →</a>
+              class="btn-stats text-primary text-decoration-none fw-bold small">
+              Ver detalles <i class="ti ti-arrow-right ms-1"></i>
+            </a>
           </div>
         </div>
       </div>
       {% endfor %}
       {% else %}
-      <div class="card border-0 bg-transparent opacity-75">
-        <div class="card-body text-center py-4">
-          <p class="text-muted small mb-0">No hay torneos activos</p>
-        </div>
+      <div class="card border-0 p-4 text-center rounded-4" style="background: var(--color-light);">
+        <p class="text-muted small mb-0">No hay torneos activos en este momento.</p>
       </div>
       {% endif %}
     </div>
@@ -38,94 +44,107 @@
     <!-- Columna Derecha: Partidos -->
     <div class="col-lg-8">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-        <h2 class="section-title h4 mb-0">📅 Últimos Partidos</h2>
-        <div class="filter-tags">
-          <button class="tag-filter active" onclick="filterMatches('all', this)">Todos</button>
-          <button class="tag-filter" onclick="filterMatches('finalizado', this)">Resultados</button>
-          <button class="tag-filter" onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
+        <div class="home-section-header mb-0">
+          <div class="icon-holder" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
+            <i class="ti ti-calendar-stats fs-3"></i>
+          </div>
+          <h2 class="section-title-modern">Últimos Partidos</h2>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="tag-filter-modern active" onclick="filterMatches('all', this)">Todos</button>
+          <button class="tag-filter-modern" onclick="filterMatches('finalizado', this)">Resultados</button>
+          <button class="tag-filter-modern" onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
         </div>
       </div>
 
       <div class="match-list">
         {% if partidos %}
         {% for partido in partidos %}
-        <div class="match-card mb-3 show" data-status="{{ partido.estado }}">
-          <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-muted small fw-bold text-uppercase">{{ partido.fecha|date:"d M Y" }}</span>
+        <div class="match-card-modern mb-3 show" data-status="{{ partido.estado }}">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
+              <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }}
+            </span>
             <span
-              class="badge {% if partido.estado == 'finalizado' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% else %}text-primary{% endif %} small">
+              class="badge {% if partido.estado == 'finalizado' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% else %}text-primary{% endif %} px-3 py-2 rounded-pill small">
               {{ partido.get_estado_display }}
             </span>
           </div>
 
-          <div class="d-flex align-items-center justify-content-between text-center">
-            <div class="flex-1">
-              <div class="fw-bold h6 mb-0">
+          <div class="row align-items-center g-0">
+            <div class="col-5 text-end pe-4">
+              <div class="fw-bold h5 mb-0 text-truncate">
                 {% for j in partido.equipo1.all %}
                 {{ j.first_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                Equipo 1
-                {% endfor %}
+                {% empty %}Equipo 1{% endfor %}
               </div>
             </div>
 
-            <div class="px-3">
+            <div class="col-2 text-center">
               {% if partido.estado == 'finalizado' %}
-              <div class="match-score h5 mb-0 px-3">{{ partido.marcador|default:"0-0" }}</div>
+              <div class="h3 fw-bold mb-0 text-primary">{{ partido.marcador|default:"0-0" }}</div>
               {% else %}
-              <div class="text-muted small fw-bold px-3 py-1 border rounded-pill">VS</div>
+              <div class="small fw-bold px-3 py-1 border rounded-pill bg-light text-muted">VS</div>
               {% endif %}
             </div>
 
-            <div class="flex-1">
-              <div class="fw-bold h6 mb-0">
+            <div class="col-5 ps-4">
+              <div class="fw-bold h5 mb-0 text-truncate">
                 {% for j in partido.equipo2.all %}
                 {{ j.first_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                Equipo 2
-                {% endfor %}
+                {% empty %}Equipo 2{% endfor %}
               </div>
             </div>
           </div>
         </div>
         {% endfor %}
         {% else %}
-        <div class="card border-0 bg-transparent opacity-75">
-          <div class="card-body text-center py-5">
-            <p class="text-muted mb-0">No hay partidos programados próximamente.</p>
-          </div>
+        <div class="card border-0 p-5 text-center rounded-4" style="background: var(--color-light);">
+          <i class="ti ti-mood-empty fs-1 text-muted mb-2"></i>
+          <p class="text-muted mb-0">No hay partidos programados próximamente.</p>
         </div>
         {% endif %}
       </div>
     </div>
   </div>
 
-  <div class="row g-5 mt-4">
+  <div class="row g-5 mt-5">
     <!-- Ranking -->
     <div class="col-lg-5">
-      <h3 class="h5 fw-bold mb-4">⭐ Top Ranking</h3>
-      <div class="card border-0 shadow-sm">
+      <div class="home-section-header">
+        <div class="icon-holder" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">
+          <i class="ti ti-star fs-3"></i>
+        </div>
+        <h3 class="section-title-modern">Top Ranking</h3>
+      </div>
+
+      <div class="card border-0 shadow-sm ranking-card overflow-hidden">
         <div class="card-body p-0">
           {% if ranking %}
           {% for jugador in ranking %}
-          <div
-            class="d-flex align-items-center justify-content-between p-3 {% if not forloop.last %}border-bottom{% endif %}">
+          <div class="ranking-item-mini">
             <div class="d-flex align-items-center">
-              <span class="text-muted me-3 fw-bold small">{{ forloop.counter }}.</span>
+              <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
               <div>
-                <div class="fw-bold small">{{ jugador.get_full_name }}</div>
+                <div class="fw-bold">{{ jugador.get_full_name }}</div>
                 <small class="text-muted text-uppercase" style="font-size:10px">
                   {% if jugador.get_categoria_jugador_display %}{{ jugador.get_categoria_jugador_display }}{% else %}Sin
                   Categoría{% endif %}
                 </small>
               </div>
             </div>
-            <span class="badge bg-primary bg-opacity-10 text-primary">{{ jugador.ranking|default:0 }} pts</span>
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
+              pts</span>
           </div>
           {% endfor %}
-          <div class="p-3 text-center border-top">
-            <a href="{% url 'core:public_ranking_list' %}" class="btn btn-primary w-100 py-2 fw-bold">Ver Ranking
-              Completo →</a>
+          <div class="p-4 text-center">
+            <a href="{% url 'core:public_ranking_list' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
+              Ver Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+          {% else %}
+          <div class="p-5 text-center">
+            <p class="text-muted small mb-0">No hay registros aún.</p>
           </div>
           {% endif %}
         </div>
@@ -134,42 +153,49 @@
 
     <!-- Canchas -->
     <div class="col-lg-7">
-      <h3 class="h5 fw-bold mb-4">🎾 Estado de Canchas</h3>
-      <div class="row g-3">
+      <div class="home-section-header">
+        <div class="icon-holder" style="background: rgba(14, 165, 233, 0.1); color: #0EA5E9;">
+          <i class="ti ti-ball-tennis fs-3"></i>
+        </div>
+        <h3 class="section-title-modern">Estado de Canchas</h3>
+      </div>
+
+      <div class="row g-4">
         {% for cancha in canchas|slice:":4" %}
         <div class="col-md-6">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body p-3">
-              <div class="d-flex justify-content-between align-items-start mb-2">
-                <h6 class="fw-bold mb-0">{{ cancha.nombre }}</h6>
-                <div class="d-flex align-items-center gap-1">
+          <div class="card border-0 shadow-sm h-100 ranking-card">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                  <h6 class="fw-bold mb-1">{{ cancha.nombre }}</h6>
+                  <small class="text-muted"><i class="ti ti-map-pin me-1"></i>{{ cancha.ubicacion }}</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
                   <span
-                    class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %}"></span>
+                    class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} shadow-sm"></span>
                   <small
-                    class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold"
-                    style="font-size: 0.7rem;">
+                    class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold">
                     {{ cancha.get_estado_display }}
                   </small>
                 </div>
               </div>
-              <small class="text-muted d-block">{{ cancha.ubicacion }}</small>
             </div>
           </div>
         </div>
         {% endfor %}
       </div>
+
       <div class="mt-4">
         <a href="{% url 'core:public_canchas_list' %}"
-          class="btn btn-primary w-100 py-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+          class="btn btn-outline-primary w-100 py-4 shadow-sm border-2 fw-bold d-flex align-items-center justify-content-center gap-2 rounded-4">
+          <i class="ti ti-search fs-4"></i>
           <span>Consultar Disponibilidad de Canchas</span>
-          <i class="bi bi-arrow-right"></i>
-          →
         </a>
       </div>
     </div>
   </div>
-
 </div>
+
 
 <script>
   function filterMatches(filter, btn) {
