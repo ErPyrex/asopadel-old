@@ -1,28 +1,330 @@
 {% extends 'base.html' %}
-{% block title %}Noticias publicadas{% endblock %}
+{% load static %}
+
+{% block title %}Gestión de Noticias - Administrador{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Noticias Publicadas</h2>
-    <div class="text-center mb-4">
-        <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">Crear Nueva Noticia</a>
+<div class="container-fluid px-lg-5 py-4">
+    <!-- Header de la sección -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+        <div>
+            <h1 class="display-5 fw-bold mb-2">Gestión de <span class="text-primary">Noticias</span></h1>
+            <p class="text-muted fs-5 mb-0">Administra las publicaciones que verán los usuarios.</p>
+        </div>
+        <div>
+            <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal"
+                data-bs-target="#createNoticiaModal">
+                <i class="ti ti-plus me-2"></i>Nueva Noticia
+            </button>
+        </div>
     </div>
-    <div class="row">
+
+    <!-- Lista de noticias -->
+    <div class="row g-4">
         {% for noticia in noticias %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{{ noticia.titulo }}</h5>
-                    <p class="card-text">{{ noticia.cuerpo|truncatewords:30 }}</p>
+        {% with autor_name=noticia.autor.get_full_name|default:noticia.autor.username %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card">
+                {% if noticia.imagen %}
+                <div style="height: 180px; overflow: hidden;">
+                    <img src="{{ noticia.imagen.url }}" class="w-100 h-100" style="object-fit: cover;"
+                        alt="{{ noticia.titulo }}">
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">{{ noticia.fecha_publicacion }} | {{ noticia.autor.get_full_name }}</small>
+                {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                    <i class="ti ti-news fs-1 text-muted opacity-25"></i>
+                </div>
+                {% endif %}
+
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3 text-muted small">
+                        <i class="ti ti-calendar"></i> {{ noticia.fecha_publicacion|date:"d M, Y" }}
+                        <span class="mx-1">•</span>
+                        <i class="ti ti-user"></i> {{ autor_name }}
+                    </div>
+                    <h5 class="fw-bold mb-3">{{ noticia.titulo }}</h5>
+                    <p class="text-muted small mb-4">{{ noticia.cuerpo|truncatewords:20 }}</p>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-grow-1"
+                            data-bs-toggle="modal" data-bs-target="#editNoticiaModal{{ noticia.id }}">
+                            <i class="ti ti-edit me-1"></i>Editar
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold flex-grow-1"
+                            data-bs-toggle="modal" data-bs-target="#deleteNoticiaModal{{ noticia.id }}">
+                            <i class="ti ti-trash me-1"></i>Eliminar
+                        </button>
+                        <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold flex-grow-1 w-100 mt-1"
+                            data-bs-toggle="modal" data-bs-target="#previewModal{{ noticia.id }}">
+                            <i class="ti ti-eye me-1"></i>Vista previa
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Modal Editar Noticia -->
+        <div class="modal fade" id="editNoticiaModal{{ noticia.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header bg-primary py-3">
+                        <h5 class="modal-title fw-bold text-white"><i class="ti ti-edit me-2"></i>Editar Noticia</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4 p-md-5">
+                        <form action="{% url 'core:admin_edit_noticia' noticia.id %}" method="POST"
+                            enctype="multipart/form-data" class="modern-form">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i
+                                            class="ti ti-type"></i></span>
+                                    <input type="text" name="titulo" class="form-control bg-light border-start-0"
+                                        value="{{ noticia.titulo }}" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i
+                                            class="ti ti-align-left"></i></span>
+                                    <textarea name="cuerpo" rows="8" class="form-control bg-light border-start-0"
+                                        required>{{ noticia.cuerpo }}</textarea>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen</label>
+                                <div class="image-upload-wrapper">
+                                    <div class="image-drop-zone has-image"
+                                        onclick="document.getElementById('edit-image-{{ noticia.id }}').click()">
+                                        <input type="file" name="imagen" id="edit-image-{{ noticia.id }}" class="d-none"
+                                            accept="image/*"
+                                            onchange="previewImageModal(this, 'edit-preview-{{ noticia.id }}', 'edit-overlay-{{ noticia.id }}')">
+                                        <div class="text-center p-4">
+                                            <div class="upload-icon mb-3"><i
+                                                    class="ti ti-cloud-upload fs-1 text-primary"></i></div>
+                                            <div class="upload-text">
+                                                <p class="fw-bold mb-1">Cambiar imagen</p>
+                                            </div>
+                                        </div>
+                                        <div id="edit-overlay-{{ noticia.id }}" class="image-preview-overlay">
+                                            <img id="edit-preview-{{ noticia.id }}" src="{{ noticia.imagen.url }}"
+                                                alt="Vista previa">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2 mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow">
+                                    <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                                </button>
+                                <button type="button" class="btn btn-light btn-lg rounded-pill fw-bold text-muted"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Vista Previa (Simulando Frontend) -->
+        <div class="modal fade" id="previewModal{{ noticia.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
+                        <button type="button" class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-0 text-start">
+                        {% if noticia.imagen %}
+                        <div class="position-relative">
+                            <img src="{{ noticia.imagen.url }}" class="w-100" alt="{{ noticia.titulo }}"
+                                style="height: 400px; object-fit: cover;">
+                            <div class="modal-hero-overlay-admin"></div>
+                        </div>
+                        {% endif %}
+                        <div class="p-4 p-md-5">
+                            <div class="d-flex align-items-center gap-3 mb-4 text-muted small">
+                                <span
+                                    class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                                    <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
+                                </span>
+                                <span>•</span>
+                                <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{ autor_name }}</span>
+                            </div>
+                            <h2 class="display-6 fw-bold mb-4">{{ noticia.titulo }}</h2>
+                            <div class="fs-5 lh-lg text-secondary">
+                                {{ noticia.cuerpo|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer bg-light border-0 p-4">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar
+                            Vista Previa</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Eliminar Noticia -->
+        <div class="modal fade" id="deleteNoticiaModal{{ noticia.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-body p-5 text-center">
+                        <div class="icon-box mb-4 mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle"
+                            style="width: 80px; height: 80px;">
+                            <i class="ti ti-alert-triangle fs-1"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">¿Eliminar noticia?</h3>
+                        <p class="text-muted mb-4 fs-5">Esta acción no se puede deshacer. Se eliminará permanentemente
+                            la noticia: <br><strong>"{{ noticia.titulo }}"</strong></p>
+                        <form action="{% url 'core:admin_delete_noticia' noticia.id %}" method="POST">
+                            {% csrf_token %}
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold">Sí,
+                                    eliminar</button>
+                                <button type="button" class="btn btn-light btn-lg rounded-pill fw-bold border"
+                                    data-bs-dismiss="modal">No, cancelar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endwith %}
         {% empty %}
-        <p class="text-center">No hay noticias publicadas aún.</p>
+        <div class="col-12 text-center py-5">
+            <div class="p-5 bg-light rounded-5">
+                <i class="ti ti-news-off fs-1 text-muted mb-3 d-block"></i>
+                <h3 class="fw-bold">No hay noticias publicadas</h3>
+                <p class="text-muted">Comienza publicando tu primera noticia para informar a la comunidad.</p>
+                <button class="btn btn-primary rounded-pill px-4 fw-bold mt-2" data-bs-toggle="modal"
+                    data-bs-target="#createNoticiaModal">
+                    Crear primera noticia
+                </button>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>
+
+{% include 'core/noticias/modals/modal_crear.html' %}
+
+<style>
+    .image-drop-zone {
+        border: 2px dashed var(--color-border);
+        border-radius: 16px;
+        background-color: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-drop-zone:hover {
+        border-color: var(--color-primary);
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+
+    .image-drop-zone.has-image {
+        border-style: solid;
+        border-color: var(--color-primary);
+    }
+
+    .image-preview-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        z-index: 5;
+    }
+
+    .image-preview-overlay img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .modern-form .input-group-text {
+        border-radius: 12px 0 0 12px;
+        color: var(--color-primary);
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+
+    .modern-form .form-control {
+        border-radius: 0 12px 12px 0;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+    }
+
+    .modern-form .form-control:focus {
+        border-color: var(--color-primary);
+        box-shadow: none;
+        background-color: #fff;
+    }
+
+    .modern-form textarea.form-control {
+        border-radius: 0 12px 12px 12px;
+    }
+
+    /* Estilos para el Hero del Preview */
+    .modal-hero-overlay-admin {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(transparent, #fff);
+    }
+
+    .dark-mode .modal-hero-overlay-admin {
+        background: linear-gradient(transparent, #1a1d21);
+    }
+</style>
+
+<script>
+    function previewImageModal(input, previewId, overlayId) {
+        const preview = document.getElementById(previewId);
+        const overlay = document.getElementById(overlayId);
+        const dropZone = input.closest('.image-drop-zone');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                overlay.classList.remove('d-none');
+                dropZone.classList.add('has-image');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Lógica para Drag and Drop en los modales
+    document.querySelectorAll('.image-drop-zone').forEach(zone => {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            zone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        zone.addEventListener('dragover', () => zone.classList.add('border-primary'), false);
+        zone.addEventListener('dragleave', () => zone.classList.remove('border-primary'), false);
+
+        zone.addEventListener('drop', e => {
+            const input = zone.querySelector('input[type="file"]');
+            input.files = e.dataTransfer.files;
+            previewImageModal(input, zone.querySelector('img').id, zone.querySelector('.image-preview-overlay').id);
+        }, false);
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,115 @@
+{% load static %}
+
+<!-- Modal Crear Noticia (Shared) -->
+<div class="modal fade" id="createNoticiaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header bg-primary py-3">
+                <h5 class="modal-title fw-bold text-white"><i class="ti ti-plus me-2"></i>Nueva Noticia</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5">
+                <form action="{% url 'core:admin_create_noticia' %}" method="POST" enctype="multipart/form-data"
+                    class="modern-form">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-type"></i></span>
+                            {{ form.titulo }}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i
+                                    class="ti ti-align-left"></i></span>
+                            {{ form.cuerpo }}
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen</label>
+                        <div class="image-upload-wrapper">
+                            <div id="news-drop-zone-modal" class="image-drop-zone"
+                                onclick="this.querySelector('input[type=file]').click()">
+                                <div class="d-none">
+                                    {{ form.imagen }}
+                                </div>
+                                <div class="text-center p-4">
+                                    <div class="upload-icon mb-3"><i class="ti ti-cloud-upload fs-1 text-primary"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p class="fw-bold mb-1">Arrastra una imagen aquí</p>
+                                        <p class="text-muted small mb-0">o haz clic para seleccionar</p>
+                                    </div>
+                                </div>
+                                <div id="news-overlay-modal" class="image-preview-overlay d-none">
+                                    <img id="news-preview-modal" src="" alt="Vista previa">
+                                    <div class="preview-actions">
+                                        <span class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold">
+                                            <i class="ti ti-refresh me-2"></i>Cambiar Foto
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow">
+                            <i class="ti ti-check me-2"></i>Publicar Noticia
+                        </button>
+                        <button type="button" class="btn btn-light btn-lg rounded-pill fw-bold text-muted"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const dropZone = document.getElementById('news-drop-zone-modal');
+        if (!dropZone) return;
+
+        const fileInput = dropZone.querySelector('input[type="file"]');
+        const preview = document.getElementById('news-preview-modal');
+        const overlay = document.getElementById('news-overlay-modal');
+
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    overlay.classList.remove('d-none');
+                    dropZone.classList.add('has-image');
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        zoneEvents = ['dragenter', 'dragover'];
+        zoneEvents.forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+        });
+
+        dropZone.addEventListener('drop', e => {
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        }, false);
+    })();
+</script>

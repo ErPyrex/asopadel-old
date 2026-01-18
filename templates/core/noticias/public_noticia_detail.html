@@ -3,15 +3,17 @@
 {% block title %}{{ noticia.titulo }} - ASOPADEL BARINAS{% endblock %}
 
 {% block back_url %}
-<a href="{% url 'core:public_noticias_list' %}" class="btn-back-custom" aria-label="Volver">
+{% url 'core:public_noticias_list' as back_url_target %}
+<button class="btn-back-custom" onclick="handleSmartBack('{{ back_url_target }}')" aria-label="Volver">
     <i class="ti ti-chevron-left"></i>
-</a>
+</button>
 {% endblock %}
 
 {% block content %}
 <div class="noticia-detail-container pb-5">
     <div class="row justify-content-center">
         <div class="col-lg-10 col-xl-8">
+            {% with autor_name=noticia.autor.get_full_name|default:noticia.autor.username %}
             <article class="noticia-article bg-white rounded-5 shadow-lg overflow-hidden border">
                 {% if noticia.imagen %}
                 <div class="noticia-hero-wrapper">
@@ -27,8 +29,7 @@
                             <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
                         </span>
                         <span>•</span>
-                        <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{
-                            noticia.autor.get_full_name|default:noticia.autor.username }}</span>
+                        <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{ autor_name }}</span>
                     </div>
 
                     <h1 class="display-4 fw-bold mb-4 noticia-titulo-main">{{ noticia.titulo }}</h1>
@@ -58,6 +59,7 @@
                     </div>
                 </div>
             </article>
+            {% endwith %}
         </div>
     </div>
 </div>

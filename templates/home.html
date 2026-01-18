@@ -117,7 +117,8 @@
         </div>
         <h2 class="section-title-modern">Última Noticia</h2>
       </div>
-      <a href="{% url 'core:public_noticia_detail' noticia.id %}" class="text-decoration-none d-block">
+      <button class="btn p-0 border-0 text-start w-100" data-bs-toggle="modal"
+        data-bs-target="#noticiaHomeModal{{ noticia.id }}">
         <div class="card border-0 shadow-lg ranking-card card-noticia-home-wide overflow-hidden mb-5">
           <div class="row g-0">
             {% if noticia.imagen %}
@@ -132,12 +133,50 @@
                 class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 mb-3 align-self-start">
                 NUEVO</div>
               <h3 class="h2 fw-bold mb-3 text-heading">{{ noticia.titulo }}</h3>
-              <p class="text-muted fs-5 mb-4">{{ noticia.cuerpo|truncatewords:40 }}</p>
+              <p class="text-muted fs-5 mb-4">{{ noticia.cuerpo|truncatewords:20 }}</p>
               <div class="text-primary fw-bold">Continuar leyendo <i class="ti ti-arrow-right ms-1"></i></div>
             </div>
           </div>
         </div>
-      </a>
+      </button>
+
+      <!-- Modal Detalle Noticia Home -->
+      <div class="modal fade" id="noticiaHomeModal{{ noticia.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
+              <button type="button" class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
+                data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+              {% if noticia.imagen %}
+              <div class="modal-hero-wrapper-home">
+                <img src="{{ noticia.imagen.url }}" class="w-100" alt="{{ noticia.titulo }}"
+                  style="height: 400px; object-fit: cover;">
+              </div>
+              {% endif %}
+              <div class="p-4 p-md-5">
+                <div class="d-flex align-items-center gap-3 mb-4 text-muted small">
+                  <span
+                    class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                    <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
+                  </span>
+                  <span>•</span>
+                  <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{
+                    noticia.autor.get_full_name|default:noticia.autor.username }}</span>
+                </div>
+                <h2 class="display-6 fw-bold mb-4">{{ noticia.titulo }}</h2>
+                <div class="noticia-cuerpo-home fs-5 lh-lg text-secondary">
+                  {{ noticia.cuerpo|linebreaks }}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer bg-light border-0 p-4">
+              <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
       {% endwith %}
       {% endif %}
     </div>
