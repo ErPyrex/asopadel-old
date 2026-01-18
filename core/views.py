@@ -193,7 +193,8 @@ def admin_delete_court(request, cancha_id):
 @user_passes_test(is_admin)
 def admin_player_list(request):
     jugadores = Usuario.objects.filter(es_jugador=True)
-    return render(request, 'core/jugadores/jugadores.html', {'jugadores': jugadores})
+    categorias = Usuario._meta.get_field('categoria_jugador').choices
+    return render(request, 'core/jugadores/jugadores.html', {'jugadores': jugadores, 'categorias': categorias})
 
 @login_required
 @user_passes_test(is_admin)
@@ -225,6 +226,26 @@ def admin_delete_player(request, jugador_id):
         messages.success(request, "Jugador eliminado exitosamente.")
         return redirect('core:admin_player_list')
     return render(request, 'core/jugadores/confirmar_eliminar_jugador.html', {'jugador': jugador})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_update_player_category(request, jugador_id):
+    """Actualiza la categoría de un jugador desde la lista"""
+    if request.method == 'POST':
+        jugador = get_object_or_404(Usuario, id=jugador_id, es_jugador=True)
+        nueva_categoria = request.POST.get('categoria')
+        
+        # Validar que la categoría sea válida
+        categorias_validas = [choice[0] for choice in Usuario._meta.get_field('categoria_jugador').choices]
+        
+        if nueva_categoria in categorias_validas:
+            jugador.categoria_jugador = nueva_categoria
+            jugador.save()
+            messages.success(request, f"Categoría de {jugador.get_full_name} actualizada a {jugador.get_categoria_jugador_display()}.")
+        else:
+            messages.error(request, "Categoría no válida.")
+            
+    return redirect('core:admin_player_list')
 
 @login_required
 @user_passes_test(is_jugador)

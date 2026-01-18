@@ -36,6 +36,7 @@ urlpatterns = [
     path('admin-gestion/jugadores/crear/', views.admin_create_player, name='admin_create_player'),
     path('admin-gestion/jugadores/<int:jugador_id>/editar/', views.admin_edit_player, name='admin_edit_player'),
     path('admin-gestion/jugadores/<int:jugador_id>/eliminar/', views.admin_delete_player, name='admin_delete_player'),
+    path('admin-gestion/jugadores/<int:jugador_id>/actualizar-categoria/', views.admin_update_player_category, name='admin_update_player_category'),
     
     # 🧑‍⚖️ Gestión de Árbitros (Admin)
     path('admin-gestion/arbitros/', views.admin_referee_list, name='admin_arbitros_list'),

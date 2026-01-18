@@ -22,6 +22,7 @@
                             <th>Nombre</th>
                             <th>Email</th>
                             <th>Teléfono</th>
+                            <th>Categoría</th>
                             <th>Ranking</th>
                             <th>Acciones</th>
                         </tr>
@@ -33,6 +34,25 @@
                             <td>{{ jugador.first_name }} {{ jugador.last_name }}</td>
                             <td>{{ jugador.email }}</td>
                             <td>{{ jugador.telefono }}</td>
+                            <td>
+                                <form method="POST" action="{% url 'core:admin_update_player_category' jugador.id %}"
+                                    class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <select name="categoria" class="form-select form-select-sm me-2"
+                                        onchange="this.form.submit()">
+                                        <option value="" {% if not jugador.categoria_jugador %}selected{% endif %}>Sin
+                                            categoría</option>
+                                        {# FIXED - FORMATTER SAFE #}
+                                        {% for codigo, nombre in categorias %}
+                                        {% if jugador.categoria_jugador == codigo %}
+                                        <option value="{{ codigo }}" selected>{{ nombre }}</option>
+                                        {% else %}
+                                        <option value="{{ codigo }}">{{ nombre }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </td>
                             <td>{{ jugador.ranking }}</td>
                             <td>
                                 <a href="{% url 'core:admin_edit_player' jugador.id %}"
