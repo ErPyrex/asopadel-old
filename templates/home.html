@@ -2,47 +2,11 @@
 {% block title %}ASOPADEL BARINAS{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container-fluid px-lg-5 py-4">
   <div class="row g-5">
-    <!-- Columna Izquierda: Torneos -->
-    <div class="col-lg-4">
-      <div class="home-section-header">
-        <div class="icon-holder">
-          <i class="ti ti-trophy fs-3"></i>
-        </div>
-        <div>
-          <h2 class="section-title-modern">Torneos</h2>
-          <span class="text-muted small">Temporada 2026</span>
-        </div>
-      </div>
-
-      {% if torneos %}
-      {% for torneo in torneos %}
-      <div class="card mb-3 border-0 shadow-sm ranking-card">
-        <div class="card-body p-4">
-          <h5 class="h6 fw-bold mb-2">{{ torneo.nombre }}</h5>
-          <p class="text-muted small mb-3">{{ torneo.descripcion|truncatechars:100 }}</p>
-          <div class="d-flex align-items-center justify-content-between">
-            <span class="badge bg-primary bg-opacity-10 text-primary small p-2">
-              <i class="ti ti-calendar-event me-1"></i> {{ torneo.fecha_inicio|date:"d M" }}
-            </span>
-            <a href="{% url 'core:public_torneos_list' %}"
-              class="btn-stats text-primary text-decoration-none fw-bold small">
-              Ver detalles <i class="ti ti-arrow-right ms-1"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="card border-0 p-4 text-center rounded-4" style="background: var(--color-light);">
-        <p class="text-muted small mb-0">No hay torneos activos en este momento.</p>
-      </div>
-      {% endif %}
-    </div>
-
-    <!-- Columna Derecha: Partidos -->
+    <!-- Columna Principal (8): Partidos y Canchas -->
     <div class="col-lg-8">
+      <!-- Sección Partidos -->
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
         <div class="home-section-header mb-0">
           <div class="icon-holder" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
@@ -57,7 +21,7 @@
         </div>
       </div>
 
-      <div class="match-list">
+      <div class="match-list mb-5">
         {% if partidos %}
         {% for partido in partidos %}
         <div class="match-card-modern mb-3" data-status="{{ partido.estado }}">
@@ -74,12 +38,10 @@
           <div class="row align-items-center g-0">
             <div class="col-5 text-end pe-4">
               <div class="fw-bold h5 mb-0 text-truncate">
-                {% for j in partido.equipo1.all %}
-                {{ j.first_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}Equipo 1{% endfor %}
+                {% for j in partido.equipo1.all %}{{ j.first_name }}{% if not forloop.last %}, {% endif %}{% empty
+                %}Equipo 1{% endfor %}
               </div>
             </div>
-
             <div class="col-2 text-center">
               {% if partido.estado == 'finalizado' %}
               <div class="h3 fw-bold mb-0 text-primary">{{ partido.marcador|default:"0-0" }}</div>
@@ -87,25 +49,20 @@
               <div class="small fw-bold px-3 py-1 border rounded-pill bg-light text-muted">VS</div>
               {% endif %}
             </div>
-
             <div class="col-5 ps-4">
               <div class="fw-bold h5 mb-0 text-truncate">
-                {% for j in partido.equipo2.all %}
-                {{ j.first_name }}{% if not forloop.last %}, {% endif %}
-                {% empty %}Equipo 2{% endfor %}
+                {% for j in partido.equipo2.all %}{{ j.first_name }}{% if not forloop.last %}, {% endif %}{% empty
+                %}Equipo 2{% endfor %}
               </div>
             </div>
           </div>
         </div>
         {% endfor %}
-
-        <!-- Mensaje dinámico cuando el filtro no arroja resultados -->
         <div id="no-matches-filtered" class="card border-0 p-5 text-center rounded-4 d-none"
           style="background: var(--color-light);">
           <i class="ti ti-search fs-1 text-muted mb-2"></i>
           <p class="text-muted mb-0">No se encontraron partidos en esta categoría.</p>
         </div>
-
         {% else %}
         <div class="card border-0 p-5 text-center rounded-4" style="background: var(--color-light);">
           <i class="ti ti-mood-empty fs-1 text-muted mb-2"></i>
@@ -113,62 +70,15 @@
         </div>
         {% endif %}
       </div>
-    </div>
-  </div>
 
-  <div class="row g-5 mt-5">
-    <!-- Ranking -->
-    <div class="col-lg-5">
-      <div class="home-section-header">
-        <div class="icon-holder" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">
-          <i class="ti ti-star fs-3"></i>
-        </div>
-        <h3 class="section-title-modern">Top Ranking</h3>
-      </div>
-
-      <div class="card border-0 shadow-sm ranking-card overflow-hidden">
-        <div class="card-body p-0">
-          {% if ranking %}
-          {% for jugador in ranking %}
-          <div class="ranking-item-mini">
-            <div class="d-flex align-items-center">
-              <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
-              <div>
-                <div class="fw-bold">{{ jugador.get_full_name }}</div>
-                <small class="text-muted text-uppercase" style="font-size:10px">
-                  {% if jugador.get_categoria_jugador_display %}{{ jugador.get_categoria_jugador_display }}{% else %}Sin
-                  Categoría{% endif %}
-                </small>
-              </div>
-            </div>
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
-              pts</span>
-          </div>
-          {% endfor %}
-          <div class="p-4 text-center">
-            <a href="{% url 'core:ranking' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
-              Ver Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
-            </a>
-          </div>
-          {% else %}
-          <div class="p-5 text-center">
-            <p class="text-muted small mb-0">No hay registros aún.</p>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <!-- Canchas -->
-    <div class="col-lg-7">
-      <div class="home-section-header">
+      <!-- Sección Canchas -->
+      <div class="home-section-header mb-4">
         <div class="icon-holder" style="background: rgba(14, 165, 233, 0.1); color: #0EA5E9;">
           <i class="ti ti-ball-tennis fs-3"></i>
         </div>
-        <h3 class="section-title-modern">Estado de Canchas</h3>
+        <h2 class="section-title-modern">Estado de Canchas</h2>
       </div>
-
-      <div class="row g-4">
+      <div class="row g-4 mb-5">
         {% for cancha in canchas|slice:":4" %}
         <div class="col-md-6">
           <div class="card border-0 shadow-sm h-100 ranking-card">
@@ -191,80 +101,176 @@
           </div>
         </div>
         {% endfor %}
+        <div class="col-12">
+          <a href="{% url 'core:public_canchas_list' %}" class="btn btn-outline-primary w-100 py-3 fw-bold rounded-4">
+            Consultar Disponibilidad Completa <i class="ti ti-search ms-1"></i>
+          </a>
+        </div>
       </div>
 
-      <div class="mt-4">
-        <a href="{% url 'core:public_canchas_list' %}"
-          class="btn btn-outline-primary w-100 py-4 shadow-sm border-2 fw-bold d-flex align-items-center justify-content-center gap-2 rounded-4">
-          <i class="ti ti-search fs-4"></i>
-          <span>Consultar Disponibilidad de Canchas</span>
-        </a>
+      <!-- Sección Última Noticia (Ancha) -->
+      {% if noticias %}
+      {% with noticia=noticias|first %}
+      <div class="home-section-header mb-4">
+        <div class="icon-holder" style="background: rgba(99, 102, 241, 0.1); color: #6366F1;">
+          <i class="ti ti-news fs-3"></i>
+        </div>
+        <h2 class="section-title-modern">Última Noticia</h2>
+      </div>
+      <a href="{% url 'core:public_noticia_detail' noticia.id %}" class="text-decoration-none d-block">
+        <div class="card border-0 shadow-lg ranking-card card-noticia-home-wide overflow-hidden mb-5">
+          <div class="row g-0">
+            {% if noticia.imagen %}
+            <div class="col-md-4">
+              <img src="{{ noticia.imagen.url }}" class="img-fluid h-100" alt="{{ noticia.titulo }}"
+                style="object-fit: cover; min-height: 200px;">
+            </div>
+            {% endif %}
+            <div
+              class="{% if noticia.imagen %}col-md-8{% else %}col-12{% endif %} p-4 p-md-5 d-flex flex-column justify-content-center">
+              <div
+                class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 mb-3 align-self-start">
+                NUEVO</div>
+              <h3 class="h2 fw-bold mb-3 text-heading">{{ noticia.titulo }}</h3>
+              <p class="text-muted fs-5 mb-4">{{ noticia.cuerpo|truncatewords:40 }}</p>
+              <div class="text-primary fw-bold">Continuar leyendo <i class="ti ti-arrow-right ms-1"></i></div>
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endwith %}
+      {% endif %}
+    </div>
+
+    <!-- Columna Lateral (4): Torneos y Ranking -->
+    <div class="col-lg-4">
+      <!-- Sección Torneos -->
+      <div class="home-section-header mb-4">
+        <div class="icon-holder">
+          <i class="ti ti-trophy fs-3"></i>
+        </div>
+        <h2 class="section-title-modern">Torneos</h2>
+      </div>
+      {% if torneos %}
+      {% for torneo in torneos %}
+      <div class="card mb-3 border-0 shadow-sm ranking-card">
+        <div class="card-body p-4">
+          <h5 class="h6 fw-bold mb-2">{{ torneo.nombre }}</h5>
+          <p class="text-muted small mb-3">{{ torneo.descripcion|truncatechars:80 }}</p>
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="badge bg-primary bg-opacity-10 text-primary small p-2">
+              <i class="ti ti-calendar-event me-1"></i> {{ torneo.fecha_inicio|date:"d M" }}
+            </span>
+            <a href="{% url 'core:public_torneos_list' %}"
+              class="btn-stats text-primary text-decoration-none fw-bold small">
+              Ver <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      {% else %}
+      <div class="card border-0 p-4 text-center rounded-4 mb-4" style="background: var(--color-light);">
+        <p class="text-muted small mb-0">No hay torneos activos.</p>
+      </div>
+      {% endif %}
+
+      <!-- Sección Ranking -->
+      <div class="home-section-header mb-4 mt-5">
+        <div class="icon-holder" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">
+          <i class="ti ti-star fs-3"></i>
+        </div>
+        <h2 class="section-title-modern">Top Ranking</h2>
+      </div>
+      <div class="card border-0 shadow-sm ranking-card overflow-hidden">
+        <div class="card-body p-0">
+          {% if ranking %}
+          {% for jugador in ranking %}
+          <div class="ranking-item-mini">
+            <div class="d-flex align-items-center">
+              <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
+              <div>
+                <div class="fw-bold">{{ jugador.get_full_name }}</div>
+                <small class="text-muted text-uppercase" style="font-size:10px">
+                  {{ jugador.get_categoria_jugador_display|default:"LIBRE" }}
+                </small>
+              </div>
+            </div>
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
+              pts</span>
+          </div>
+          {% endfor %}
+          <div class="p-4">
+            <a href="{% url 'core:ranking' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
+              Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
+            </a>
+          </div>
+          {% else %}
+          <div class="p-5 text-center">
+            <p class="text-muted small mb-0">No hay registros aún.</p>
+          </div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-
 <script>
   function filterMatches(filter, btn) {
     const isActive = btn.classList.contains('active');
-    const allBtn = document.querySelector('button[onclick*="all"]');
-
     if (isActive && filter !== 'all') {
+      const allBtn = document.querySelector('button[onclick*="all"]');
       if (allBtn) filterMatches('all', allBtn);
       return;
     }
-
     document.querySelectorAll('.tag-filter-modern').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     const targets = filter.split(',');
     let visibleCount = 0;
-
     document.querySelectorAll('.match-card-modern').forEach(match => {
       const status = match.getAttribute('data-status');
       if (filter === 'all' || targets.includes(status)) {
         match.classList.remove('d-none');
         visibleCount++;
-        setTimeout(() => {
-          match.style.opacity = '1';
-          match.style.transform = 'translateY(0)';
-        }, 10);
+        setTimeout(() => { match.style.opacity = '1'; match.style.transform = 'translateY(0)'; }, 10);
       } else {
         match.style.opacity = '0';
         match.style.transform = 'translateY(10px)';
-        setTimeout(() => {
-          match.classList.add('d-none');
-        }, 300);
+        setTimeout(() => { match.classList.add('d-none'); }, 300);
       }
     });
-
-    // Manejar mensaje de lista vacía
     const noResults = document.getElementById('no-matches-filtered');
-    if (noResults) {
-      if (visibleCount === 0) {
-        noResults.classList.remove('d-none');
-      } else {
-        noResults.classList.add('d-none');
-      }
-    }
+    if (noResults) visibleCount === 0 ? noResults.classList.remove('d-none') : noResults.classList.add('d-none');
   }
 </script>
 
 <style>
-  .match-card {
-    transition: opacity 0.3s ease;
+  .card-noticia-home-wide {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--color-border) !important;
+    background: var(--bg-card);
+  }
+
+  .card-noticia-home-wide:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15), 0 18px 36px -18px rgba(0, 0, 0, 0.2) !important;
+    border-color: var(--color-primary) !important;
+  }
+
+  .card-noticia-home-wide .text-heading {
+    transition: color 0.3s ease;
+  }
+
+  .card-noticia-home-wide:hover .text-heading {
+    color: var(--color-primary);
   }
 
   .status-indicator {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     display: inline-block;
-  }
-
-  .flex-1 {
-    flex: 1;
   }
 </style>
 {% endblock %}

@@ -52,7 +52,7 @@
 
     </svg>
     <nav class="navbar navbar-expand-lg">
-        <div class="container">
+        <div class="container-fluid px-lg-5">
             {% block back_url %}
             {% url 'core:home' as home_url %}
             {% if request.path != home_url and request.path != '/' %}
@@ -61,26 +61,36 @@
             </button>
             {% endif %}
             {% endblock %}
-            <a class="navbar-brand" href="{% url 'core:home' %}">ASOPADEL BARINAS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <a class="navbar-brand fw-bolder fs-4" href="{% url 'core:home' %}">
+                <span class="text-primary">ASOPADEL</span> BARINAS
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <i class="ti ti-menu-2 fs-2"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:home' %}">Inicio</a>
+                        <a class="nav-link px-3 {% if request.path == '/' or request.path == home_url %}active{% endif %}"
+                            href="{% url 'core:home' %}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:ranking' %}">Ranking</a>
+                        <a class="nav-link px-3 {% if '/noticias/' in request.path %}active{% endif %}"
+                            href="{% url 'core:public_noticias_list' %}">Noticias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3 {% if '/ranking/' in request.path %}active{% endif %}"
+                            href="{% url 'core:ranking' %}">Ranking</a>
                     </li>
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'core:dashboard_by_role' %}">Panel</a>
+                        <a class="nav-link px-3 {% if '/dashboard/' in request.path or '/admin-dashboard/' in request.path %}active{% endif %}"
+                            href="{% url 'core:dashboard_by_role' %}">Panel</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:login' %}">Iniciar sesión</a>
+                        <a class="nav-link px-3 btn-login-nav" href="{% url 'users:login' %}">Iniciar sesión</a>
                     </li>
                     {% endif %}
 

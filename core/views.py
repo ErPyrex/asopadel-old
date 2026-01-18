@@ -49,6 +49,14 @@ def public_court_detail(request, cancha_id):
     cancha = get_object_or_404(Cancha, id=cancha_id)
     return render(request, 'core/canchas/detalle_cancha.html', {'cancha': cancha})
 
+def public_noticias_list(request):
+    noticias = Noticia.objects.order_by('-fecha_publicacion')
+    return render(request, 'core/noticias/public_noticias_list.html', {'noticias': noticias})
+
+def public_noticia_detail(request, noticia_id):
+    noticia = get_object_or_404(Noticia, id=noticia_id)
+    return render(request, 'core/noticias/public_noticia_detail.html', {'noticia': noticia})
+
 # ====================================================================================
 # 🧑‍💼 Dashboards por rol
 # ====================================================================================
@@ -570,7 +578,7 @@ from facilities.models import Cancha
 from competitions.models import Torneo
 
 def home(request):
-    noticias = Noticia.objects.order_by('-fecha_publicacion')[:3]  # solo las 3 más recientes
+    noticias = Noticia.objects.order_by('-fecha_publicacion')[:1]  # solo la más reciente
     canchas = Cancha.objects.all()
     torneos = Torneo.objects.order_by('-fecha_inicio')[:5]  # opcional si quieres mostrar torneos
     

@@ -11,7 +11,8 @@ urlpatterns = [
     path('torneos/', views.public_tournament_list, name='public_torneos_list'),
     path('canchas/', views.public_court_list, name='public_canchas_list'),
     path('canchas/<int:cancha_id>/', views.public_court_detail, name='public_court_detail'),
-
+    path('noticias/', views.public_noticias_list, name='public_noticias_list'),
+    path('noticias/<int:noticia_id>/', views.public_noticia_detail, name='public_noticia_detail'),
 
     # 🔐 Dashboards por rol
     path('dashboard/', views.dashboard_by_role, name='dashboard_by_role'),

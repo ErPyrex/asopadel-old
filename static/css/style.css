@@ -98,34 +98,68 @@ a:hover {
 .navbar {
     background-color: var(--bg-navbar) !important;
     border-bottom: 1px solid var(--color-border);
-    padding: 1rem 0;
+    padding: 0.85rem 0;
     position: sticky;
     top: 0;
-    z-index: 1000;
-    box-shadow: var(--shadow-sm);
+    z-index: 1050;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: rgba(var(--bg-navbar-rgb, 255, 255, 255), 0.85) !important;
+}
+
+[data-bs-theme="dark"] .navbar {
+    --bg-navbar-rgb: 15, 23, 42;
 }
 
 .navbar-brand {
     font-weight: 800;
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     color: var(--color-heading) !important;
     letter-spacing: -0.5px;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover {
+    transform: scale(1.02);
 }
 
 .nav-link {
     color: var(--color-text) !important;
     font-weight: 600;
     font-size: 0.95rem;
-    margin-left: 1rem;
-    padding: 0.5rem 1rem !important;
-    border-radius: var(--border-radius-sm);
+    padding: 0.6rem 1.25rem !important;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
 .nav-link:hover {
     color: var(--color-primary) !important;
-    background-color: var(--color-light);
-    box-shadow: inset 0 0 0 1px var(--color-primary);
-    transform: none;
+    background-color: rgba(14, 165, 233, 0.08);
+}
+
+.nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1.25rem;
+    right: 1.25rem;
+    height: 3px;
+    background: var(--color-primary);
+    border-radius: 2px;
+}
+
+.btn-login-nav {
+    background: var(--color-primary);
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);
+}
+
+.btn-login-nav:hover {
+    background: var(--color-secondary) !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.35);
 }
 
 /* Cards */
@@ -267,6 +301,25 @@ a:hover {
     height: 3px;
     background: var(--color-primary);
     border-radius: 2px;
+}
+
+.card-noticia-home {
+    transition: all 0.3s ease;
+    border: 1px solid var(--color-border) !important;
+}
+
+.card-noticia-home:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.card-noticia-home .text-heading {
+    transition: color 0.3s ease;
+}
+
+.card-noticia-home:hover .text-heading {
+    color: var(--color-primary);
 }
 
 /* Match Cards */

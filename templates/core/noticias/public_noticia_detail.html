@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ noticia.titulo }} - ASOPADEL BARINAS{% endblock %}
+
+{% block back_url %}
+<a href="{% url 'core:public_noticias_list' %}" class="btn-back-custom" aria-label="Volver">
+    <i class="ti ti-chevron-left"></i>
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="noticia-detail-container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <article class="noticia-article bg-white rounded-5 shadow-lg overflow-hidden border">
+                {% if noticia.imagen %}
+                <div class="noticia-hero-wrapper">
+                    <img src="{{ noticia.imagen.url }}" class="noticia-hero-img" alt="{{ noticia.titulo }}">
+                    <div class="noticia-hero-overlay"></div>
+                </div>
+                {% endif %}
+
+                <div class="p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 text-muted">
+                        <span
+                            class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                            <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
+                        </span>
+                        <span>•</span>
+                        <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{
+                            noticia.autor.get_full_name|default:noticia.autor.username }}</span>
+                    </div>
+
+                    <h1 class="display-4 fw-bold mb-4 noticia-titulo-main">{{ noticia.titulo }}</h1>
+
+                    <div class="noticia-cuerpo fs-5 lh-lg text-secondary">
+                        {{ noticia.cuerpo|linebreaks }}
+                    </div>
+                </div>
+
+                <div class="bg-light p-4 border-top border-bottom-0">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="text-muted fw-bold small">Compartir:</span>
+                            <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                                style="width: 36px; height: 36px; padding: 0;"><i class="ti ti-brand-x"></i></button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                                style="width: 36px; height: 36px; padding: 0;"><i
+                                    class="ti ti-brand-facebook"></i></button>
+                            <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                                style="width: 36px; height: 36px; padding: 0;"><i
+                                    class="ti ti-brand-whatsapp"></i></button>
+                        </div>
+                        <a href="{% url 'core:public_noticias_list' %}"
+                            class="btn btn-link link-secondary text-decoration-none fw-bold">
+                            <i class="ti ti-arrow-left me-1"></i> Volver a noticias
+                        </a>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+
+<style>
+    .noticia-hero-wrapper {
+        position: relative;
+        height: 450px;
+        width: 100%;
+    }
+
+    .noticia-hero-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .noticia-hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .noticia-titulo-main {
+        color: var(--color-heading);
+        letter-spacing: -1px;
+    }
+
+    .noticia-article {
+        margin-top: -20px;
+        position: relative;
+        z-index: 2;
+    }
+
+    @media (max-width: 768px) {
+        .noticia-hero-wrapper {
+            height: 300px;
+        }
+
+        .noticia-titulo-main {
+            font-size: 2.5rem;
+        }
+    }
+
+    [data-bs-theme="dark"] .bg-white {
+        background-color: var(--bg-card) !important;
+    }
+
+    [data-bs-theme="dark"] .bg-light {
+        background-color: rgba(255, 255, 255, 0.03) !important;
+    }
+</style>
+{% endblock %}
