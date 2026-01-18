@@ -2,275 +2,140 @@
 {% block title %}ASOPADEL BARINAS{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-lg-5 py-4">
-  <div class="row g-5">
-    <!-- Columna Principal (8): Partidos y Canchas -->
-    <div class="col-lg-8">
-      <!-- Sección Partidos -->
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-        <div class="home-section-header mb-0">
-          <div class="icon-holder" style="background: rgba(16, 185, 129, 0.1); color: #10B981;">
-            <i class="ti ti-calendar-stats fs-3"></i>
-          </div>
-          <h2 class="section-title-modern">Últimos Partidos</h2>
-        </div>
-        <div class="d-flex gap-2">
-          <button class="tag-filter-modern active" onclick="filterMatches('all', this)">Todos</button>
-          <button class="tag-filter-modern" onclick="filterMatches('finalizado', this)">Resultados</button>
-          <button class="tag-filter-modern" onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
-        </div>
-      </div>
+<div class="container">
 
-      <div class="match-list mb-5">
-        {% if partidos %}
-        {% for partido in partidos %}
-        <div class="match-card-modern mb-3" data-status="{{ partido.estado }}">
-          <div class="d-flex justify-content-between align-items-center mb-4">
-            <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
-              <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }}
-            </span>
-            <span
-              class="badge {% if partido.estado == 'finalizado' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% else %}text-primary{% endif %} px-3 py-2 rounded-pill small">
-              {{ partido.get_estado_display }}
-            </span>
-          </div>
-
-          <div class="row align-items-center g-0">
-            <div class="col-5 text-end pe-4">
-              <div class="fw-bold h5 mb-0 text-truncate">
-                {% for j in partido.equipo1.all %}{{ j.first_name }}{% if not forloop.last %}, {% endif %}{% empty
-                %}Equipo 1{% endfor %}
-              </div>
-            </div>
-            <div class="col-2 text-center">
-              {% if partido.estado == 'finalizado' %}
-              <div class="h3 fw-bold mb-0 text-primary">{{ partido.marcador|default:"0-0" }}</div>
-              {% else %}
-              <div class="small fw-bold px-3 py-1 border rounded-pill bg-light text-muted">VS</div>
-              {% endif %}
-            </div>
-            <div class="col-5 ps-4">
-              <div class="fw-bold h5 mb-0 text-truncate">
-                {% for j in partido.equipo2.all %}{{ j.first_name }}{% if not forloop.last %}, {% endif %}{% empty
-                %}Equipo 2{% endfor %}
-              </div>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-        <div id="no-matches-filtered" class="card border-0 p-5 text-center rounded-4 d-none"
-          style="background: var(--color-light);">
-          <i class="ti ti-search fs-1 text-muted mb-2"></i>
-          <p class="text-muted mb-0">No se encontraron partidos en esta categoría.</p>
-        </div>
-        {% else %}
-        <div class="card border-0 p-5 text-center rounded-4" style="background: var(--color-light);">
-          <i class="ti ti-mood-empty fs-1 text-muted mb-2"></i>
-          <p class="text-muted mb-0">No hay partidos programados próximamente.</p>
-        </div>
-        {% endif %}
-      </div>
-
-      <!-- Sección Canchas -->
-      <div class="home-section-header mb-4">
-        <div class="icon-holder" style="background: rgba(14, 165, 233, 0.1); color: #0EA5E9;">
-          <i class="ti ti-ball-tennis fs-3"></i>
-        </div>
-        <h2 class="section-title-modern">Estado de Canchas</h2>
-      </div>
-      <div class="row g-4 mb-5">
-        {% for cancha in canchas|slice:":4" %}
-        <div class="col-md-6">
-          <div class="card border-0 shadow-sm h-100 ranking-card">
-            <div class="card-body p-4">
-              <div class="d-flex justify-content-between align-items-start mb-3">
-                <div>
-                  <h6 class="fw-bold mb-1">{{ cancha.nombre }}</h6>
-                  <small class="text-muted"><i class="ti ti-map-pin me-1"></i>{{ cancha.ubicacion }}</small>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span
-                    class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} shadow-sm"></span>
-                  <small
-                    class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold">
-                    {{ cancha.get_estado_display }}
-                  </small>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-        <div class="col-12">
-          <a href="{% url 'core:public_canchas_list' %}" class="btn btn-outline-primary w-100 py-3 fw-bold rounded-4">
-            Consultar Disponibilidad Completa <i class="ti ti-search ms-1"></i>
-          </a>
-        </div>
-      </div>
-
-      <!-- Sección Última Noticia (Ancha) -->
-      {% if noticias %}
-      {% with noticia=noticias|first %}
-      <div class="home-section-header mb-4">
-        <div class="icon-holder" style="background: rgba(99, 102, 241, 0.1); color: #6366F1;">
-          <i class="ti ti-news fs-3"></i>
-        </div>
-        <h2 class="section-title-modern">Última Noticia</h2>
-      </div>
-      <a href="{% url 'core:public_noticia_detail' noticia.id %}" class="text-decoration-none d-block">
-        <div class="card border-0 shadow-lg ranking-card card-noticia-home-wide overflow-hidden mb-5">
-          <div class="row g-0">
-            {% if noticia.imagen %}
-            <div class="col-md-4">
-              <img src="{{ noticia.imagen.url }}" class="img-fluid h-100" alt="{{ noticia.titulo }}"
-                style="object-fit: cover; min-height: 200px;">
-            </div>
-            {% endif %}
-            <div
-              class="{% if noticia.imagen %}col-md-8{% else %}col-12{% endif %} p-4 p-md-5 d-flex flex-column justify-content-center">
-              <div
-                class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 mb-3 align-self-start">
-                NUEVO</div>
-              <h3 class="h2 fw-bold mb-3 text-heading">{{ noticia.titulo }}</h3>
-              <p class="text-muted fs-5 mb-4">{{ noticia.cuerpo|truncatewords:40 }}</p>
-              <div class="text-primary fw-bold">Continuar leyendo <i class="ti ti-arrow-right ms-1"></i></div>
-            </div>
-          </div>
-        </div>
-      </a>
-      {% endwith %}
-      {% endif %}
-    </div>
-
-    <!-- Columna Lateral (4): Torneos y Ranking -->
-    <div class="col-lg-4">
-      <!-- Sección Torneos -->
-      <div class="home-section-header mb-4">
-        <div class="icon-holder">
-          <i class="ti ti-trophy fs-3"></i>
-        </div>
-        <h2 class="section-title-modern">Torneos</h2>
-      </div>
-      {% if torneos %}
-      {% for torneo in torneos %}
-      <div class="card mb-3 border-0 shadow-sm ranking-card">
-        <div class="card-body p-4">
-          <h5 class="h6 fw-bold mb-2">{{ torneo.nombre }}</h5>
-          <p class="text-muted small mb-3">{{ torneo.descripcion|truncatechars:80 }}</p>
-          <div class="d-flex align-items-center justify-content-between">
-            <span class="badge bg-primary bg-opacity-10 text-primary small p-2">
-              <i class="ti ti-calendar-event me-1"></i> {{ torneo.fecha_inicio|date:"d M" }}
-            </span>
-            <a href="{% url 'core:public_torneos_list' %}"
-              class="btn-stats text-primary text-decoration-none fw-bold small">
-              Ver <i class="ti ti-arrow-right ms-1"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-      {% else %}
-      <div class="card border-0 p-4 text-center rounded-4 mb-4" style="background: var(--color-light);">
-        <p class="text-muted small mb-0">No hay torneos activos.</p>
-      </div>
-      {% endif %}
-
-      <!-- Sección Ranking -->
-      <div class="home-section-header mb-4 mt-5">
-        <div class="icon-holder" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;">
-          <i class="ti ti-star fs-3"></i>
-        </div>
-        <h2 class="section-title-modern">Top Ranking</h2>
-      </div>
-      <div class="card border-0 shadow-sm ranking-card overflow-hidden">
-        <div class="card-body p-0">
-          {% if ranking %}
-          {% for jugador in ranking %}
-          <div class="ranking-item-mini">
-            <div class="d-flex align-items-center">
-              <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
-              <div>
-                <div class="fw-bold">{{ jugador.get_full_name }}</div>
-                <small class="text-muted text-uppercase" style="font-size:10px">
-                  {{ jugador.get_categoria_jugador_display|default:"LIBRE" }}
-                </small>
-              </div>
-            </div>
-            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
-              pts</span>
-          </div>
-          {% endfor %}
-          <div class="p-4">
-            <a href="{% url 'core:ranking' %}" class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
-              Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
-            </a>
-          </div>
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+      <div class="card text-center shadow-sm mb-5">
+        <div class="card-body">
+          <h3 class="card-title">Accede a tu panel</h3>
+          {% if user.is_authenticated %}
+          <p>Tu sesión está activa. Accede a tu panel personalizado.</p>
+          <a href="{% url 'core:dashboard_by_role' %}" class="btn btn-primary">Ir a mi panel</a>
+          <form method="POST" action="{% url 'users:logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger ms-2">Cerrar sesión</button>
+          </form>
           {% else %}
-          <div class="p-5 text-center">
-            <p class="text-muted small mb-0">No hay registros aún.</p>
-          </div>
+          <p>Inicia sesión para acceder a tu panel personalizado.</p>
+          <a href="{% url 'users:login' %}" class="btn btn-primary">Iniciar sesión</a>
           {% endif %}
         </div>
       </div>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col-lg-6 mb-5">
+      <section class="tournaments-section">
+        <h3 class="text-center mb-4">Torneos Recientes</h3>
+        {% if torneos %}
+        <div class="list-group">
+          {% for torneo in torneos %}
+          <a href="{% url 'core:public_torneos_list' %}" class="list-group-item list-group-item-action">
+            <h5>{{ torneo.nombre }}</h5>
+            <p class="mb-1"><strong>Ubicación:</strong> {{ torneo.ubicacion }}</p>
+            <small>Fecha de inicio: {{ torneo.fecha_inicio }}</small>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center">No hay torneos registrados aún.</p>
+        {% endif %}
+      </section>
+    </div>
+
+    <div class="col-lg-6 mb-5">
+      <section class="ranking-section">
+        <h3 class="text-center mb-4">Top 10 del Ranking</h3>
+        {% if ranking %}
+        <ul class="list-group">
+          {% for jugador in ranking %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ forloop.counter }}. {{ jugador.get_full_name }}</strong>
+              {% if jugador.categoria_jugador %}
+              <br><small class="text-muted">{{ jugador.get_categoria_jugador_display }}</small>
+              {% endif %}
+            </div>
+            <span class="badge bg-primary rounded-pill">{{ jugador.ranking|default:0 }} pts</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="text-center mt-3">
+          <a href="{% url 'core:public_ranking_list' %}" class="btn btn-secondary">Ver Ranking Completo</a>
+        </div>
+        {% else %}
+        <p class="text-center">No hay jugadores en el ranking aún.</p>
+        <p class="text-center text-muted">Los jugadores aparecerán aquí cuando finalicen partidos.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+
+  <section class="courts-section mb-5">
+    <h3 class="text-center mb-4">Actualidad de las Canchas</h3>
+    <div class="row">
+      {% for cancha in canchas %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a href="{% url 'core:public_court_detail' cancha.id %}"
+                class="text-decoration-none text-dark stretched-link">
+                {{ cancha.nombre }}
+              </a>
+            </h5>
+            <p><strong>Ubicación:</strong> {{ cancha.ubicacion }}</p>
+            <p><strong>Estado:</strong>
+              {% if cancha.estado == 'disponible' %}
+              <span class="badge bg-success">Disponible</span>
+              {% elif cancha.estado == 'reservada' %}
+              <span class="badge bg-danger">Ocupada</span>
+              {% else %}
+              <span class="badge bg-warning text-dark">Mantenimiento</span>
+              {% endif %}
+            </p>
+            {% if user.is_authenticated and user.es_jugador and cancha.estado == 'disponible' %}
+            <form method="get" action="{% url 'core:player_reserve_court' %}">
+              <input type="hidden" name="cancha_id" value="{{ cancha.id }}">
+              <button type="submit" class="btn btn-primary">Reservar</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-center">No hay canchas disponibles.</p>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-3">
+      <a href="{% url 'core:public_canchas_list' %}" class="btn btn-secondary">Ver Todas las Canchas</a>
+    </div>
+  </section>
+
+  <section class="news-section">
+    <h3 class="text-center mb-4">Noticias Recientes</h3>
+    <div class="row">
+      {% for noticia in noticias %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          {% if noticia.imagen %}
+          <img src="{{ noticia.imagen.url }}" class="card-img-top" alt="{{ noticia.titulo }}"
+            style="height: 200px; object-fit: cover;">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ noticia.titulo }}</h5>
+            <p class="card-text">{{ noticia.cuerpo|truncatewords:20 }}</p>
+            <small class="text-muted">Publicado el {{ noticia.fecha_publicacion }}</small>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-center">No hay noticias publicadas aún.</p>
+      {% endfor %}
+    </div>
+  </section>
+
 </div>
-
-<script>
-  function filterMatches(filter, btn) {
-    const isActive = btn.classList.contains('active');
-    if (isActive && filter !== 'all') {
-      const allBtn = document.querySelector('button[onclick*="all"]');
-      if (allBtn) filterMatches('all', allBtn);
-      return;
-    }
-    document.querySelectorAll('.tag-filter-modern').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const targets = filter.split(',');
-    let visibleCount = 0;
-    document.querySelectorAll('.match-card-modern').forEach(match => {
-      const status = match.getAttribute('data-status');
-      if (filter === 'all' || targets.includes(status)) {
-        match.classList.remove('d-none');
-        visibleCount++;
-        setTimeout(() => { match.style.opacity = '1'; match.style.transform = 'translateY(0)'; }, 10);
-      } else {
-        match.style.opacity = '0';
-        match.style.transform = 'translateY(10px)';
-        setTimeout(() => { match.classList.add('d-none'); }, 300);
-      }
-    });
-    const noResults = document.getElementById('no-matches-filtered');
-    if (noResults) visibleCount === 0 ? noResults.classList.remove('d-none') : noResults.classList.add('d-none');
-  }
-</script>
-
-<style>
-  .card-noticia-home-wide {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid var(--color-border) !important;
-    background: var(--bg-card);
-  }
-
-  .card-noticia-home-wide:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15), 0 18px 36px -18px rgba(0, 0, 0, 0.2) !important;
-    border-color: var(--color-primary) !important;
-  }
-
-  .card-noticia-home-wide .text-heading {
-    transition: color 0.3s ease;
-  }
-
-  .card-noticia-home-wide:hover .text-heading {
-    color: var(--color-primary);
-  }
-
-  .status-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-  }
-</style>
 {% endblock %}

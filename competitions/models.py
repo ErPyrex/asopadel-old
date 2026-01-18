@@ -47,6 +47,10 @@ class Partido(models.Model):
         verbose_name='Equipo Ganador'
     )
     
+    # OLD: Kept for backward compatibility (will be migrated)
+    jugadores = models.ManyToManyField(Usuario, related_name='partidos_jugados', blank=True)
+    ganador = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='partidos_ganados', verbose_name='Ganador')
+    
     arbitro = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='partidos_arbitrados')
     marcador = models.CharField(max_length=100, blank=True)
     estado = models.CharField(max_length=50, choices=[

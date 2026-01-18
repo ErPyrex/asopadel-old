@@ -34,11 +34,15 @@
                                 {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
                                 {% endfor %}
                                 {% else %}
-                                <span class="text-muted">Sin jugadores asignados</span>
+                                {# Fallback para partidos viejos #}
+                                {% for jugador in partido.jugadores.all %}
+                                {{ jugador.get_full_name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                Sin jugadores
+                                {% endfor %}
                                 {% endif %}
                             </p>
-                            <p class="mb-1"><strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No
-                                asignado" }}</p>
+                            <p class="mb-1"><strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No asignado" }}</p>
                             <p class="mb-1"><strong>Estado:</strong>
                                 <span class="badge 
                                     {% if partido.estado == 'pendiente' %}bg-warning text-dark

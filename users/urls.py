@@ -26,4 +26,14 @@ urlpatterns = [
     path('admin-management/promote/<int:user_id>/', admin_management.promote_to_admin, name='promote_to_admin'),
     path('admin-management/demote/<int:user_id>/', admin_management.demote_from_admin, name='demote_from_admin'),
     
+    # Eliminadas:
+    # - path('panel/jugador/', views.panel_jugador, name='panel_jugador'),
+    # - path('panel/arbitro/', views.panel_arbitro, name='panel_arbitro'),
+    # - path('panel/admin/', views.panel_admin, name='panel_admin'),
+    #   -> Estas vistas de dashboards están en core/urls.py.
+    # - path('admin/arbitros/', views.gestion_arbitros, name='arbitros'),
+    # - path('admin/arbitros/crear/', views.crear_arbitro, name='crear_arbitro'),
+    #   -> Estas vistas de gestión de árbitros están en core/urls.py.
+    # - path('test/', test_ruta),
+    #   -> Eliminado, era solo una ruta de prueba.
 ]

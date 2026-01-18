@@ -9,10 +9,5 @@ echo "Applying database migrations..."
 python manage.py migrate
 
 # Start server
-if [ "$DEBUG" = "True" ]; then
-    echo "Starting development server (runserver) with auto-reload..."
-    python manage.py runserver 0.0.0.0:8000
-else
-    echo "Starting production server (gunicorn)..."
-    gunicorn asopadel_barinas.wsgi:application --bind 0.0.0.0:8000
-fi
+echo "Starting server..."
+gunicorn asopadel_barinas.wsgi:application --bind 0.0.0.0:8000
