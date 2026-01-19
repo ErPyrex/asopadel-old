@@ -1,220 +1,1285 @@
 {% extends 'base.html' %}
-{% block title %}Gestión de Partidos{% endblock %}
+{% load static %}
+{% block title %}Gestión de Partidos | ASOPADEL{% endblock %}
+{% block extra_head %}
+    <style>
+  /* Variables locales de estilo refinadas */
+  :root {
+    --aso-primary: #0ea5e9;
+    --aso-secondary: #6366f1;
+    --card-bg-modern: rgba(15, 23, 42, 0.6);
+    --border-aso: rgba(255, 255, 255, 0.08);
+    --glass-effect: blur(12px) saturate(180%);
+  }
+
+  [data-bs-theme="light"] {
+    --card-bg-modern: rgba(255, 255, 255, 0.8);
+    --border-aso: rgba(0, 0, 0, 0.05);
+  }
+
+  .premium-header {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+    backdrop-filter: var(--glass-effect);
+    border-radius: 28px;
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border-aso);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .filter-card {
+    background: var(--card-bg-modern) !important;
+    backdrop-filter: var(--glass-effect);
+    border: 1px solid var(--border-aso) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15) !important;
+  }
+
+  .form-label-premium {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .aso-select, .aso-input {
+    border-radius: 14px !important;
+    padding: 0.85rem 1.25rem !important;
+    background: rgba(255,255,255,0.03) !important;
+    border: 1px solid var(--border-aso) !important;
+    color: inherit !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  [data-bs-theme="light"] .aso-select, [data-bs-theme="light"] .aso-input {
+    background: #f1f5f9 !important;
+  }
+
+  .aso-select:focus {
+    border-color: var(--aso-primary) !important;
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15) !important;
+    transform: translateY(-1px);
+  }
+
+  /* Botones Premium */
+  .btn-premium {
+    border-radius: 14px !important;
+    padding: 0.85rem 1.75rem !important;
+    font-weight: 700 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .btn-premium-primary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+  }
+
+  .btn-premium-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(14, 165, 233, 0.4);
+  }
+
+  .btn-premium-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .btn-premium-primary:active::after {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+
+  .btn-premium-outline {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid var(--border-aso) !important;
+    color: var(--color-text-body) !important;
+    backdrop-filter: blur(5px);
+  }
+
+  .btn-premium-outline:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--aso-primary) !important;
+    transform: translateY(-2px);
+    color: var(--aso-primary) !important;
+  }
+
+  /* Table Styles Modern */
+  .table-container-premium {
+    background: var(--card-bg-modern);
+    border-radius: 28px;
+    border: 1px solid var(--border-aso);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    backdrop-filter: var(--glass-effect);
+  }
+
+  .table-premium {
+    margin-bottom: 0 !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+
+  .table-premium thead th {
+    background: rgba(15, 23, 42, 0.4) !important;
+    color: #94a3b8 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 1.5px !important;
+    padding: 1.5rem 1.25rem !important;
+    border: none !important;
+  }
+
+  [data-bs-theme="light"] .table-premium thead th {
+    background: rgba(241, 245, 249, 0.6) !important;
+    color: #64748b !important;
+  }
+
+  .table-premium tbody td {
+    padding: 1.5rem 1.25rem !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid var(--border-aso) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .table-premium tr:last-child td {
+    border-bottom: none !important;
+  }
+
+  .table-premium tr:hover td {
+    background: rgba(14, 165, 233, 0.03) !important;
+  }
+
+  /* Badges ASO */
+  .badge-aso {
+    border-radius: 10px !important;
+    padding: 0.6rem 1rem !important;
+    font-weight: 800 !important;
+    font-size: 0.65rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.8px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .badge-pendiente { background: rgba(245, 158, 11, 0.12) !important; color: #fbbf24 !important; border: 1px solid rgba(245, 158, 11, 0.2) !important; }
+  .badge-confirmado { background: rgba(14, 165, 233, 0.12) !important; color: #38bdf8 !important; border: 1px solid rgba(14, 165, 233, 0.2) !important; }
+  .badge-finalizado { background: rgba(16, 185, 129, 0.12) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.2) !important; }
+  .badge-cancelado { background: rgba(239, 68, 68, 0.12) !important; color: #f87171 !important; border: 1px solid rgba(239, 68, 68, 0.2) !important; }
+
+  /* Squad Visualization Refined */
+  .squad-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .squad-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .squad-label {
+    font-size: 0.6rem;
+    font-weight: 900;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+  }
+  .player-pill {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-aso);
+    color: var(--color-text-muted);
+  }
+
+  /* Empty State Premium */
+  .empty-state {
+    padding: 6rem 2rem;
+    text-align: center;
+    background: var(--card-bg-modern);
+    border-radius: 32px;
+    border: 2px dashed var(--border-aso);
+    backdrop-filter: var(--glass-effect);
+    transition: all 0.3s ease;
+  }
+
+  .empty-state:hover {
+    border-color: var(--aso-primary);
+    background: rgba(14, 165, 233, 0.02);
+  }
+
+  .empty-icon-container {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    border: 1px solid var(--border-aso);
+    position: relative;
+    animation: pulse-glow 3s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.2); }
+    70% { box-shadow: 0 0 0 20px rgba(14, 165, 233, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+  }
+
+  /* Action Buttons Group */
+  .action-btn {
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border-aso);
+    background: rgba(255,255,255,0.02);
+    color: var(--color-text-muted);
+  }
+  .action-btn:hover {
+    transform: scale(1.1) translateY(-2px);
+    color: white;
+  }
+  .btn-view:hover { background: #0ea5e9 !important; border-color: #0ea5e9 !important; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4); }
+  .btn-edit:hover { background: #f59e0b !important; border-color: #f59e0b !important; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4); }
+  .btn-delete:hover { background: #ef4444 !important; border-color: #ef4444 !important; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4); }
+
+  /* Modal Premium Refined */
+  .modal-aso-premium .modal-content {
+    border-radius: 32px !important;
+    background: #0f172a !important;
+    border: 1px solid var(--border-aso) !important;
+    overflow: hidden !important;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5) !important;
+  }
+  .modal-aso-premium .modal-header {
+    background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%) !important;
+    color: white !important;
+    border-bottom: none !important;
+    padding: 2rem !important;
+  }
+    </style>
+{% endblock %}
 {% block content %}
-  <div class="container mt-4">
-    <h2 class="mb-4">🗓️ Gestión de Partidos</h2>
-    <!-- Filtros -->
-    <div class="card mb-4">
-      <div class="card-body">
-        <form method="GET" class="row g-3">
-          <div class="col-md-4">
-            <label for="torneo" class="form-label">Filtrar por Torneo</label>
-            <select name="torneo" id="torneo" class="form-select">
-              <option value="">Todos los torneos</option>
-              {% for torneo in torneos %}
-                <option value="{{ torneo.id }}" {% if torneo.selected %}selected{% endif %}>{{ torneo.nombre }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="estado" class="form-label">Filtrar por Estado</label>
-            <select name="estado" id="estado" class="form-select">
-              <option value="">Todos los estados</option>
-              {% for estado_opcion in estados %}
-                <option value="{{ estado_opcion.value }}"
-                        {% if estado_opcion.selected %}selected{% endif %}>{{ estado_opcion.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-md-4 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary me-2">Filtrar</button>
-            <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">Limpiar</a>
-          </div>
-        </form>
-      </div>
-    </div>
-    <!-- Botón crear nuevo -->
-    <div class="mb-3">
-      <a href="{% url 'core:admin_create_match' %}" class="btn btn-success">
-        <i class="bi bi-plus-circle"></i> Crear Nuevo Partido
-      </a>
-    </div>
-    <!-- Tabla de partidos -->
-    {% if partidos %}
-      <div class="table-responsive">
-        <table class="table table-striped table-hover">
-          <thead class="table-dark">
-            <tr>
-              <th>Torneo</th>
-              <th>Cancha</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Jugadores</th>
-              <th>Árbitro</th>
-              <th>Estado</th>
-              <th>Marcador</th>
-              <th class="text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for partido in partidos %}
-              <tr>
-                <td>{{ partido.torneo.nombre|default:"Amistoso / Casual" }}</td>
-                <td>{{ partido.cancha.nombre|default:"-" }}</td>
-                <td>{{ partido.fecha }}</td>
-                <td>{{ partido.hora }}</td>
-                <td>
-                  {% if partido.equipo1.exists or partido.equipo2.exists %}
-                    <small class="d-block text-primary fw-bold">E1:</small>
-                    {% for j in partido.equipo1.all %}
-                      <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
-                    {% endfor %}
-                    <small class="d-block text-danger fw-bold mt-1">E2:</small>
-                    {% for j in partido.equipo2.all %}
-                      <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
-                    {% endfor %}
-                  {% else %}
-                    <span class="text-muted">Sin jugadores</span>
-                  {% endif %}
-                </td>
-                <td>{{ partido.arbitro.get_full_name|default:"-" }}</td>
-                <td>
-                  {% if partido.estado == 'pendiente' %}
-                    <span class="badge bg-warning text-dark">Pendiente</span>
-                  {% elif partido.estado == 'confirmado' %}
-                    <span class="badge bg-info">Confirmado</span>
-                  {% elif partido.estado == 'finalizado' %}
-                    <span class="badge bg-success">Finalizado</span>
-                  {% elif partido.estado == 'cancelado' %}
-                    <span class="badge bg-danger">Cancelado</span>
-                  {% endif %}
-                </td>
-                <td>{{ partido.marcador|default:"-" }}</td>
-                <td class="text-center">
-                  <div class="btn-group btn-group-sm" role="group">
-                    <a href="{% url 'core:admin_match_detail' partido.id %}"
-                       class="btn btn-outline-primary btn-sm"
-                       title="Ver detalles">
-                      <i class="bi bi-eye"></i> Ver
-                    </a>
-                    <a href="{% url 'core:admin_edit_match' partido.id %}"
-                       class="btn btn-outline-warning btn-sm"
-                       title="Editar">
-                      <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <button type="button"
-                            class="btn btn-outline-danger btn-sm"
-                            title="Eliminar"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deleteModal{{ partido.id }}"
-                            data-partido-id="{{ partido.id }}">
-                      <i class="bi bi-trash"></i> Eliminar
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <!-- Modal de confirmación para este partido -->
-              <div class="modal fade"
-                   id="deleteModal{{ partido.id }}"
-                   tabindex="-1"
-                   aria-labelledby="deleteModalLabel{{ partido.id }}"
-                   aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content border-danger">
-                    <div class="modal-header bg-danger text-white">
-                      <h5 class="modal-title" id="deleteModalLabel{{ partido.id }}">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Eliminación
-                      </h5>
-                      <button type="button"
-                              class="btn-close btn-close-white"
-                              data-bs-dismiss="modal"
-                              aria-label="Close"></button>
+    <div class="container py-5">
+        <!-- Encabezado -->
+        <div class="premium-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h2 class="fw-bold mb-1 d-flex align-items-center">
+                    <i class="ti ti-calendar-event me-3 text-primary fs-1"></i>
+                    Gestión de Partidos
+                </h2>
+                <p class="text-muted mb-0">Organiza y supervisa los encuentros de la asociación.</p>
+            </div>
+            <button type="button"
+                    class="btn btn-premium btn-premium-primary shadow-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createMatchModal">
+                <i class="ti ti-plus fs-5"></i> Crear Nuevo Partido
+            </button>
+        </div>
+        <!-- Filtros -->
+        <div class="card filter-card mb-5">
+            <div class="card-body p-4">
+                <form method="GET" class="row g-4 align-items-end">
+                    <div class="col-md-4">
+                        <label for="torneo" class="form-label-premium">Filtrar por Torneo</label>
+                        <select name="torneo" id="torneo" class="form-select aso-select">
+                            <option value="">Todos los torneos</option>
+                            {% for torneo in torneos %}
+                                <option value="{{ torneo.id }}" {% if torneo.selected %}selected{% endif %}>{{ torneo.nombre }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
-                    <div class="modal-body">
-                      <div class="alert alert-warning">
-                        <strong>¿Estás seguro de eliminar este partido?</strong>
-                        <p class="mb-0 mt-2">Esta acción no se puede deshacer.</p>
-                      </div>
-                      <div class="card bg-light">
-                        <div class="card-body">
-                          <h6 class="card-title fw-bold">{{ partido.torneo.nombre|default:"Partido Amistoso / Casual" }}</h6>
-                          <p class="mb-1">
-                            <strong>Cancha:</strong> {{ partido.cancha.nombre|default:"No asignada" }}
-                          </p>
-                          <p class="mb-1">
-                            <strong>Fecha:</strong> {{ partido.fecha }} a las {{ partido.hora }}
-                          </p>
-                          <p class="mb-1">
-                            <strong>Jugadores:</strong>
-                          </p>
-                          <div class="ms-3">
-                            {% if partido.equipo1.exists or partido.equipo2.exists %}
-                              <small class="d-block text-primary fw-bold">Equipo 1:</small>
-                              <ul class="list-unstyled ms-2 mb-2">
-                                {% for j in partido.equipo1.all %}<li>{{ j.get_full_name }}</li>{% endfor %}
-                              </ul>
-                              <small class="d-block text-danger fw-bold">Equipo 2:</small>
-                              <ul class="list-unstyled ms-2">
-                                {% for j in partido.equipo2.all %}<li>{{ j.get_full_name }}</li>{% endfor %}
-                              </ul>
-                            {% else %}
-                              <span class="text-muted">Sin jugadores</span>
-                            {% endif %}
-                          </div>
-                          <p class="mb-1">
-                            <strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No asignado" }}
-                          </p>
-                          <p class="mb-0">
-                            <strong>Estado:</strong>
-                            {% if partido.estado == 'pendiente' %}
-                              <span class="badge bg-warning text-dark">Pendiente</span>
-                            {% elif partido.estado == 'confirmado' %}
-                              <span class="badge bg-info">Confirmado</span>
-                            {% elif partido.estado == 'finalizado' %}
-                              <span class="badge bg-success">Finalizado</span>
-                            {% elif partido.estado == 'cancelado' %}
-                              <span class="badge bg-danger">Cancelado</span>
-                            {% endif %}
-                          </p>
+                    <div class="col-md-4">
+                        <label for="estado" class="form-label-premium">Filtrar por Estado</label>
+                        <select name="estado" id="estado" class="form-select aso-select">
+                            <option value="">Todos los estados</option>
+                            {% for estado_opcion in estados %}
+                                <option value="{{ estado_opcion.value }}"
+                                        {% if estado_opcion.selected %}selected{% endif %}>
+                                    {{ estado_opcion.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-premium btn-premium-primary flex-fill">
+                                <i class="ti ti-filter"></i> Filtrar
+                            </button>
+                            <a href="{% url 'core:admin_partidos_list' %}"
+                               class="btn btn-premium btn-premium-outline flex-fill">
+                                <i class="ti ti-refresh"></i> Limpiar
+                            </a>
                         </div>
-                      </div>
-                      {% if partido.estado == 'finalizado' %}
-                        <div class="alert alert-danger mt-3 mb-0">
-                          <strong><i class="bi bi-exclamation-triangle-fill me-1"></i>Advertencia:</strong>
-                          Este partido está finalizado. Las estadísticas y puntos de ranking ya fueron
-                          actualizados y
-                          <strong>NO se revertirán automáticamente</strong> al eliminar el partido.
-                        </div>
-                      {% endif %}
                     </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                      <form method="POST"
-                            action="{% url 'core:admin_delete_match' partido.id %}"
-                            class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">
-                          <i class="bi bi-trash-fill me-1"></i>Confirmar Eliminación
-                        </button>
-                      </form>
-                    </div>
-                  </div>
+                </form>
+            </div>
+        </div>
+        <!-- Listado de Partidos -->
+        {% if partidos %}
+            <div class="table-container-premium table-responsive">
+                <table class="table table-premium">
+                    <thead>
+                        <tr>
+                            <th>Evento</th>
+                            <th>Fecha y Hora</th>
+                            <th>Competidores</th>
+                            <th>Árbitro</th>
+                            <th>Estado</th>
+                            <th class="text-center">Resultado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for partido in partidos %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-white">{{ partido.torneo.nombre|default:"Casual" }}</div>
+                                    <div class="small text-muted">
+                                        <i class="ti ti-map-pin me-1"></i>{{ partido.cancha.nombre|default:"Sin cancha" }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">{{ partido.fecha|date:"D, d M" }}</div>
+                                    <div class="small text-muted">
+                                        <i class="ti ti-clock me-1"></i>{{ partido.hora|time:"H:i" }}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="squad-info">
+                                        <div class="squad-row">
+                                            <span class="squad-label text-primary">E1</span>
+                                            {% for j in partido.equipo1.all %}
+                                                <span class="player-pill">{{ j.get_full_name }}</span>
+                                            {% empty %}
+                                                <span class="text-muted small">Sin asignar</span>
+                                            {% endfor %}
+                                        </div>
+                                        <div class="squad-row">
+                                            <span class="squad-label text-danger">E2</span>
+                                            {% for j in partido.equipo2.all %}
+                                                <span class="player-pill">{{ j.get_full_name }}</span>
+                                            {% empty %}
+                                                <span class="text-muted small">Sin asignar</span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small fw-medium">{{ partido.arbitro.get_full_name|default:"-" }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-aso {% if partido.estado == 'pendiente' %}badge-pendiente {% elif partido.estado == 'confirmado' %}badge-confirmado {% elif partido.estado == 'finalizado' %}badge-finalizado {% elif partido.estado == 'cancelado' %}badge-cancelado{% endif %}">
+                                        <i class="ti {% if partido.estado == 'pendiente' %}ti-clock {% elif partido.estado == 'confirmado' %}ti-check {% elif partido.estado == 'finalizado' %}ti-trophy {% elif partido.estado == 'cancelado' %}ti-x{% endif %}"></i>
+                                        {{ partido.get_estado_display }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="fw-bold fs-5 text-primary">{{ partido.marcador|default:"-" }}</div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                                        <!-- Ver detalle (siempre visible) -->
+                                        <a href="{% url 'core:admin_match_detail' partido.id %}"
+                                           class="action-btn btn-view"
+                                           title="Ver detalle">
+                                            <i class="ti ti-external-link"></i>
+                                        </a>
+                                        {% if request.user.is_staff or request.user.is_superuser %}
+                                            <!-- Editar (siempre visible para admins) -->
+                                            <button type="button"
+                                                    class="action-btn btn-edit"
+                                                    title="Editar"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editModal{{ partido.id }}">
+                                                <i class="ti ti-edit"></i>
+                                            </button>
+                                            {% if partido.estado == 'pendiente' or partido.estado == 'confirmado' %}
+                                                <!-- Cancelar partido (solo si no se ha efectuado) -->
+                                                <button type="button"
+                                                        class="action-btn"
+                                                        title="Cancelar Partido"
+                                                        style="background: rgba(239, 68, 68, 0.1);
+                                                               color: #ef4444"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#cancelModal{{ partido.id }}">
+                                                    <i class="ti ti-ban"></i>
+                                                </button>
+                                                <!-- Registrar resultado -->
+                                                <button type="button"
+                                                        class="action-btn"
+                                                        title="Registrar Resultado"
+                                                        style="background: rgba(16, 185, 129, 0.1);
+                                                               color: #10b981"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#resultModal{{ partido.id }}">
+                                                    <i class="ti ti-trophy"></i>
+                                                </button>
+                                            {% elif partido.estado == 'finalizado' %}
+                                                <!-- Editar resultado: admins siempre, árbitros max 2 ediciones -->
+                                                {% if request.user.is_staff or request.user.is_superuser or partido.ediciones_resultado < 2 %}
+                                                    <button type="button"
+                                                            class="action-btn"
+                                                            title="Editar Resultado{% if not request.user.is_staff and not request.user.is_superuser %} ({{ 2|add:partido.ediciones_resultado|default:2 }} restantes){% endif %}"
+                                                            style="background: rgba(245, 158, 11, 0.1);
+                                                                   color: #f59e0b"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editResultModal{{ partido.id }}">
+                                                        <i class="ti ti-trophy-filled"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <!-- Árbitro sin ediciones restantes -->
+                                                    <span class="action-btn"
+                                                          title="Sin correcciones disponibles"
+                                                          style="background: rgba(100, 100, 100, 0.1);
+                                                                 color: #64748b;
+                                                                 cursor: not-allowed">
+                                                        <i class="ti ti-lock"></i>
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Modal Editar Partido -->
+                            <div class="modal fade"
+                                 id="editModal{{ partido.id }}"
+                                 tabindex="-1"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                                         style="background: #0f172a">
+                                        <!-- Header -->
+                                        <div class="modal-header py-3 border-0"
+                                             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+                                            <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                                                <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                                                     style="width: 36px;
+                                                            height: 36px">
+                                                    <i class="ti ti-edit fs-5"></i>
+                                                </div>
+                                                Editar Partido
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal"
+                                                    aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body p-4 p-md-5" style="background: #0f172a;">
+                                            <form action="{% url 'core:admin_edit_match' partido.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <!-- Info del partido -->
+                                                <div class="mb-4 p-3 rounded-3"
+                                                     style="background: rgba(255,255,255,0.03);
+                                                            border: 1px solid rgba(255,255,255,0.08)">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <i class="ti ti-info-circle text-warning fs-4"></i>
+                                                        <div>
+                                                            <div class="text-white fw-bold">{{ partido.torneo.nombre|default:"Partido Casual" }}</div>
+                                                            <small class="text-muted">Creado el {{ partido.fecha|date:"d M, Y" }}</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Tipo de Partido -->
+                                                <div class="mb-4">
+                                                    <div class="form-check form-switch d-flex align-items-center gap-3 p-3 rounded-3"
+                                                         style="background: rgba(255,255,255,0.03);
+                                                                border: 1px solid rgba(255,255,255,0.08)">
+                                                        <input class="form-check-input"
+                                                               type="checkbox"
+                                                               role="switch"
+                                                               id="edit_es_casual_{{ partido.id }}"
+                                                               name="es_casual"
+                                                               style="width: 3rem;
+                                                                      height: 1.5rem"
+                                                               {% if not partido.torneo %}checked{% endif %}>
+                                                        <label class="form-check-label text-white fw-bold"
+                                                               for="edit_es_casual_{{ partido.id }}">
+                                                            <i class="ti ti-ball-tennis me-2 text-warning"></i>Partido Casual / Amistoso
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <!-- Torneo -->
+                                                <div class="mb-4"
+                                                     id="editTorneoContainer{{ partido.id }}"
+                                                     {% if not partido.torneo %}style="opacity: 0.4; pointer-events: none;"{% endif %}>
+                                                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Torneo</label>
+                                                    <div class="input-group modern-input-group-modal">
+                                                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-trophy text-warning"></i></span>
+                                                        <select name="torneo"
+                                                                id="edit_torneo_{{ partido.id }}"
+                                                                class="form-select border-0 py-2 bg-transparent text-white">
+                                                            <option value="">Seleccione un Torneo</option>
+                                                            {% for t in torneos_modal %}
+                                                                <option value="{{ t.id }}"
+                                                                        {% if partido.torneo.id == t.id %}selected{% endif %}>
+                                                                    {{ t.nombre }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="row g-4">
+                                                    <!-- Cancha -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cancha</label>
+                                                        <div class="input-group modern-input-group-modal">
+                                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-map-pin text-warning"></i></span>
+                                                            <select name="cancha"
+                                                                    class="form-select border-0 py-2 bg-transparent text-white"
+                                                                    required>
+                                                                <option value="">Seleccione una cancha</option>
+                                                                {% for c in canchas %}
+                                                                    <option value="{{ c.id }}"
+                                                                            {% if partido.cancha.id == c.id %}selected{% endif %}>
+                                                                        {{ c.nombre }}
+                                                                    </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Fecha -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha del Partido</label>
+                                                        <div class="input-group modern-input-group-modal">
+                                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar text-warning"></i></span>
+                                                            <input type="date"
+                                                                   name="fecha"
+                                                                   class="form-control border-0 py-2 bg-transparent text-white"
+                                                                   value="{{ partido.fecha|date:'Y-m-d' }}"
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Hora -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario</label>
+                                                        <div class="input-group modern-input-group-modal">
+                                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-warning"></i></span>
+                                                            <select name="hora"
+                                                                    class="form-select border-0 py-2 bg-transparent text-white"
+                                                                    required>
+                                                                {% for valor, etiqueta in horarios %}
+                                                                    <option value="{{ valor }}"
+                                                                            {% if partido.hora|time:'H:i' == valor %}selected{% endif %}>
+                                                                        {{ etiqueta }}
+                                                                    </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Árbitro -->
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro (Opcional)</label>
+                                                        <div class="input-group modern-input-group-modal">
+                                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-check text-warning"></i></span>
+                                                            <select name="arbitro"
+                                                                    class="form-select border-0 py-2 bg-transparent text-white">
+                                                                <option value="">Sin árbitro asignado</option>
+                                                                {% for a in arbitros %}
+                                                                    <option value="{{ a.id }}"
+                                                                            {% if partido.arbitro.id == a.id %}selected{% endif %}>
+                                                                        {{ a.first_name }} {{ a.last_name }}
+                                                                    </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Separador Visual -->
+                                                <div class="my-4 py-3">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <div class="flex-grow-1"
+                                                             style="height: 1px;
+                                                                    background: rgba(255,255,255,0.1)"></div>
+                                                        <span class="text-muted small text-uppercase fw-bold"><i class="ti ti-users me-2"></i>Equipos</span>
+                                                        <div class="flex-grow-1"
+                                                             style="height: 1px;
+                                                                    background: rgba(255,255,255,0.1)"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="row g-4">
+                                                    <!-- Equipo 1 -->
+                                                    <div class="col-md-6">
+                                                        <div class="p-3 rounded-3"
+                                                             style="background: rgba(14, 165, 233, 0.08);
+                                                                    border: 1px solid rgba(14, 165, 233, 0.2)">
+                                                            <h6 class="fw-bold text-primary mb-3">
+                                                                <i class="ti ti-shield me-2"></i>Equipo 1
+                                                            </h6>
+                                                            <div class="mb-3">
+                                                                <label class="form-label text-muted small">Jugador 1 *</label>
+                                                                <select name="equipo1_jugador1"
+                                                                        class="form-select form-select-sm bg-dark border-0 text-white"
+                                                                        required>
+                                                                    <option value="">Seleccione jugador</option>
+                                                                    {% for j in jugadores %}
+                                                                        <option value="{{ j.id }}"
+                                                                                {% if j in partido.equipo1.all %}selected{% endif %}>
+                                                                            {{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label class="form-label text-muted small">Jugador 2 (Dobles)</label>
+                                                                <select name="equipo1_jugador2"
+                                                                        class="form-select form-select-sm bg-dark border-0 text-white">
+                                                                    <option value="">Sin segundo jugador</option>
+                                                                    {% for j in jugadores %}
+                                                                        <option value="{{ j.id }}"
+                                                                                {% if partido.equipo1.count > 1 and j == partido.equipo1.all.1 %}selected{% endif %}>
+                                                                            {{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Equipo 2 -->
+                                                    <div class="col-md-6">
+                                                        <div class="p-3 rounded-3"
+                                                             style="background: rgba(239, 68, 68, 0.08);
+                                                                    border: 1px solid rgba(239, 68, 68, 0.2)">
+                                                            <h6 class="fw-bold text-danger mb-3">
+                                                                <i class="ti ti-shield me-2"></i>Equipo 2
+                                                            </h6>
+                                                            <div class="mb-3">
+                                                                <label class="form-label text-muted small">Jugador 1 *</label>
+                                                                <select name="equipo2_jugador1"
+                                                                        class="form-select form-select-sm bg-dark border-0 text-white"
+                                                                        required>
+                                                                    <option value="">Seleccione jugador</option>
+                                                                    {% for j in jugadores %}
+                                                                        <option value="{{ j.id }}"
+                                                                                {% if j in partido.equipo2.all %}selected{% endif %}>
+                                                                            {{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label class="form-label text-muted small">Jugador 2 (Dobles)</label>
+                                                                <select name="equipo2_jugador2"
+                                                                        class="form-select form-select-sm bg-dark border-0 text-white">
+                                                                    <option value="">Sin segundo jugador</option>
+                                                                    {% for j in jugadores %}
+                                                                        <option value="{{ j.id }}"
+                                                                                {% if partido.equipo2.count > 1 and j == partido.equipo2.all.1 %}selected{% endif %}>
+                                                                            {{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})
+                                                                        </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Botones de Acción -->
+                                                <div class="d-grid gap-3 mt-5">
+                                                    <button type="submit"
+                                                            class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
+                                                            style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                                                                   color: white">
+                                                        <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                                                    </button>
+                                                    <button type="button"
+                                                            class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                                            data-bs-dismiss="modal">Cancelar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal Cancelar Partido -->
+                            <div class="modal fade"
+                                 id="cancelModal{{ partido.id }}"
+                                 tabindex="-1"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                                         style="background: #0f172a">
+                                        <div class="modal-header py-3 border-0"
+                                             style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%)">
+                                            <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                                                <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                                                     style="width: 36px;
+                                                            height: 36px">
+                                                    <i class="ti ti-ban fs-5"></i>
+                                                </div>
+                                                Cancelar Partido
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body p-4" style="background: #0f172a;">
+                                            <div class="text-center mb-4">
+                                                <div class="bg-danger bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                                                    <i class="ti ti-alert-triangle text-danger" style="font-size: 3rem;"></i>
+                                                </div>
+                                                <h5 class="text-white fw-bold">¿Cancelar este partido?</h5>
+                                                <p class="text-muted">Esta acción marcará el partido como cancelado. No se efectuará.</p>
+                                            </div>
+                                            <div class="p-3 rounded-3 mb-4"
+                                                 style="background: rgba(255,255,255,0.03)">
+                                                <div class="text-muted small">
+                                                    Partido del <strong class="text-white">{{ partido.fecha|date:"d M, Y" }}</strong>
+                                                </div>
+                                                <div class="text-white fw-bold">{{ partido.torneo.nombre|default:"Partido Casual" }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer border-0 p-4 gap-2" style="background: #0f172a;">
+                                            <button type="button"
+                                                    class="btn btn-outline-secondary flex-fill rounded-pill"
+                                                    data-bs-dismiss="modal">Volver</button>
+                                            <form method="POST"
+                                                  action="{% url 'core:admin_cancel_match' partido.id %}"
+                                                  class="flex-fill">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-danger w-100 rounded-pill fw-bold">
+                                                    <i class="ti ti-ban me-2"></i>Cancelar Partido
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal Registrar Resultado -->
+                            <div class="modal fade"
+                                 id="resultModal{{ partido.id }}"
+                                 tabindex="-1"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                                         style="background: #0f172a">
+                                        <div class="modal-header py-3 border-0"
+                                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                                            <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                                                <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                                                     style="width: 36px;
+                                                            height: 36px">
+                                                    <i class="ti ti-trophy fs-5"></i>
+                                                </div>
+                                                Registrar Resultado
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body p-4" style="background: #0f172a;">
+                                            <form method="POST"
+                                                  action="{% url 'core:admin_record_result' partido.id %}"
+                                                  id="resultForm{{ partido.id }}">
+                                                {% csrf_token %}
+                                                <!-- Info del partido -->
+                                                <div class="p-3 rounded-3 mb-4"
+                                                     style="background: rgba(255,255,255,0.03)">
+                                                    <div class="text-muted small">{{ partido.fecha|date:"d M, Y" }} · {{ partido.hora|time:"H:i" }}</div>
+                                                    <div class="text-white fw-bold">{{ partido.torneo.nombre|default:"Partido Casual" }}</div>
+                                                </div>
+                                                <!-- Marcador -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Marcador</label>
+                                                    <div class="input-group modern-input-group-modal">
+                                                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-numbers text-success"></i></span>
+                                                        <input type="text"
+                                                               name="marcador"
+                                                               class="form-control border-0 py-2 bg-transparent text-white"
+                                                               placeholder="Ej: 6-4, 6-3 o 2-1"
+                                                               required
+                                                               pattern="^(\d+-\d+)(,?\s*\d+-\d+)*$">
+                                                    </div>
+                                                    <small class="text-muted">Formato: Sets (6-4, 6-3) o puntos (2-1)</small>
+                                                </div>
+                                                <!-- Equipo Ganador -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Equipo Ganador</label>
+                                                    <div class="row g-3">
+                                                        <div class="col-6">
+                                                            <input type="radio"
+                                                                   class="btn-check"
+                                                                   name="equipo_ganador"
+                                                                   id="eq1_{{ partido.id }}"
+                                                                   value="1"
+                                                                   required>
+                                                            <label class="btn btn-outline-primary w-100 py-3 rounded-3"
+                                                                   for="eq1_{{ partido.id }}">
+                                                                <i class="ti ti-shield d-block mb-1" style="font-size: 1.5rem;"></i>
+                                                                <span class="fw-bold">Equipo 1</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <input type="radio"
+                                                                   class="btn-check"
+                                                                   name="equipo_ganador"
+                                                                   id="eq2_{{ partido.id }}"
+                                                                   value="2"
+                                                                   required>
+                                                            <label class="btn btn-outline-danger w-100 py-3 rounded-3"
+                                                                   for="eq2_{{ partido.id }}">
+                                                                <i class="ti ti-shield d-block mb-1" style="font-size: 1.5rem;"></i>
+                                                                <span class="fw-bold">Equipo 2</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-grid gap-2 mt-4">
+                                                    <button type="submit"
+                                                            class="btn btn-lg rounded-pill fw-bold py-3"
+                                                            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                                                   color: white">
+                                                        <i class="ti ti-check me-2"></i>Confirmar Resultado
+                                                    </button>
+                                                    <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Cancelar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal Editar Resultado (para partidos finalizados) -->
+                            <div class="modal fade"
+                                 id="editResultModal{{ partido.id }}"
+                                 tabindex="-1"
+                                 aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                                         style="background: #0f172a">
+                                        <div class="modal-header py-3 border-0"
+                                             style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+                                            <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                                                <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                                                     style="width: 36px;
+                                                            height: 36px">
+                                                    <i class="ti ti-trophy-filled fs-5"></i>
+                                                </div>
+                                                Editar Resultado
+                                            </h5>
+                                            <button type="button"
+                                                    class="btn-close btn-close-white"
+                                                    data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body p-4" style="background: #0f172a;">
+                                            <form method="POST" action="{% url 'core:admin_edit_result' partido.id %}">
+                                                {% csrf_token %}
+                                                <!-- Info del partido -->
+                                                <div class="p-3 rounded-3 mb-4"
+                                                     style="background: rgba(255,255,255,0.03)">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <div class="text-muted small">{{ partido.fecha|date:"d M, Y" }}</div>
+                                                            <div class="text-white fw-bold">{{ partido.torneo.nombre|default:"Partido Casual" }}</div>
+                                                        </div>
+                                                        <span class="badge bg-success bg-opacity-10 text-success px-3 py-2">Finalizado</span>
+                                                    </div>
+                                                </div>
+                                                <!-- Marcador actual -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Marcador</label>
+                                                    <div class="input-group modern-input-group-modal">
+                                                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-numbers text-warning"></i></span>
+                                                        <input type="text"
+                                                               name="marcador"
+                                                               class="form-control border-0 py-2 bg-transparent text-white"
+                                                               value="{{ partido.marcador }}"
+                                                               placeholder="Ej: 6-4, 6-3"
+                                                               required>
+                                                    </div>
+                                                </div>
+                                                <!-- Equipo Ganador -->
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Equipo Ganador</label>
+                                                    <div class="row g-3">
+                                                        <div class="col-6">
+                                                            <input type="radio"
+                                                                   class="btn-check"
+                                                                   name="equipo_ganador"
+                                                                   id="edit_eq1_{{ partido.id }}"
+                                                                   value="1">
+                                                            <label class="btn btn-outline-primary w-100 py-3 rounded-3"
+                                                                   for="edit_eq1_{{ partido.id }}">
+                                                                <i class="ti ti-shield d-block mb-1" style="font-size: 1.5rem;"></i>
+                                                                <span class="fw-bold">Equipo 1</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <input type="radio"
+                                                                   class="btn-check"
+                                                                   name="equipo_ganador"
+                                                                   id="edit_eq2_{{ partido.id }}"
+                                                                   value="2">
+                                                            <label class="btn btn-outline-danger w-100 py-3 rounded-3"
+                                                                   for="edit_eq2_{{ partido.id }}">
+                                                                <i class="ti ti-shield d-block mb-1" style="font-size: 1.5rem;"></i>
+                                                                <span class="fw-bold">Equipo 2</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-grid gap-2 mt-4">
+                                                    <button type="submit"
+                                                            class="btn btn-lg rounded-pill fw-bold py-3"
+                                                            style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                                                                   color: white">
+                                                        <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                                                    </button>
+                                                    <button type="button" class="btn btn-link text-muted" data-bs-dismiss="modal">Cancelar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon-container">
+                    <i class="ti ti-calendar-off text-primary" style="font-size: 3.5rem;"></i>
                 </div>
-              </div>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <div class="alert alert-info">
-        <h4>No hay partidos registrados</h4>
-        <p>No se encontraron partidos con los filtros seleccionados.</p>
-        <a href="{% url 'core:admin_create_match' %}" class="btn btn-primary">Crear Primer Partido</a>
-      </div>
-    {% endif %}
-    <!-- Botón volver -->
-    <div class="mt-4">
-      <a href="{% url 'core:admin_dashboard' %}" class="btn btn-secondary">Volver al Panel</a>
+                <h3 class="fw-bold text-white">No hay partidos registrados</h3>
+                <p class="text-muted mx-auto mb-0" style="max-width: 450px;">
+                    Parece que no hay encuentros que coincidan con tus filtros. Puedes organizar un nuevo partido ahora mismo para mantener la actividad de la asociación.
+                </p>
+            </div>
+        {% endif %}
     </div>
-  </div>
+    <!-- Modal Crear Partido -->
+    <div class="modal fade"
+         id="createMatchModal"
+         tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                 style="background: #0f172a">
+                <!-- Header Moderno con Gradiente -->
+                <div class="modal-header py-3 border-0"
+                     style="background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                        <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                             style="width: 36px;
+                                    height: 36px">
+                            <i class="ti ti-calendar-plus fs-5"></i>
+                        </div>
+                        Agendar Nuevo Partido
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-4 p-md-5" style="background: #0f172a;">
+                    <form action="{% url 'core:admin_create_match' %}"
+                          method="POST"
+                          id="createMatchForm">
+                        {% csrf_token %}
+                        <!-- Tipo de Partido -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch d-flex align-items-center gap-3 p-3 rounded-3"
+                                 style="background: rgba(255,255,255,0.03);
+                                        border: 1px solid rgba(255,255,255,0.08)">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       role="switch"
+                                       id="modal_es_casual"
+                                       name="es_casual"
+                                       style="width: 3rem;
+                                              height: 1.5rem">
+                                <label class="form-check-label text-white fw-bold" for="modal_es_casual">
+                                    <i class="ti ti-ball-tennis me-2 text-primary"></i>Partido Casual / Amistoso
+                                </label>
+                            </div>
+                            <small class="text-muted d-block mt-2 ps-2">Marque si el partido no pertenece a ningún torneo oficial.</small>
+                        </div>
+                        <!-- Torneo -->
+                        <div class="mb-4" id="torneoFieldContainer">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Torneo</label>
+                            <div class="input-group modern-input-group-modal">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-trophy text-primary"></i></span>
+                                <select name="torneo"
+                                        id="modal_torneo"
+                                        class="form-select border-0 py-2 bg-transparent text-white">
+                                    <option value="">Seleccione un Torneo</option>
+                                    {% for t in torneos_modal %}<option value="{{ t.id }}">{{ t.nombre }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-4">
+                            <!-- Cancha -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cancha</label>
+                                <div class="input-group modern-input-group-modal">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-map-pin text-primary"></i></span>
+                                    <select name="cancha"
+                                            class="form-select border-0 py-2 bg-transparent text-white"
+                                            required>
+                                        <option value="">Seleccione una cancha</option>
+                                        {% for c in canchas %}<option value="{{ c.id }}">{{ c.nombre }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Fecha -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha del Partido</label>
+                                <div class="input-group modern-input-group-modal">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar text-primary"></i></span>
+                                    <input type="date"
+                                           name="fecha"
+                                           class="form-control border-0 py-2 bg-transparent text-white"
+                                           required>
+                                </div>
+                            </div>
+                            <!-- Hora -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario</label>
+                                <div class="input-group modern-input-group-modal">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
+                                    <select name="hora"
+                                            class="form-select border-0 py-2 bg-transparent text-white"
+                                            required>
+                                        {% for valor, etiqueta in horarios %}<option value="{{ valor }}">{{ etiqueta }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Árbitro -->
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro (Opcional)</label>
+                                <div class="input-group modern-input-group-modal">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-check text-primary"></i></span>
+                                    <select name="arbitro"
+                                            class="form-select border-0 py-2 bg-transparent text-white">
+                                        <option value="">Sin árbitro asignado</option>
+                                        {% for a in arbitros %}<option value="{{ a.id }}">{{ a.first_name }} {{ a.last_name }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Separador Visual -->
+                        <div class="my-4 py-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="flex-grow-1"
+                                     style="height: 1px;
+                                            background: rgba(255,255,255,0.1)"></div>
+                                <span class="text-muted small text-uppercase fw-bold"><i class="ti ti-users me-2"></i>Equipos</span>
+                                <div class="flex-grow-1"
+                                     style="height: 1px;
+                                            background: rgba(255,255,255,0.1)"></div>
+                            </div>
+                        </div>
+                        <div class="row g-4">
+                            <!-- Equipo 1 -->
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3"
+                                     style="background: rgba(14, 165, 233, 0.08);
+                                            border: 1px solid rgba(14, 165, 233, 0.2)">
+                                    <h6 class="fw-bold text-primary mb-3">
+                                        <i class="ti ti-shield me-2"></i>Equipo 1
+                                    </h6>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Jugador 1 *</label>
+                                        <select name="equipo1_jugador1"
+                                                class="form-select form-select-sm bg-dark border-0 text-white"
+                                                required>
+                                            <option value="">Seleccione jugador</option>
+                                            {% for j in jugadores %}
+                                                <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label text-muted small">Jugador 2 (Dobles)</label>
+                                        <select name="equipo1_jugador2"
+                                                class="form-select form-select-sm bg-dark border-0 text-white">
+                                            <option value="">Sin segundo jugador</option>
+                                            {% for j in jugadores %}
+                                                <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Equipo 2 -->
+                            <div class="col-md-6">
+                                <div class="p-3 rounded-3"
+                                     style="background: rgba(239, 68, 68, 0.08);
+                                            border: 1px solid rgba(239, 68, 68, 0.2)">
+                                    <h6 class="fw-bold text-danger mb-3">
+                                        <i class="ti ti-shield me-2"></i>Equipo 2
+                                    </h6>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Jugador 1 *</label>
+                                        <select name="equipo2_jugador1"
+                                                class="form-select form-select-sm bg-dark border-0 text-white"
+                                                required>
+                                            <option value="">Seleccione jugador</option>
+                                            {% for j in jugadores %}
+                                                <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="form-label text-muted small">Jugador 2 (Dobles)</label>
+                                        <select name="equipo2_jugador2"
+                                                class="form-select form-select-sm bg-dark border-0 text-white">
+                                            <option value="">Sin segundo jugador</option>
+                                            {% for j in jugadores %}
+                                                <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Botones de Acción -->
+                        <div class="d-grid gap-3 mt-5">
+                            <button type="submit"
+                                    class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
+                                    style="background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+                                           color: white">
+                                <i class="ti ti-calendar-check me-2"></i>Agendar Partido
+                            </button>
+                            <button type="button"
+                                    class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+/* Estilos del Modal */
+.modern-input-group-modal {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+.modern-input-group-modal:focus-within {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.15);
+}
+.modern-input-group-modal .form-control,
+.modern-input-group-modal .form-select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: white !important;
+}
+.modern-input-group-modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+.modern-input-group-modal .form-select option {
+    background: #1e293b;
+    color: white;
+}
+#createMatchModal .form-select-sm {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+}
+#createMatchModal .form-select-sm option {
+    background: #1e293b;
+    color: white;
+}
+    </style>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejo del modal de crear partido
+    const casualCheckbox = document.getElementById('modal_es_casual');
+    const torneoContainer = document.getElementById('torneoFieldContainer');
+    const torneoSelect = document.getElementById('modal_torneo');
+    
+    if (casualCheckbox && torneoContainer) {
+        casualCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                torneoContainer.style.opacity = '0.4';
+                torneoContainer.style.pointerEvents = 'none';
+                torneoSelect.required = false;
+                torneoSelect.value = '';
+            } else {
+                torneoContainer.style.opacity = '1';
+                torneoContainer.style.pointerEvents = 'auto';
+                torneoSelect.required = true;
+            }
+        });
+    }
+    
+    // Set minimum date to today for create modal
+    const fechaInput = document.querySelector('#createMatchModal input[name="fecha"]');
+    if (fechaInput) {
+        const today = new Date().toISOString().split('T')[0];
+        fechaInput.setAttribute('min', today);
+    }
+    
+    // Manejo de los modales de edición (múltiples)
+    document.querySelectorAll('[id^="edit_es_casual_"]').forEach(function(checkbox) {
+        const partidoId = checkbox.id.replace('edit_es_casual_', '');
+        const container = document.getElementById('editTorneoContainer' + partidoId);
+        const select = document.getElementById('edit_torneo_' + partidoId);
+        
+        if (container && select) {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    container.style.opacity = '0.4';
+                    container.style.pointerEvents = 'none';
+                    select.required = false;
+                    select.value = '';
+                } else {
+                    container.style.opacity = '1';
+                    container.style.pointerEvents = 'auto';
+                    select.required = true;
+                }
+            });
+        }
+    });
+    
+    // Abrir modal automáticamente si viene desde el panel de admin
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('open_modal') === 'crear') {
+        const createModal = new bootstrap.Modal(document.getElementById('createMatchModal'));
+        createModal.show();
+        // Limpiar el parámetro de la URL sin recargar
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+    </script>
 {% endblock %}
