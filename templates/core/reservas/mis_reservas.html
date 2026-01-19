@@ -1,188 +1,185 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Mis Reservas - ASOPADEL{% endblock %}
-
 {% block content %}
-<div class="container-fluid px-lg-5 py-4">
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
-        <div>
-            <h1 class="display-5 fw-bold mb-2">Mis <span class="text-primary">Reservas</span></h1>
-            <p class="text-muted fs-5 mb-0">Gestiona tus próximos partidos e historial de pista.</p>
+    <div class="container-fluid px-lg-5 py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+            <div>
+                <h1 class="display-5 fw-bold mb-2">
+                    Mis <span class="text-primary">Reservas</span>
+                </h1>
+                <p class="text-muted fs-5 mb-0">Gestiona tus próximos partidos e historial de pista.</p>
+            </div>
+            <div>
+                <a href="{% url 'core:player_reserve_court' %}"
+                   class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="ti ti-calendar-plus me-2"></i>Nueva Reserva
+                </a>
+            </div>
         </div>
-        <div>
-            <a href="{% url 'core:player_reserve_court' %}"
-                class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm">
-                <i class="ti ti-calendar-plus me-2"></i>Nueva Reserva
-            </a>
+        <!-- Navegación de Pestañas Premium -->
+        <div class="custom-tabs-wrapper mb-5">
+            <ul class="nav nav-pills gap-3" id="reservasTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-4 fw-bold shadow-sm"
+                            id="activas-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#activas"
+                            type="button"
+                            role="tab">
+                        <i class="ti ti-current-location me-2"></i>Próximas
+                        {% if activas %}<span class="badge bg-white text-primary ms-2">{{ activas.count }}</span>{% endif %}
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 fw-bold shadow-sm"
+                            id="historial-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#historial"
+                            type="button"
+                            role="tab">
+                        <i class="ti ti-history me-2"></i>Historial
+                    </button>
+                </li>
+            </ul>
         </div>
-    </div>
-
-    <!-- Navegación de Pestañas Premium -->
-    <div class="custom-tabs-wrapper mb-5">
-        <ul class="nav nav-pills gap-3" id="reservasTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active rounded-pill px-4 fw-bold shadow-sm" id="activas-tab"
-                    data-bs-toggle="tab" data-bs-target="#activas" type="button" role="tab">
-                    <i class="ti ti-current-location me-2"></i>Próximas
-                    {% if activas %}
-                    <span class="badge bg-white text-primary ms-2">{{ activas.count }}</span>
-                    {% endif %}
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link rounded-pill px-4 fw-bold shadow-sm" id="historial-tab" data-bs-toggle="tab"
-                    data-bs-target="#historial" type="button" role="tab">
-                    <i class="ti ti-history me-2"></i>Historial
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    <div class="tab-content" id="reservasTabContent">
-        <!-- Tab Activas -->
-        <div class="tab-pane fade show active" id="activas" role="tabpanel">
-            {% if activas %}
-            <div class="row g-4">
-                {% for reserva in activas %}
-                <div class="col-md-6 col-lg-4 col-xl-3">
-                    <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden ranking-card transition-hover">
-                        <div
-                            class="card-header bg-primary bg-opacity-10 border-0 py-3 d-flex justify-content-between align-items-center">
-                            <span class="fw-bold text-primary small text-uppercase letter-spacing-1">
-                                <i class="ti ti-ball-tennis me-1"></i>{{ reserva.cancha.nombre }}
-                            </span>
-                            <span
-                                class="badge {% if reserva.estado == 'confirmada' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill px-3 py-2 shadow-sm">
-                                {{ reserva.get_estado_display }}
-                            </span>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="text-center mb-4">
-                                <h6 class="text-muted small text-uppercase fw-bold mb-2">{{ reserva.fecha|date:"l" }}
-                                </h6>
-                                <h4 class="fw-bold mb-0">{{ reserva.fecha|date:"d M, Y" }}</h4>
-                            </div>
-
-                            <div class="bg-light rounded-4 p-4 text-center mb-4">
-                                <div class="d-flex align-items-center justify-content-center gap-3">
-                                    <div class="text-center">
-                                        <small class="text-muted d-block tiny fw-bold text-uppercase">Inicio</small>
-                                        <span class="fs-4 fw-bold">{{ reserva.hora_inicio|time:"H:i" }}</span>
+        <div class="tab-content" id="reservasTabContent">
+            <!-- Tab Activas -->
+            <div class="tab-pane fade show active" id="activas" role="tabpanel">
+                {% if activas %}
+                    <div class="row g-4">
+                        {% for reserva in activas %}
+                            <div class="col-md-6 col-lg-4 col-xl-3">
+                                <div class="card h-100 border-0 shadow-lg rounded-4 overflow-hidden ranking-card transition-hover">
+                                    <div class="card-header bg-primary bg-opacity-10 border-0 py-3 d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold text-primary small text-uppercase letter-spacing-1">
+                                            <i class="ti ti-ball-tennis me-1"></i>{{ reserva.cancha.nombre }}
+                                        </span>
+                                        <span class="badge {% if reserva.estado == 'confirmada' %}bg-success{% else %}bg-warning text-dark{% endif %} rounded-pill px-3 py-2 shadow-sm">
+                                            {{ reserva.get_estado_display }}
+                                        </span>
                                     </div>
-                                    <div class="text-muted opacity-25 fs-2">|</div>
-                                    <div class="text-center">
-                                        <small class="text-muted d-block tiny fw-bold text-uppercase">Fin</small>
-                                        <span class="fs-4 fw-bold">{{ reserva.hora_fin|time:"H:i" }}</span>
+                                    <div class="card-body p-4">
+                                        <div class="text-center mb-4">
+                                            <h6 class="text-muted small text-uppercase fw-bold mb-2">{{ reserva.fecha|date:"l" }}</h6>
+                                            <h4 class="fw-bold mb-0">{{ reserva.fecha|date:"d M, Y" }}</h4>
+                                        </div>
+                                        <div class="bg-light rounded-4 p-4 text-center mb-4">
+                                            <div class="d-flex align-items-center justify-content-center gap-3">
+                                                <div class="text-center">
+                                                    <small class="text-muted d-block tiny fw-bold text-uppercase">Inicio</small>
+                                                    <span class="fs-4 fw-bold">{{ reserva.hora_inicio|time:"H:i" }}</span>
+                                                </div>
+                                                <div class="text-muted opacity-25 fs-2">|</div>
+                                                <div class="text-center">
+                                                    <small class="text-muted d-block tiny fw-bold text-uppercase">Fin</small>
+                                                    <span class="fs-4 fw-bold">{{ reserva.hora_fin|time:"H:i" }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2 text-muted small bg-white border rounded-pill px-3 py-2 mb-4">
+                                            <i class="ti ti-map-pin text-primary"></i>
+                                            <span class="text-truncate">{{ reserva.cancha.ubicacion }}</span>
+                                        </div>
+                                        <div class="d-grid mt-auto">
+                                            <a href="{% url 'core:player_cancel_reservation' reserva.id %}"
+                                               class="btn btn-outline-danger btn-sm rounded-pill py-2 fw-bold">
+                                                <i class="ti ti-calendar-cancel me-1"></i> Cancelar Reserva
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div
-                                class="d-flex align-items-center gap-2 text-muted small bg-white border rounded-pill px-3 py-2 mb-4">
-                                <i class="ti ti-map-pin text-primary"></i>
-                                <span class="text-truncate">{{ reserva.cancha.ubicacion }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+                        <div class="card-body py-5">
+                            <div class="icon-holder-large mb-4 mx-auto"
+                                 style="background: rgba(var(--bs-primary-rgb), 0.1);
+                                        color: var(--color-primary)">
+                                <i class="ti ti-calendar-off fs-display-1"></i>
                             </div>
-
-                            <div class="d-grid mt-auto">
-                                <a href="{% url 'core:player_cancel_reservation' reserva.id %}"
-                                    class="btn btn-outline-danger btn-sm rounded-pill py-2 fw-bold">
-                                    <i class="ti ti-calendar-cancel me-1"></i> Cancelar Reserva
-                                </a>
-                            </div>
+                            <h3 class="fw-bold">No tienes reservas próximas</h3>
+                            <p class="text-muted mb-4">¡Anímate a jugar! Reserva una pista hoy mismo.</p>
+                            <a href="{% url 'core:player_reserve_court' %}"
+                               class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
+                                Reservar Ahora <i class="ti ti-arrow-right ms-2"></i>
+                            </a>
                         </div>
                     </div>
-                </div>
-                {% endfor %}
+                {% endif %}
             </div>
-            {% else %}
-            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
-                <div class="card-body py-5">
-                    <div class="icon-holder-large mb-4 mx-auto"
-                        style="background: rgba(var(--bs-primary-rgb), 0.1); color: var(--color-primary);">
-                        <i class="ti ti-calendar-off fs-display-1"></i>
+            <!-- Tab Historial -->
+            <div class="tab-pane fade" id="historial" role="tabpanel">
+                {% if historial %}
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-dark text-white">
+                                    <tr>
+                                        <th class="px-4 py-4 border-0">Fecha</th>
+                                        <th class="py-4 border-0">Pista / Cancha</th>
+                                        <th class="py-4 border-0">Horario</th>
+                                        <th class="py-4 border-0">Ubicación</th>
+                                        <th class="py-4 border-0">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-transparent">
+                                    {% for reserva in historial %}
+                                        <tr class="{% if reserva.estado == 'cancelada' %}opacity-50{% endif %}">
+                                            <td class="px-4 py-4 fw-bold text-nowrap">{{ reserva.fecha|date:"d/m/Y" }}</td>
+                                            <td class="py-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                                                        <i class="ti ti-ball-tennis"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="fw-bold d-block">{{ reserva.cancha.nombre }}</span>
+                                                        <small class="text-muted tiny">Reserva #{{ reserva.id }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="py-4">
+                                                <span class="badge bg-light text-dark fw-bold border p-2 rounded-3">
+                                                    {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}
+                                                </span>
+                                            </td>
+                                            <td class="py-4 text-muted small">
+                                                <i class="ti ti-map-pin text-primary me-1"></i> {{ reserva.cancha.ubicacion }}
+                                            </td>
+                                            <td class="py-4">
+                                                {% if reserva.estado == 'cancelada' %}
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">
+                                                        <i class="ti ti-x me-1"></i>Cancelada
+                                                    </span>
+                                                {% elif reserva.estado == 'finalizado' %}
+                                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                                                        <i class="ti ti-check me-1"></i>Finalizada
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">
+                                                        <i class="ti ti-clock me-1"></i>{{ reserva.get_estado_display }}
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <h3 class="fw-bold">No tienes reservas próximas</h3>
-                    <p class="text-muted mb-4">¡Anímate a jugar! Reserva una pista hoy mismo.</p>
-                    <a href="{% url 'core:player_reserve_court' %}"
-                        class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">
-                        Reservar Ahora <i class="ti ti-arrow-right ms-2"></i>
-                    </a>
-                </div>
+                {% else %}
+                    <div class="card border-0 shadow-sm rounded-4 text-center py-5">
+                        <div class="card-body">
+                            <p class="text-muted mb-0">No tienes historial de reservas antiguas.</p>
+                        </div>
+                    </div>
+                {% endif %}
             </div>
-            {% endif %}
-        </div>
-
-        <!-- Tab Historial -->
-        <div class="tab-pane fade" id="historial" role="tabpanel">
-            {% if historial %}
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-dark text-white">
-                            <tr>
-                                <th class="px-4 py-4 border-0">Fecha</th>
-                                <th class="py-4 border-0">Pista / Cancha</th>
-                                <th class="py-4 border-0">Horario</th>
-                                <th class="py-4 border-0">Ubicación</th>
-                                <th class="py-4 border-0">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-transparent">
-                            {% for reserva in historial %}
-                            <tr class="{% if reserva.estado == 'cancelada' %}opacity-50{% endif %}">
-                                <td class="px-4 py-4 fw-bold text-nowrap">{{ reserva.fecha|date:"d/m/Y" }}</td>
-                                <td class="py-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
-                                            <i class="ti ti-ball-tennis"></i>
-                                        </div>
-                                        <div>
-                                            <span class="fw-bold d-block">{{ reserva.cancha.nombre }}</span>
-                                            <small class="text-muted tiny">Reserva #{{ reserva.id }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-4">
-                                    <span class="badge bg-light text-dark fw-bold border p-2 rounded-3">
-                                        {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}
-                                    </span>
-                                </td>
-                                <td class="py-4 text-muted small">
-                                    <i class="ti ti-map-pin text-primary me-1"></i> {{ reserva.cancha.ubicacion }}
-                                </td>
-                                <td class="py-4">
-                                    {% if reserva.estado == 'cancelada' %}
-                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">
-                                        <i class="ti ti-x me-1"></i>Cancelada
-                                    </span>
-                                    {% elif reserva.estado == 'finalizado' %}
-                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
-                                        <i class="ti ti-check me-1"></i>Finalizada
-                                    </span>
-                                    {% else %}
-                                    <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">
-                                        <i class="ti ti-clock me-1"></i>{{ reserva.get_estado_display }}
-                                    </span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {% else %}
-            <div class="card border-0 shadow-sm rounded-4 text-center py-5">
-                <div class="card-body">
-                    <p class="text-muted mb-0">No tienes historial de reservas antiguas.</p>
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
-</div>
-
-<style>
+    <style>
     .letter-spacing-1 {
         letter-spacing: 0.5px;
     }
@@ -223,5 +220,5 @@
         transform: translateY(-8px);
         box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
     }
-</style>
+    </style>
 {% endblock %}

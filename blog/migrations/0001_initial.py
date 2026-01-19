@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,24 +14,51 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Hero',
+            name="Hero",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('titulo', models.CharField(max_length=100)),
-                ('subtitulo', models.CharField(max_length=200)),
-                ('imagen', models.ImageField(blank=True, null=True, upload_to='hero/')),
-                ('activo', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("titulo", models.CharField(max_length=100)),
+                ("subtitulo", models.CharField(max_length=200)),
+                ("imagen", models.ImageField(blank=True, null=True, upload_to="hero/")),
+                ("activo", models.BooleanField(default=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Noticia',
+            name="Noticia",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('titulo', models.CharField(max_length=150)),
-                ('cuerpo', models.TextField()),
-                ('imagen', models.ImageField(blank=True, null=True, upload_to='noticias/')),
-                ('fecha_publicacion', models.DateField(auto_now_add=True)),
-                ('autor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("titulo", models.CharField(max_length=150)),
+                ("cuerpo", models.TextField()),
+                (
+                    "imagen",
+                    models.ImageField(blank=True, null=True, upload_to="noticias/"),
+                ),
+                ("fecha_publicacion", models.DateField(auto_now_add=True)),
+                (
+                    "autor",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

@@ -1,65 +1,69 @@
 {% load static %}
-
 <!-- Modal Crear Cancha -->
-<div class="modal fade" id="createCourtModal" tabindex="-1" aria-labelledby="createCourtModalLabel" aria-hidden="true">
+<div class="modal fade"
+     id="createCourtModal"
+     tabindex="-1"
+     aria-labelledby="createCourtModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="modal-header bg-primary py-3">
                 <h5 class="modal-title fw-bold text-white" id="createCourtModalLabel">
                     <i class="ti ti-ball-tennis me-2"></i>Registrar Nueva Cancha
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
             <div class="modal-body p-4 p-md-5">
-                <form action="{% url 'core:admin_create_court' %}" method="POST" enctype="multipart/form-data"
-                    class="modern-form">
+                <form action="{% url 'core:admin_create_court' %}"
+                      method="POST"
+                      enctype="multipart/form-data"
+                      class="modern-form">
                     {% csrf_token %}
-
                     <div class="row g-4">
                         <!-- Nombre -->
                         <div class="col-md-7">
-                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre de la
-                                Cancha</label>
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                Nombre de la
+                                Cancha
+                            </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i
-                                        class="ti ti-id-badge-2"></i></span>
+                                <span class="input-group-text bg-light border-end-0"><i class="ti ti-id-badge-2"></i></span>
                                 {{ form.nombre }}
                             </div>
                         </div>
-
                         <!-- Estado -->
                         <div class="col-md-5">
-                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Estado
-                                Inicial</label>
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                Estado
+                                Inicial
+                            </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i
-                                        class="ti ti-activity"></i></span>
+                                <span class="input-group-text bg-light border-end-0"><i class="ti ti-activity"></i></span>
                                 {{ form.estado }}
                             </div>
                         </div>
-
                         <!-- Ubicación -->
                         <div class="col-12">
-                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ubicación
-                                Física</label>
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                Ubicación
+                                Física
+                            </label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i
-                                        class="ti ti-map-pin"></i></span>
+                                <span class="input-group-text bg-light border-end-0"><i class="ti ti-map-pin"></i></span>
                                 {{ form.ubicacion }}
                             </div>
                         </div>
-
                         <!-- Grid de Detalles -->
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Precio / Hora</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i
-                                        class="ti ti-currency-dollar"></i></span>
+                                <span class="input-group-text bg-light border-end-0"><i class="ti ti-currency-dollar"></i></span>
                                 {{ form.precio_hora }}
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apertura</label>
                             <div class="input-group">
@@ -67,47 +71,41 @@
                                 {{ form.horario_apertura }}
                             </div>
                         </div>
-
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cierre</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0"><i
-                                        class="ti ti-clock-pause"></i></span>
+                                <span class="input-group-text bg-light border-end-0"><i class="ti ti-clock-pause"></i></span>
                                 {{ form.horario_cierre }}
                             </div>
                         </div>
-
                         <!-- Descripción -->
                         <div class="col-12">
                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i
-                                        class="ti ti-align-left"></i></span>
+                                <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="ti ti-align-left"></i></span>
                                 {{ form.descripcion }}
                             </div>
                         </div>
-
                         <!-- Imagen Drag & Drop -->
                         <div class="col-12">
-                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de la
-                                Cancha</label>
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                Imagen de la
+                                Cancha
+                            </label>
                             <div class="image-upload-wrapper">
-                                <div id="court-drop-zone-modal" class="image-drop-zone"
-                                    onclick="this.querySelector('input[type=file]').click()">
-
-                                    <div class="d-none court-hidden-input">
-                                        {{ form.imagen }}
-                                    </div>
-
+                                <div id="court-drop-zone-modal"
+                                     class="image-drop-zone"
+                                     onclick="this.querySelector('input[type=file]').click()">
+                                    <div class="d-none court-hidden-input">{{ form.imagen }}</div>
                                     <div class="drop-zone-content text-center p-4">
-                                        <div class="upload-icon mb-3"><i
-                                                class="ti ti-camera-plus fs-1 text-primary"></i></div>
+                                        <div class="upload-icon mb-3">
+                                            <i class="ti ti-camera-plus fs-1 text-primary"></i>
+                                        </div>
                                         <div class="upload-text">
                                             <p class="fw-bold mb-1">Subir Foto</p>
                                             <p class="text-muted small mb-0">JPG o PNG. Máx 5MB.</p>
                                         </div>
                                     </div>
-
                                     <div id="court-image-overlay-modal" class="image-preview-overlay d-none">
                                         <img id="court-preview-img-modal" src="" alt="Vista previa">
                                         <div class="preview-actions">
@@ -120,11 +118,12 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="modal-footer border-0 px-0 pb-0 mt-4">
-                        <button type="button" class="btn btn-outline-secondary btn-lg rounded-pill px-4"
-                            data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-lg rounded-pill px-4"
+                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit"
+                                class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
                             Guardar Cancha
                         </button>
                     </div>
@@ -133,7 +132,6 @@
         </div>
     </div>
 </div>
-
 <style>
     .modern-form .input-group-text {
         border-radius: 12px 0 0 12px;
@@ -207,7 +205,6 @@
         opacity: 1;
     }
 </style>
-
 <script>
     (function () {
         const dropZone = document.getElementById('court-drop-zone-modal');

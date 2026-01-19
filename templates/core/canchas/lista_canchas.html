@@ -1,133 +1,135 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block title %}Gestión de Canchas - Administrador{% endblock %}
-
 {% block content %}
-<div class="container-fluid px-lg-5 py-4">
-    <!-- Header de la sección -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
-        <div>
-            <h1 class="display-5 fw-bold mb-2">Gestión de <span class="text-primary">Canchas</span></h1>
-            <p class="text-muted fs-5 mb-0">Administra las instalaciones y su disponibilidad.</p>
+    <div class="container-fluid px-lg-5 py-4">
+        <!-- Header de la sección -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+            <div>
+                <h1 class="display-5 fw-bold mb-2">
+                    Gestión de <span class="text-primary">Canchas</span>
+                </h1>
+                <p class="text-muted fs-5 mb-0">Administra las instalaciones y su disponibilidad.</p>
+            </div>
+            <div>
+                <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createCourtModal">
+                    <i class="ti ti-plus me-2"></i>Registrar Nueva Cancha
+                </button>
+            </div>
         </div>
-        <div>
-            <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal"
-                data-bs-target="#createCourtModal">
-                <i class="ti ti-plus me-2"></i>Registrar Nueva Cancha
-            </button>
+        <!-- Filtros Rápidos -->
+        <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
+            <button class="btn btn-light rounded-pill px-4 fw-bold active border shadow-sm">Todas</button>
+            <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Disponibles</button>
+            <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Mantenimiento</button>
         </div>
-    </div>
-
-    <!-- Filtros Rápidos -->
-    <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
-        <button class="btn btn-light rounded-pill px-4 fw-bold active border shadow-sm">Todas</button>
-        <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Disponibles</button>
-        <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Mantenimiento</button>
-    </div>
-
-    <!-- Lista de canchas -->
-    <div class="row g-4">
-        {% for cancha in canchas %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card transition-hover">
-                <!-- Imagen con Badge de Estado -->
-                <div class="position-relative" style="height: 200px;">
-                    {% if cancha.imagen %}
-                    <img src="{{ cancha.imagen.url }}" class="w-100 h-100" style="object-fit: cover;"
-                        alt="{{ cancha.nombre }}">
-                    {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center h-100">
-                        <i class="ti ti-photo fs-1 text-muted opacity-25"></i>
-                    </div>
-                    {% endif %}
-
-                    <div class="position-absolute top-0 end-0 p-3">
-                        {% if cancha.estado == 'disponible' %}
-                        <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm"><i
-                                class="ti ti-check me-1"></i>Disponible</span>
-                        {% elif cancha.estado == 'mantenimiento' %}
-                        <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm"><i
-                                class="ti ti-tool me-1"></i>Mantenimiento</span>
-                        {% else %}
-                        <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm"><i
-                                class="ti ti-lock me-1"></i>Ocupada</span>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-2">{{ cancha.nombre }}</h5>
-                    <div class="d-flex align-items-center gap-2 text-muted small mb-4">
-                        <i class="ti ti-map-pin text-primary"></i> <span class="text-truncate">{{ cancha.ubicacion }}</span>
-                    </div>
-                    <div class="row g-2 mb-4">
-                        <div class="col-5">
-                            <div
-                                class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
-                                <span class="d-block text-muted tiny text-uppercase fw-bold">Precio</span>
-                                <span class="fw-bold text-primary">${{ cancha.precio_hora }}</span>
+        <!-- Lista de canchas -->
+        <div class="row g-4">
+            {% for cancha in canchas %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card transition-hover">
+                        <!-- Imagen con Badge de Estado -->
+                        <div class="position-relative" style="height: 200px;">
+                            {% if cancha.imagen %}
+                                <img src="{{ cancha.imagen.url }}"
+                                     class="w-100 h-100"
+                                     style="object-fit: cover"
+                                     alt="{{ cancha.nombre }}">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center h-100">
+                                    <i class="ti ti-photo fs-1 text-muted opacity-25"></i>
+                                </div>
+                            {% endif %}
+                            <div class="position-absolute top-0 end-0 p-3">
+                                {% if cancha.estado == 'disponible' %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm"><i class="ti ti-check me-1"></i>Disponible</span>
+                                {% elif cancha.estado == 'mantenimiento' %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2 shadow-sm"><i class="ti ti-tool me-1"></i>Mantenimiento</span>
+                                {% else %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm"><i class="ti ti-lock me-1"></i>Ocupada</span>
+                                {% endif %}
                             </div>
                         </div>
-                        <div class="col-7">
-                            <div
-                                class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
-                                <span class="d-block text-muted tiny text-uppercase fw-bold">Horario</span>
-                                <span class="fw-bold small">{{ cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</span>
-                        </div>
-                    </div>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <a href="{% url 'core:admin_edit_court' cancha.id %}"
-                            class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-grow-1">
-                            <i class="ti ti-edit me-1"></i>Editar
-                        </a>
-                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold flex-grow-1"
-                            data-bs-toggle="modal" data-bs-target="#deleteCourtModal{{ cancha.id }}">
-                            <i class="ti ti-trash me-1"></i>Eliminar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Eliminar Cancha -->
-        <div class="modal fade" id="deleteCourtModal{{ cancha.id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-sm">
-                <div class="modal-content border-0 shadow-lg rounded-4">
-                    <div class="modal-body p-4 text-center">
-                        <div class="icon-box-danger mb-3 mx-auto">
-                            <i class="ti ti-alert-triangle fs-1 text-danger"></i>
-                        </div>
-                        <h5 class="fw-bold">¿Eliminar cancha?</h5>
-                        <p class="text-muted small">Esta acción no se puede deshacer. Se eliminarán los datos de
-                            <strong>{{ cancha.nombre }}</strong>.</p>
-                        <div class="d-grid gap-2 mt-4">
-                            <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-danger rounded-pill fw-bold w-100">Sí,
-                                    eliminar</button>
-                            </form>
-                            <button type="button" class="btn btn-light rounded-pill fw-bold"
-                                data-bs-dismiss="modal">Cancelar</button>
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-2">{{ cancha.nombre }}</h5>
+                            <div class="d-flex align-items-center gap-2 text-muted small mb-4">
+                                <i class="ti ti-map-pin text-primary"></i> <span class="text-truncate">{{ cancha.ubicacion }}</span>
+                            </div>
+                            <div class="row g-2 mb-4">
+                                <div class="col-5">
+                                    <div class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
+                                        <span class="d-block text-muted tiny text-uppercase fw-bold">Precio</span>
+                                        <span class="fw-bold text-primary">${{ cancha.precio_hora }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-7">
+                                    <div class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
+                                        <span class="d-block text-muted tiny text-uppercase fw-bold">Horario</span>
+                                        <span class="fw-bold small">{{ cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'core:admin_edit_court' cancha.id %}"
+                                   class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-grow-1">
+                                    <i class="ti ti-edit me-1"></i>Editar
+                                </a>
+                                <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold flex-grow-1"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteCourtModal{{ cancha.id }}">
+                                    <i class="ti ti-trash me-1"></i>Eliminar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <!-- Modal Eliminar Cancha -->
+                <div class="modal fade"
+                     id="deleteCourtModal{{ cancha.id }}"
+                     tabindex="-1"
+                     aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content border-0 shadow-lg rounded-4">
+                            <div class="modal-body p-4 text-center">
+                                <div class="icon-box-danger mb-3 mx-auto">
+                                    <i class="ti ti-alert-triangle fs-1 text-danger"></i>
+                                </div>
+                                <h5 class="fw-bold">¿Eliminar cancha?</h5>
+                                <p class="text-muted small">
+                                    Esta acción no se puede deshacer. Se eliminarán los datos de
+                                    <strong>{{ cancha.nombre }}</strong>.
+                                </p>
+                                <div class="d-grid gap-2 mt-4">
+                                    <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger rounded-pill fw-bold w-100">
+                                            Sí,
+                                            eliminar
+                                        </button>
+                                    </form>
+                                    <button type="button"
+                                            class="btn btn-light rounded-pill fw-bold"
+                                            data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="mb-4">
+                        <i class="ti ti-ball-tennis fs-display-1 text-muted opacity-10"></i>
+                    </div>
+                    <h3 class="text-muted fw-bold">No hay canchas registradas</h3>
+                    <p class="text-muted">Comienza registrando tu primera instalación deportiva.</p>
+                </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="mb-4"><i class="ti ti-ball-tennis fs-display-1 text-muted opacity-10"></i></div>
-            <h3 class="text-muted fw-bold">No hay canchas registradas</h3>
-            <p class="text-muted">Comienza registrando tu primera instalación deportiva.</p>
-        </div>
-        {% endfor %}
     </div>
-</div>
-
-{% include 'core/canchas/modals/modal_crear.html' %}
-
-<style>
+    {% include 'core/canchas/modals/modal_crear.html' %}
+    <style>
     .transition-hover {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
@@ -154,5 +156,5 @@
     .fs-display-1 {
         font-size: 5rem;
     }
-</style>
+    </style>
 {% endblock %}

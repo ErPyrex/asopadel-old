@@ -6,16 +6,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('competitions', '0003_alter_partido_torneo'),
+        ("competitions", "0003_alter_partido_torneo"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='partido',
-            name='ganador',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='partidos_ganados', to=settings.AUTH_USER_MODEL, verbose_name='Ganador'),
+            model_name="partido",
+            name="ganador",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="partidos_ganados",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Ganador",
+            ),
         ),
     ]

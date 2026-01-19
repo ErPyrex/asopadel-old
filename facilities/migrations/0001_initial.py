@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,49 +14,113 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Cancha',
+            name="Cancha",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=100)),
-                ('ubicacion', models.CharField(max_length=200)),
-                ('estado', models.CharField(choices=[('disponible', 'Disponible'), ('reservada', 'Reservada'), ('mantenimiento', 'Mantenimiento')], max_length=50)),
-                ('imagen', models.ImageField(blank=True, null=True, upload_to='canchas/')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=100)),
+                ("ubicacion", models.CharField(max_length=200)),
+                (
+                    "estado",
+                    models.CharField(
+                        choices=[
+                            ("disponible", "Disponible"),
+                            ("reservada", "Reservada"),
+                            ("mantenimiento", "Mantenimiento"),
+                        ],
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "imagen",
+                    models.ImageField(blank=True, null=True, upload_to="canchas/"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Canchas',
+                "verbose_name_plural": "Canchas",
             },
         ),
         migrations.CreateModel(
-            name='TipoCancha',
+            name="TipoCancha",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=50, unique=True)),
-                ('descripcion', models.TextField(blank=True, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("nombre", models.CharField(max_length=50, unique=True)),
+                ("descripcion", models.TextField(blank=True, null=True)),
             ],
             options={
-                'verbose_name': 'Tipo de Cancha',
-                'verbose_name_plural': 'Tipos de Cancha',
+                "verbose_name": "Tipo de Cancha",
+                "verbose_name_plural": "Tipos de Cancha",
             },
         ),
         migrations.CreateModel(
-            name='ReservaCancha',
+            name="ReservaCancha",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('fecha', models.DateField()),
-                ('hora_inicio', models.TimeField()),
-                ('hora_fin', models.TimeField()),
-                ('estado', models.CharField(choices=[('pendiente', 'Pendiente'), ('confirmada', 'Confirmada'), ('cancelada', 'Cancelada')], default='pendiente', max_length=50)),
-                ('cancha', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='facilities.cancha')),
-                ('jugador', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("fecha", models.DateField()),
+                ("hora_inicio", models.TimeField()),
+                ("hora_fin", models.TimeField()),
+                (
+                    "estado",
+                    models.CharField(
+                        choices=[
+                            ("pendiente", "Pendiente"),
+                            ("confirmada", "Confirmada"),
+                            ("cancelada", "Cancelada"),
+                        ],
+                        default="pendiente",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "cancha",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="facilities.cancha",
+                    ),
+                ),
+                (
+                    "jugador",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'Reservas de Canchas',
-                'ordering': ['fecha', 'hora_inicio'],
+                "verbose_name_plural": "Reservas de Canchas",
+                "ordering": ["fecha", "hora_inicio"],
             },
         ),
         migrations.AddField(
-            model_name='cancha',
-            name='tipo',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='facilities.tipocancha'),
+            model_name="cancha",
+            name="tipo",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="facilities.tipocancha",
+            ),
         ),
     ]

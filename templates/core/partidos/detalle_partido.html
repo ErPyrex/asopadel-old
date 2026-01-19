@@ -1,158 +1,147 @@
 {% extends 'base.html' %}
 {% block title %}Detalle del Partido{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">🗓️ Detalles del Partido</h3>
-                </div>
-                <div class="card-body p-4">
-                    <!-- Torneo -->
-                    <div class="mb-4">
-                        <h5 class="text-primary">Torneo</h5>
-                        {% if partido.torneo %}
-                        <p class="fs-5"><strong>{{ partido.torneo.nombre }}</strong></p>
-                        {% else %}
-                        <p class="fs-5"><strong>Amistoso / Casual</strong></p>
-                        {% endif %}
-                        {% if partido.torneo.categoria %}
-                        {% if partido.torneo and partido.torneo.categoria %}
-                        <p class="text-muted">Categoría: {{ partido.torneo.categoria.nombre }}</p>
-                        {% else %}
-                        <p class="text-muted">Categoría: Libre</p>
-                        {% endif %}
-                        {% endif %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">🗓️ Detalles del Partido</h3>
                     </div>
-
-                    <hr>
-
-                    <!-- Información básica -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6 class="text-secondary">📅 Fecha</h6>
-                            <p>{{ partido.fecha }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-secondary">🕐 Hora</h6>
-                            <p>{{ partido.hora }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Cancha -->
-                    <div class="mb-4">
-                        <h6 class="text-secondary">🏟️ Cancha</h6>
-                        {% if partido.cancha %}
-                        <p><strong>{{ partido.cancha.nombre }}</strong></p>
-                        <p class="text-muted">{{ partido.cancha.ubicacion }}</p>
-                        {% else %}
-                        <p class="text-muted">No asignada</p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Jugadores -->
-                    <div class="mb-4">
-                        <h6 class="text-secondary mb-3">🎾 Jugadores</h6>
-                        <div class="row">
-                            <!-- Equipo 1 -->
-                            <div class="col-md-6 border-end">
-                                <h6 class="small fw-bold text-primary text-uppercase mb-3">Equipo 1</h6>
-                                {% for jugador in partido.equipo1.all %}
-                                <div class="player-meta mb-3">
-                                    <div class="player-avatar">
-                                        {{ jugador.first_name|first }}{{ jugador.last_name|first }}
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <span class="player-name">{{ jugador.get_full_name }}</span>
-                                        <span class="player-cedula small">Ranking: {{ jugador.ranking|default:0
-                                            }}</span>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <p class="text-muted small">Sin jugadores asignados</p>
-                                {% endfor %}
-                            </div>
-
-                            <!-- Equipo 2 -->
-                            <div class="col-md-6 ps-md-4">
-                                <h6 class="small fw-bold text-danger text-uppercase mb-3">Equipo 2</h6>
-                                {% for jugador in partido.equipo2.all %}
-                                <div class="player-meta mb-3">
-                                    <div class="player-avatar">
-                                        {{ jugador.first_name|first }}{{ jugador.last_name|first }}
-                                    </div>
-                                    <div class="d-flex flex-column">
-                                        <span class="player-name">{{ jugador.get_full_name }}</span>
-                                        <span class="player-cedula small">Ranking: {{ jugador.ranking|default:0
-                                            }}</span>
-                                    </div>
-                                </div>
-                                {% empty %}
-                                <p class="text-muted small">Sin jugadores asignados</p>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <!-- Árbitro -->
-                    <div class="mb-4">
-                        <h6 class="text-secondary">🧑‍⚖️ Árbitro</h6>
-                        {% if partido.arbitro %}
-                        <p><strong>{{ partido.arbitro.get_full_name }}</strong></p>
-                        <p class="text-muted">{{ partido.arbitro.cedula }}</p>
-                        {% else %}
-                        <p class="text-muted">No asignado</p>
-                        {% endif %}
-                    </div>
-
-                    <hr>
-
-                    <!-- Estado y Marcador -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h6 class="text-secondary">Estado</h6>
-                            <p>
-                                <span class="badge fs-6
-                                    {% if partido.estado == 'pendiente' %}bg-warning text-dark
-                                    {% elif partido.estado == 'confirmado' %}bg-info
-                                    {% elif partido.estado == 'finalizado' %}bg-success
-                                    {% elif partido.estado == 'cancelado' %}bg-danger
-                                    {% endif %}">
-                                    {{ partido.get_estado_display }}
-                                </span>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-secondary">📊 Marcador</h6>
-                            {% if partido.marcador %}
-                            <p class="fs-5"><strong>{{ partido.marcador }}</strong></p>
+                    <div class="card-body p-4">
+                        <!-- Torneo -->
+                        <div class="mb-4">
+                            <h5 class="text-primary">Torneo</h5>
+                            {% if partido.torneo %}
+                                <p class="fs-5">
+                                    <strong>{{ partido.torneo.nombre }}</strong>
+                                </p>
                             {% else %}
-                            <p class="text-muted">Sin marcador</p>
+                                <p class="fs-5">
+                                    <strong>Amistoso / Casual</strong>
+                                </p>
+                            {% endif %}
+                            {% if partido.torneo.categoria %}
+                                {% if partido.torneo and partido.torneo.categoria %}
+                                    <p class="text-muted">Categoría: {{ partido.torneo.categoria.nombre }}</p>
+                                {% else %}
+                                    <p class="text-muted">Categoría: Libre</p>
+                                {% endif %}
                             {% endif %}
                         </div>
-                    </div>
-
-                    <!-- Botones de acción -->
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <a href="{% url 'core:admin_edit_match' partido.id %}" class="btn btn-primary">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <a href="{% url 'core:admin_delete_match' partido.id %}" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Eliminar
-                        </a>
-                        <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">
-                            Volver a Lista
-                        </a>
+                        <hr>
+                        <!-- Información básica -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-secondary">📅 Fecha</h6>
+                                <p>{{ partido.fecha }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-secondary">🕐 Hora</h6>
+                                <p>{{ partido.hora }}</p>
+                            </div>
+                        </div>
+                        <!-- Cancha -->
+                        <div class="mb-4">
+                            <h6 class="text-secondary">🏟️ Cancha</h6>
+                            {% if partido.cancha %}
+                                <p>
+                                    <strong>{{ partido.cancha.nombre }}</strong>
+                                </p>
+                                <p class="text-muted">{{ partido.cancha.ubicacion }}</p>
+                            {% else %}
+                                <p class="text-muted">No asignada</p>
+                            {% endif %}
+                        </div>
+                        <hr>
+                        <!-- Jugadores -->
+                        <div class="mb-4">
+                            <h6 class="text-secondary mb-3">🎾 Jugadores</h6>
+                            <div class="row">
+                                <!-- Equipo 1 -->
+                                <div class="col-md-6 border-end">
+                                    <h6 class="small fw-bold text-primary text-uppercase mb-3">Equipo 1</h6>
+                                    {% for jugador in partido.equipo1.all %}
+                                        <div class="player-meta mb-3">
+                                            <div class="player-avatar">{{ jugador.first_name|first }}{{ jugador.last_name|first }}</div>
+                                            <div class="d-flex flex-column">
+                                                <span class="player-name">{{ jugador.get_full_name }}</span>
+                                                <span class="player-cedula small">Ranking: {{ jugador.ranking|default:0
+                                                }}</span>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-muted small">Sin jugadores asignados</p>
+                                    {% endfor %}
+                                </div>
+                                <!-- Equipo 2 -->
+                                <div class="col-md-6 ps-md-4">
+                                    <h6 class="small fw-bold text-danger text-uppercase mb-3">Equipo 2</h6>
+                                    {% for jugador in partido.equipo2.all %}
+                                        <div class="player-meta mb-3">
+                                            <div class="player-avatar">{{ jugador.first_name|first }}{{ jugador.last_name|first }}</div>
+                                            <div class="d-flex flex-column">
+                                                <span class="player-name">{{ jugador.get_full_name }}</span>
+                                                <span class="player-cedula small">Ranking: {{ jugador.ranking|default:0
+                                                }}</span>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p class="text-muted small">Sin jugadores asignados</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <!-- Árbitro -->
+                        <div class="mb-4">
+                            <h6 class="text-secondary">🧑‍⚖️ Árbitro</h6>
+                            {% if partido.arbitro %}
+                                <p>
+                                    <strong>{{ partido.arbitro.get_full_name }}</strong>
+                                </p>
+                                <p class="text-muted">{{ partido.arbitro.cedula }}</p>
+                            {% else %}
+                                <p class="text-muted">No asignado</p>
+                            {% endif %}
+                        </div>
+                        <hr>
+                        <!-- Estado y Marcador -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-secondary">Estado</h6>
+                                <p>
+                                    <span class="badge fs-6 {% if partido.estado == 'pendiente' %}bg-warning text-dark {% elif partido.estado == 'confirmado' %}bg-info {% elif partido.estado == 'finalizado' %}bg-success {% elif partido.estado == 'cancelado' %}bg-danger {% endif %}">
+                                        {{ partido.get_estado_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-secondary">📊 Marcador</h6>
+                                {% if partido.marcador %}
+                                    <p class="fs-5">
+                                        <strong>{{ partido.marcador }}</strong>
+                                    </p>
+                                {% else %}
+                                    <p class="text-muted">Sin marcador</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Botones de acción -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'core:admin_edit_match' partido.id %}"
+                               class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a href="{% url 'core:admin_delete_match' partido.id %}"
+                               class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                            <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">Volver a Lista</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

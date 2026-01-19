@@ -4,19 +4,17 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0002_alter_usuario_options_remove_usuario_foto_perfil_and_more'),
+        ("users", "0002_alter_usuario_options_remove_usuario_foto_perfil_and_more"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='usuario',
-            managers=[
-            ],
+            name="usuario",
+            managers=[],
         ),
         migrations.RemoveField(
-            model_name='usuario',
-            name='username',
+            model_name="usuario",
+            name="username",
         ),
     ]

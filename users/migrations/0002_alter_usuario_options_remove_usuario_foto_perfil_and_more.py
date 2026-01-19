@@ -4,78 +4,86 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='usuario',
-            options={'verbose_name': 'user', 'verbose_name_plural': 'users'},
+            name="usuario",
+            options={"verbose_name": "user", "verbose_name_plural": "users"},
         ),
         migrations.RemoveField(
-            model_name='usuario',
-            name='foto_perfil',
+            model_name="usuario",
+            name="foto_perfil",
         ),
         migrations.AddField(
-            model_name='usuario',
-            name='biografia',
+            model_name="usuario",
+            name="biografia",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='usuario',
-            name='categoria_jugador',
-            field=models.CharField(blank=True, choices=[('juvenil', 'Juvenil'), ('adulto', 'Adulto'), ('senior', 'Senior')], max_length=50, null=True),
+            model_name="usuario",
+            name="categoria_jugador",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("juvenil", "Juvenil"),
+                    ("adulto", "Adulto"),
+                    ("senior", "Senior"),
+                ],
+                max_length=50,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='usuario',
-            name='foto',
-            field=models.ImageField(blank=True, null=True, upload_to='perfiles/'),
+            model_name="usuario",
+            name="foto",
+            field=models.ImageField(blank=True, null=True, upload_to="perfiles/"),
         ),
         migrations.AddField(
-            model_name='usuario',
-            name='ranking',
+            model_name="usuario",
+            name="ranking",
             field=models.IntegerField(blank=True, default=0, null=True),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='cedula',
+            model_name="usuario",
+            name="cedula",
             field=models.CharField(max_length=12, unique=True),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='email',
+            model_name="usuario",
+            name="email",
             field=models.EmailField(max_length=254, unique=True),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='es_admin_aso',
+            model_name="usuario",
+            name="es_admin_aso",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='es_arbitro',
+            model_name="usuario",
+            name="es_arbitro",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='es_jugador',
+            model_name="usuario",
+            name="es_jugador",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='first_name',
+            model_name="usuario",
+            name="first_name",
             field=models.CharField(max_length=150),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='last_name',
+            model_name="usuario",
+            name="last_name",
             field=models.CharField(max_length=150),
         ),
         migrations.AlterField(
-            model_name='usuario',
-            name='telefono',
+            model_name="usuario",
+            name="telefono",
             field=models.CharField(blank=True, max_length=20, null=True),
         ),
     ]

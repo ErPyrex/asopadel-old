@@ -1,56 +1,65 @@
 {% extends 'base.html' %}
 {% block title %}Lista de Árbitros{% endblock %}
-
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Árbitros Registrados</h2>
-    <div class="d-flex justify-content-between mb-4">
-        <form method="get" class="d-flex">
-            <input type="text" name="q" placeholder="Buscar por nombre..." value="{{ query }}" class="form-control me-2">
-            <button type="submit" class="btn btn-primary">Buscar</button>
-        </form>
-        <a href="{% url 'core:admin_create_arbitro' %}" class="btn btn-success">Crear Árbitro</a>
-    </div>
-
-    <div class="card shadow-lg">
-        <div class="card-body">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Cédula</th>
-                        <th>Nombre completo</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for arbitro in arbitros %}
-                    <tr>
-                        <td>{{ arbitro.cedula }}</td>
-                        <td>{{ arbitro.first_name }} {{ arbitro.last_name }}</td>
-                        <td>{{ arbitro.email }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center">No hay árbitros registrados.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="container">
+        <h2 class="text-center mb-4">Árbitros Registrados</h2>
+        <div class="d-flex justify-content-between mb-4">
+            <form method="get" class="d-flex">
+                <input type="text"
+                       name="q"
+                       placeholder="Buscar por nombre..."
+                       value="{{ query }}"
+                       class="form-control me-2">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </form>
+            <a href="{% url 'core:admin_create_arbitro' %}" class="btn btn-success">Crear Árbitro</a>
+        </div>
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Nombre completo</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for arbitro in arbitros %}
+                            <tr>
+                                <td>{{ arbitro.cedula }}</td>
+                                <td>{{ arbitro.first_name }} {{ arbitro.last_name }}</td>
+                                <td>{{ arbitro.email }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No hay árbitros registrados.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    {% if arbitros.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?q={{ query }}&page={{ arbitros.previous_page_number }}">Anterior</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">Página {{ arbitros.number }} de {{ arbitros.paginator.num_pages }}</a>
+                    </li>
+                    {% if arbitros.has_next %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?q={{ query }}&page={{ arbitros.next_page_number }}">Siguiente</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
-
-    <div class="d-flex justify-content-center mt-4">
-        <nav>
-            <ul class="pagination">
-                {% if arbitros.has_previous %}
-                <li class="page-item"><a class="page-link" href="?q={{ query }}&page={{ arbitros.previous_page_number }}">Anterior</a></li>
-                {% endif %}
-                <li class="page-item disabled"><a class="page-link" href="#">Página {{ arbitros.number }} de {{ arbitros.paginator.num_pages }}</a></li>
-                {% if arbitros.has_next %}
-                <li class="page-item"><a class="page-link" href="?q={{ query }}&page={{ arbitros.next_page_number }}">Siguiente</a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-</div>
 {% endblock %}

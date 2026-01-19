@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('competitions', '0002_estadisticajugador_derrotas'),
+        ("competitions", "0002_estadisticajugador_derrotas"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='partido',
-            name='torneo',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='partidos', to='competitions.torneo'),
+            model_name="partido",
+            name="torneo",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="partidos",
+                to="competitions.torneo",
+            ),
         ),
     ]

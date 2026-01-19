@@ -7,10 +7,10 @@ Contains role-checking functions and other helpers.
 def IsAdmin(User):
     """
     Check if a user has administrator privileges.
-    
+
     Args:
         User: The user object to check
-        
+
     Returns:
         bool: True if user is authenticated and is an administrator
     """
@@ -20,10 +20,10 @@ def IsAdmin(User):
 def IsArbitro(User):
     """
     Check if a user is a referee (arbitro).
-    
+
     Args:
         User: The user object to check
-        
+
     Returns:
         bool: True if user is authenticated and is a referee
     """
@@ -33,10 +33,10 @@ def IsArbitro(User):
 def IsJugador(User):
     """
     Check if a user is a player (jugador).
-    
+
     Args:
         User: The user object to check
-        
+
     Returns:
         bool: True if user is authenticated and is a player
     """
@@ -46,12 +46,11 @@ def IsJugador(User):
 def IsAdminOrArbitro(User):
     """
     Check if a user is either an admin or a referee.
-    
+
     Args:
         User: The user object to check
-        
+
     Returns:
         bool: True if user is authenticated and is an admin OR a referee
     """
     return User.is_authenticated and (User.es_admin_aso or User.es_arbitro)
-

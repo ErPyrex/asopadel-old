@@ -1,5 +1,5 @@
 from django.test import TestCase
-from users.models import Usuario, UsuarioManager
+from users.models import Usuario
 
 
 class UsuarioManagerTestCase(TestCase):
@@ -8,15 +8,15 @@ class UsuarioManagerTestCase(TestCase):
     def test_create_user(self):
         """Test creating a regular user"""
         user = Usuario.objects.create_user(
-            cedula='12345678',
-            password='testpass123',
-            email='test@example.com',
-            first_name='Test',
-            last_name='User'
+            cedula="12345678",
+            password="testpass123",
+            email="test@example.com",
+            first_name="Test",
+            last_name="User",
         )
-        self.assertEqual(user.cedula, '12345678')
-        self.assertEqual(user.email, 'test@example.com')
-        self.assertTrue(user.check_password('testpass123'))
+        self.assertEqual(user.cedula, "12345678")
+        self.assertEqual(user.email, "test@example.com")
+        self.assertTrue(user.check_password("testpass123"))
         self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.es_admin_aso)
@@ -24,21 +24,18 @@ class UsuarioManagerTestCase(TestCase):
     def test_create_user_without_cedula(self):
         """Test that creating a user without cedula raises ValueError"""
         with self.assertRaises(ValueError):
-            Usuario.objects.create_user(
-                cedula='',
-                password='testpass123'
-            )
+            Usuario.objects.create_user(cedula="", password="testpass123")
 
     def test_create_superuser(self):
         """Test creating a superuser"""
         admin = Usuario.objects.create_superuser(
-            cedula='87654321',
-            password='adminpass123',
-            email='admin@example.com',
-            first_name='Admin',
-            last_name='User'
+            cedula="87654321",
+            password="adminpass123",
+            email="admin@example.com",
+            first_name="Admin",
+            last_name="User",
         )
-        self.assertEqual(admin.cedula, '87654321')
+        self.assertEqual(admin.cedula, "87654321")
         self.assertTrue(admin.is_staff)
         self.assertTrue(admin.is_superuser)
         self.assertTrue(admin.es_admin_aso)
@@ -47,9 +44,7 @@ class UsuarioManagerTestCase(TestCase):
         """Test that creating superuser with is_staff=False raises ValueError"""
         with self.assertRaises(ValueError):
             Usuario.objects.create_superuser(
-                cedula='99999999',
-                password='testpass123',
-                is_staff=False
+                cedula="99999999", password="testpass123", is_staff=False
             )
 
 
@@ -59,24 +54,24 @@ class UsuarioModelTestCase(TestCase):
     def setUp(self):
         """Set up test data"""
         self.user = Usuario.objects.create_user(
-            cedula='11111111',
-            password='testpass123',
-            email='player@example.com',
-            first_name='Juan',
-            last_name='Pérez'
+            cedula="11111111",
+            password="testpass123",
+            email="player@example.com",
+            first_name="Juan",
+            last_name="Pérez",
         )
 
     def test_str_method(self):
         """Test the __str__ method returns cedula"""
-        self.assertEqual(str(self.user), '11111111')
+        self.assertEqual(str(self.user), "11111111")
 
     def test_get_full_name(self):
         """Test get_full_name property"""
-        self.assertEqual(self.user.get_full_name, 'Juan Pérez')
+        self.assertEqual(self.user.get_full_name, "Juan Pérez")
 
     def test_get_short_name(self):
         """Test get_short_name property"""
-        self.assertEqual(self.user.get_short_name, 'Juan')
+        self.assertEqual(self.user.get_short_name, "Juan")
 
     def test_jugador_role(self):
         """Test setting jugador role"""
@@ -113,17 +108,17 @@ class UsuarioModelTestCase(TestCase):
 
     def test_categoria_jugador_choices(self):
         """Test categoria_jugador field choices"""
-        self.user.categoria_jugador = 'juvenil'
+        self.user.categoria_jugador = "juvenil"
         self.user.save()
-        self.assertEqual(self.user.categoria_jugador, 'juvenil')
+        self.assertEqual(self.user.categoria_jugador, "juvenil")
 
-        self.user.categoria_jugador = 'adulto'
+        self.user.categoria_jugador = "adulto"
         self.user.save()
-        self.assertEqual(self.user.categoria_jugador, 'adulto')
+        self.assertEqual(self.user.categoria_jugador, "adulto")
 
-        self.user.categoria_jugador = 'senior'
+        self.user.categoria_jugador = "senior"
         self.user.save()
-        self.assertEqual(self.user.categoria_jugador, 'senior')
+        self.assertEqual(self.user.categoria_jugador, "senior")
 
     def test_ranking_default(self):
         """Test that ranking defaults to 0"""
@@ -133,20 +128,20 @@ class UsuarioModelTestCase(TestCase):
         """Test that cedula must be unique"""
         with self.assertRaises(Exception):
             Usuario.objects.create_user(
-                cedula='11111111',  # Same as self.user
-                password='testpass123',
-                email='another@example.com',
-                first_name='Another',
-                last_name='User'
+                cedula="11111111",  # Same as self.user
+                password="testpass123",
+                email="another@example.com",
+                first_name="Another",
+                last_name="User",
             )
 
     def test_unique_email(self):
         """Test that email must be unique"""
         with self.assertRaises(Exception):
             Usuario.objects.create_user(
-                cedula='22222222',
-                password='testpass123',
-                email='player@example.com',  # Same as self.user
-                first_name='Another',
-                last_name='User'
+                cedula="22222222",
+                password="testpass123",
+                email="player@example.com",  # Same as self.user
+                first_name="Another",
+                last_name="User",
             )
