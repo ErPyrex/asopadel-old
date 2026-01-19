@@ -231,11 +231,33 @@ def jugador_dashboard(request):
     Dashboard view for players (jugadores).
     Shows their reservations and matches.
     """
-    reservas = ReservaCancha.objects.filter(jugador=request.user)
-    partidos = Partido.objects.filter(jugadores=request.user)
+    user = request.user
+    reservas = ReservaCancha.objects.filter(jugador=user)
+    partidos = Partido.objects.filter(Q(equipo1=user) | Q(equipo2=user)).distinct()
+    torneos = Torneo.objects.filter(jugadores_inscritos=user)
+    
+    from competitions.models import EstadisticaJugador
+    estadisticas = EstadisticaJugador.objects.filter(jugador=user).first()
+
+    # Pre-calculate display values to avoid template tag breaking
+    display_name = user.first_name if user.first_name else user.username
+    full_name = user.get_full_name() if user.get_full_name() else user.username
+    categoria = user.get_categoria_jugador_display() if hasattr(user, 'get_categoria_jugador_display') and user.categoria_jugador else 'Sin categoría'
+    ranking_pts = user.ranking if hasattr(user, 'ranking') and user.ranking else 0
+    partidos_count = estadisticas.partidos_jugados if estadisticas else 0
+    victorias_count = estadisticas.victorias if estadisticas else 0
+
     return render(request, 'users/panel_jugador.html', {
         'reservas': reservas,
         'partidos': partidos,
+        'torneos': torneos,
+        'estadisticas': estadisticas,
+        'display_name': display_name,
+        'full_name': full_name,
+        'cat': categoria,
+        'ranking_pts': ranking_pts,
+        'partidos_count': partidos_count,
+        'victorias_count': victorias_count,
     })
 
 # ====================================================================================
