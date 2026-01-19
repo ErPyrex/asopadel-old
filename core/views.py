@@ -17,6 +17,7 @@ from .forms import (
     ReservaCanchaForm,
 )
 from .forms import JugadorForm, ArbitroForm
+from django.utils import timezone
 from .utils import IsAdmin, IsArbitro, IsJugador, IsAdminOrArbitro
 
 # Aliases for backward compatibility with existing code
@@ -104,8 +105,40 @@ def admin_dashboard(request):
 @login_required
 @user_passes_test(is_admin)
 def admin_tournament_list(request):
+    tipo_seleccionado = request.GET.get("tipo", "")
+    estado_seleccionado = request.GET.get("activo", "")
+    
     torneos = Torneo.objects.all()
-    return render(request, "core/torneos/torneos.html", {"torneos": torneos})
+    
+    # Nota: El modelo Torneo no tiene campo 'tipo' o 'activo' actualmente.
+    # Si se desea filtrar por tipo (que podría ser categoría) o estado:
+    if tipo_seleccionado:
+        # Asumiendo que 'tipo' se refiere a la categoría para este ejemplo
+        torneos = torneos.filter(categoria__nombre__icontains=tipo_seleccionado)
+    
+    if estado_seleccionado == "1":
+        # Activo si la fecha_fin >= hoy
+        torneos = torneos.filter(fecha_fin__gte=timezone.now().date())
+    elif estado_seleccionado == "0":
+        # Inactivo si la fecha_fin < hoy
+        torneos = torneos.filter(fecha_fin__lt=timezone.now().date())
+    
+    # Datos para el modal de creación
+    from competitions.models import Categoria
+    categorias = Categoria.objects.all()
+    arbitros = Usuario.objects.filter(es_arbitro=True, is_active=True)
+        
+    return render(
+        request, 
+        "core/torneos/torneos.html", 
+        {
+            "torneos": torneos,
+            "tipo_seleccionado": tipo_seleccionado,
+            "estado_seleccionado": estado_seleccionado,
+            "categorias": categorias,
+            "arbitros": arbitros,
+        }
+    )
 
 
 @login_required
@@ -138,12 +171,11 @@ def admin_edit_tournament(request, torneo_id):
 def admin_delete_tournament(request, torneo_id):
     torneo = get_object_or_404(Torneo, id=torneo_id)
     if request.method == "POST":
-        torneo.delete()
-        messages.success(request, "Torneo eliminado exitosamente.")
+        torneo.cancelado = True
+        torneo.save()
+        messages.success(request, f"Torneo '{torneo.nombre}' cancelado exitosamente.")
         return redirect("core:admin_torneos_list")
-    return render(
-        request, "core/torneos/confirmar_eliminar_torneo.html", {"torneo": torneo}
-    )
+    return redirect("core:admin_torneos_list")
 
 
 # ====================================================================================

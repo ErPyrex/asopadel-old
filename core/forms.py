@@ -90,6 +90,11 @@ class TorneoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Asegúrate de que solo los usuarios que son árbitros puedan ser seleccionados
         self.fields["arbitro"].queryset = Usuario.objects.filter(es_arbitro=True)
+        self.fields["arbitro"].empty_label = None
+        
+        # Asegurarse de que categoría no tenga guiones
+        self.fields["categoria"].empty_label = None
+        
         # Asegúrate de que solo los usuarios que son jugadores puedan ser seleccionados
         self.fields["jugadores_inscritos"].queryset = Usuario.objects.filter(
             es_jugador=True

@@ -33,6 +33,14 @@ class Torneo(models.Model):
     jugadores_inscritos = models.ManyToManyField(
         Usuario, blank=True, related_name="torneos_inscritos"
     )
+    cancelado = models.BooleanField(default=False, verbose_name="Torneo Cancelado")
+
+    @property
+    def activo(self):
+        from django.utils import timezone
+        if self.cancelado:
+            return False
+        return self.fecha_fin >= timezone.now().date()
 
     def __str__(self):
         return f"{self.nombre} ({self.categoria})"

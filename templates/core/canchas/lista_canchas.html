@@ -83,70 +83,124 @@
                 <div class="modal fade" id="editCourtModal{{ cancha.id }}" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                            <div class="modal-header bg-primary py-3">
-                                <h5 class="modal-title fw-bold text-white"><i class="ti ti-edit me-2"></i>Editar Cancha</h5>
+                            <!-- Header Moderno -->
+                            <div class="modal-header bg-primary py-3 border-0">
+                                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="ti ti-edit fs-5"></i>
+                                    </div>
+                                    Editar Cancha: {{ cancha.nombre }}
+                                </h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <div class="modal-body p-4">
+
+                            <div class="modal-body p-4 p-md-5 bg-card text-start">
                                 <form action="{% url 'core:admin_edit_court' cancha.id %}" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
-                                    <div class="row g-3">
+                                    <div class="row g-4">
+                                        <!-- Nombre -->
                                         <div class="col-md-7">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Nombre</label>
-                                            <input type="text" name="nombre" class="form-control" value="{{ cancha.nombre }}" required>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre de la Cancha</label>
+                                            <div class="input-group modern-input-group">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-id-badge-2 text-primary"></i></span>
+                                                <input type="text" name="nombre" class="form-control border-0 py-2 bg-transparent" value="{{ cancha.nombre }}" required>
+                                            </div>
                                         </div>
+
+                                        <!-- Estado -->
                                         <div class="col-md-5">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Estado</label>
-                                            <select name="estado" class="form-select">
-                                                <option value="disponible" {% if cancha.estado == 'disponible' %}selected{% endif %}>Disponible</option>
-                                                <option value="mantenimiento" {% if cancha.estado == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
-                                                <option value="reservada" {% if cancha.estado == 'reservada' %}selected{% endif %}>Reservada</option>
-                                            </select>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Estado</label>
+                                            <div class="input-group modern-input-group">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-activity text-primary"></i></span>
+                                                <select name="estado" class="form-select border-0 py-2 bg-transparent">
+                                                    <option value="disponible" {% if cancha.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+                                                    <option value="mantenimiento" {% if cancha.estado == 'mantenimiento' %}selected{% endif %}>Mantenimiento</option>
+                                                    <option value="reservada" {% if cancha.estado == 'reservada' %}selected{% endif %}>Reservada</option>
+                                                </select>
+                                            </div>
                                         </div>
+
+                                        <!-- Ubicación -->
                                         <div class="col-12">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Ubicación</label>
-                                            <input type="text" name="ubicacion" class="form-control" value="{{ cancha.ubicacion }}" required>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ubicación</label>
+                                            <div class="input-group modern-input-group">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-map-pin text-primary"></i></span>
+                                                <input type="text" name="ubicacion" class="form-control border-0 py-2 bg-transparent" value="{{ cancha.ubicacion }}" required>
+                                            </div>
+                                        </div>
+
+                                        <!-- Grid de Detalles -->
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Precio/Hora</label>
+                                            <div class="input-group modern-input-group">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-currency-dollar text-primary"></i></span>
+                                                <input type="number" name="precio_hora" class="form-control border-0 py-2 bg-transparent" value="{{ cancha.precio_hora }}" step="0.01" required>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Precio/Hora</label>
-                                            <input type="number" name="precio_hora" class="form-control" value="{{ cancha.precio_hora }}" step="0.01" required>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apertura</label>
+                                            <div class="input-group modern-input-group">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
+                                                <input type="time" name="horario_apertura" class="form-control border-0 py-2 bg-transparent" value="{{ cancha.horario_apertura|time:'H:i' }}" required>
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Apertura</label>
-                                            <input type="time" name="horario_apertura" class="form-control" value="{{ cancha.horario_apertura|time:'H:i' }}" required>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cierre</label>
+                                            <div class="input-group modern-input-group">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock-pause text-primary"></i></span>
+                                                <input type="time" name="horario_cierre" class="form-control border-0 py-2 bg-transparent" value="{{ cancha.horario_cierre|time:'H:i' }}" required>
+                                            </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Cierre</label>
-                                            <input type="time" name="horario_cierre" class="form-control" value="{{ cancha.horario_cierre|time:'H:i' }}" required>
-                                        </div>
+
+                                        <!-- Descripción -->
                                         <div class="col-12">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Descripción</label>
-                                            <textarea name="descripcion" class="form-control" rows="3">{{ cancha.descripcion }}</textarea>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
+                                            <div class="input-group modern-input-group align-items-start pt-1">
+                                                <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                                                <textarea name="descripcion" class="form-control border-0 py-2 bg-transparent" rows="3">{{ cancha.descripcion }}</textarea>
+                                            </div>
                                         </div>
+
+                                        <!-- Imagen -->
                                         <div class="col-12">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Imagen</label>
-                                            <div class="edit-court-image-zone" id="edit-court-zone-{{ cancha.id }}">
-                                                {% if cancha.imagen %}
-                                                <div class="current-image-preview position-relative rounded-3 overflow-hidden" style="height: 150px;">
-                                                    <img src="{{ cancha.imagen.url }}" class="w-100 h-100" style="object-fit: cover" alt="{{ cancha.nombre }}">
-                                                    <label class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark bg-opacity-50 text-white fw-bold" style="cursor: pointer; opacity: 0; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">
-                                                        <i class="ti ti-refresh me-2"></i>Cambiar imagen
-                                                        <input type="file" name="imagen" accept="image/*" class="d-none">
-                                                    </label>
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de la Cancha</label>
+                                            <div class="image-crop-container">
+                                                <div class="news-drop-zone-modern" onclick="this.querySelector('input[type=file]').click()">
+                                                    <div class="d-none">
+                                                        <input type="file" name="imagen" accept="image/*" onchange="handleImagePreview(this, 'edit-preview-{{ cancha.id }}')">
+                                                    </div>
+                                                    <div class="image-preview-overlay {% if not cancha.imagen %}d-none{% endif %}" id="edit-preview-container-{{ cancha.id }}">
+                                                        {% if cancha.imagen %}
+                                                            <img id="edit-preview-{{ cancha.id }}" src="{{ cancha.imagen.url }}" alt="{{ cancha.nombre }}">
+                                                        {% else %}
+                                                            <img id="edit-preview-{{ cancha.id }}" src="" alt="Vista previa">
+                                                        {% endif %}
+                                                        <div class="preview-actions">
+                                                            <span class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold">
+                                                                <i class="ti ti-refresh me-2"></i>Cambiar Foto
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {% if not cancha.imagen %}
+                                                    <div class="upload-placeholder text-center p-5" id="placeholder-{{ cancha.id }}">
+                                                        <div class="upload-icon-wrapper mb-3">
+                                                            <i class="ti ti-camera-plus fs-1 text-primary"></i>
+                                                        </div>
+                                                        <h6 class="fw-bold mb-1">Subir Foto</h6>
+                                                        <p class="text-muted small mb-0">Haga clic para seleccionar</p>
+                                                    </div>
+                                                    {% endif %}
                                                 </div>
-                                                {% else %}
-                                                <div class="border rounded-3 p-4 text-center bg-light" style="cursor: pointer;" onclick="this.querySelector('input').click()">
-                                                    <i class="ti ti-cloud-upload fs-1 text-primary mb-2"></i>
-                                                    <p class="mb-0 small text-muted">Subir imagen</p>
-                                                    <input type="file" name="imagen" accept="image/*" class="d-none">
-                                                </div>
-                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="d-grid gap-2 mt-4">
-                                        <button type="submit" class="btn btn-primary rounded-pill fw-bold py-2"><i class="ti ti-device-floppy me-2"></i>Guardar Cambios</button>
-                                        <button type="button" class="btn btn-light rounded-pill fw-bold text-muted" data-bs-dismiss="modal">Cancelar</button>
+
+                                    <!-- Botones de Acción -->
+                                    <div class="d-grid gap-3 mt-5">
+                                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                                            <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                                        </button>
+                                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none shadow-none" data-bs-dismiss="modal">Cancelar</button>
                                     </div>
                                 </form>
                             </div>
@@ -155,21 +209,21 @@
                 </div>
                 <!-- Modal Eliminar Cancha -->
                 <div class="modal fade" id="deleteCourtModal{{ cancha.id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg rounded-4">
-                            <div class="modal-body p-4 text-center">
-                                <div class="icon-box-danger mb-3 mx-auto">
-                                    <i class="ti ti-alert-triangle fs-1 text-danger"></i>
+                            <div class="modal-body p-5 text-center">
+                                <div class="icon-box mb-4 mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle" style="width: 80px; height: 80px;">
+                                    <i class="ti ti-alert-triangle fs-1"></i>
                                 </div>
-                                <h5 class="fw-bold">¿Eliminar cancha?</h5>
-                                <p class="text-muted small">Esta acción no se puede deshacer. Se eliminarán los datos de <strong>{{ cancha.nombre }}</strong>.</p>
-                                <div class="d-grid gap-2 mt-4">
-                                    <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-danger rounded-pill fw-bold w-100">Sí, eliminar</button>
-                                    </form>
-                                    <button type="button" class="btn btn-light rounded-pill fw-bold" data-bs-dismiss="modal">Cancelar</button>
-                                </div>
+                                <h3 class="fw-bold mb-3">¿Eliminar cancha?</h3>
+                                <p class="text-muted mb-4 fs-5">Esta acción no se puede deshacer. Se eliminarán los datos de: <br><strong>"{{ cancha.nombre }}"</strong></p>
+                                <form action="{% url 'core:admin_delete_court' cancha.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold">Sí, eliminar</button>
+                                        <button type="button" class="btn btn-light btn-lg rounded-pill fw-bold border" data-bs-dismiss="modal">No, cancelar</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -186,44 +240,125 @@
         </div>
     </div>
     {% include 'core/canchas/modals/modal_crear.html' %}
+
     <style>
+    /* Estilos Generales y Dark Mode */
+    .bg-card { background: #ffffff; }
+    [data-bs-theme="dark"] .bg-card { background: #1a1d21; }
+
     .transition-hover {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
     .transition-hover:hover {
         transform: translateY(-5px);
         box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
     }
 
-    .tiny {
-        font-size: 0.65rem;
+    /* Modern Input Groups */
+    .modern-input-group {
+        background: var(--bs-gray-100);
+        border: 1px solid var(--bs-gray-200);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    [data-bs-theme="dark"] .modern-input-group {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .modern-input-group:focus-within {
+        background: #fff !important;
+        border-color: var(--bs-primary) !important;
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.1) !important;
     }
 
-    .icon-box-danger {
-        width: 60px;
-        height: 60px;
-        background: rgba(220, 53, 69, 0.1);
-        border-radius: 50%;
+    .modern-input-group .form-control, 
+    .modern-input-group .form-select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: inherit !important;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Zona de Carga Modernizada */
+    .news-drop-zone-modern {
+        border: 2px dashed var(--bs-gray-300);
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bs-gray-100);
+        overflow: hidden;
+        position: relative;
+        min-height: 200px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
-
-    .fs-display-1 {
-        font-size: 5rem;
+    [data-bs-theme="dark"] .news-drop-zone-modern {
+        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
     }
+    .news-drop-zone-modern:hover {
+        border-color: var(--bs-primary);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .upload-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background: #fff;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    [data-bs-theme="dark"] .upload-icon-wrapper { background: rgba(255, 255, 255, 0.1); }
+
+    .image-preview-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        z-index: 5;
+    }
+    .image-preview-overlay img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .preview-actions {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 6;
+    }
+    .news-drop-zone-modern:hover .preview-actions { opacity: 1; }
+
+    .hover-lift { transition: transform 0.2s ease; }
+    .hover-lift:hover { transform: translateY(-3px); }
+
+    .tiny { font-size: 0.65rem; }
+    .fs-display-1 { font-size: 5rem; }
     </style>
+
     <script>
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            // Cambiar botón activo
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            
             const filter = this.dataset.filter;
-            
-            // Filtrar tarjetas
             document.querySelectorAll('.court-card').forEach(card => {
                 if (filter === 'all' || card.dataset.status === filter) {
                     card.style.display = '';
@@ -233,5 +368,21 @@
             });
         });
     });
+
+    function handleImagePreview(input, previewId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewImg = document.getElementById(previewId);
+                const container = previewImg.closest('.image-preview-overlay');
+                const placeholder = document.getElementById('placeholder-' + previewId.split('-').pop());
+                
+                previewImg.src = e.target.result;
+                container.classList.remove('d-none');
+                if (placeholder) placeholder.classList.add('d-none');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
     </script>
 {% endblock %}

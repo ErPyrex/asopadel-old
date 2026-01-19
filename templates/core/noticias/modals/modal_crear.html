@@ -3,67 +3,84 @@
 <div class="modal fade" id="createNoticiaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="modal-header bg-primary py-3">
-                <h5 class="modal-title fw-bold text-white">
-                    <i class="ti ti-plus me-2"></i>Nueva Noticia
+            <!-- Header con Gradiente Sutil -->
+            <div class="modal-header bg-primary py-3 border-0">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="ti ti-plus fs-5"></i>
+                    </div>
+                    Nueva Noticia
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4">
+            
+            <div class="modal-body p-4 p-md-5 bg-card">
                 <form action="{% url 'core:admin_create_noticia' %}" method="POST" enctype="multipart/form-data" id="noticiaFormModal">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-1">Título</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-type"></i></span>
-                            <input type="text" name="titulo" class="form-control bg-light border-start-0" placeholder="Título de la noticia" required>
+                    
+                    <!-- Campo Título -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título de la Noticia</label>
+                        <div class="input-group modern-input-group">
+                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
+                            <input type="text" name="titulo" class="form-control border-0 py-2 bg-transparent" placeholder="Escriba un título impactante..." required>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-1">Contenido</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="ti ti-align-left"></i></span>
-                            <textarea name="cuerpo" class="form-control bg-light border-start-0" rows="5" placeholder="Escribe el contenido de la noticia..." required></textarea>
+                    
+                    <!-- Campo Contenido -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+                        <div class="input-group modern-input-group align-items-start pt-1">
+                            <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                            <textarea name="cuerpo" class="form-control border-0 py-2 bg-transparent" rows="5" placeholder="Cuente los detalles de la noticia..." required></textarea>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-1">Imagen</label>
+                    
+                    <!-- Zona de Imagen / Cropper -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de Portada</label>
                         <input type="hidden" id="news-pos-x-modal" name="imagen_pos_x" value="50">
                         <input type="hidden" id="news-pos-y-modal" name="imagen_pos_y" value="50">
+                        
                         <div class="image-crop-container">
                             <!-- Zona de Drop -->
-                            <div id="news-drop-zone-modal" class="news-drop-zone" onclick="document.getElementById('news-file-input-modal').click()">
+                            <div id="news-drop-zone-modal" class="news-drop-zone-modern" onclick="document.getElementById('news-file-input-modal').click()">
                                 <input type="file" id="news-file-input-modal" name="imagen" accept="image/*" class="d-none">
-                                <div class="upload-placeholder text-center p-4">
-                                    <i class="ti ti-cloud-upload fs-1 text-primary mb-2"></i>
-                                    <p class="fw-bold mb-1">Arrastra una imagen aquí</p>
-                                    <p class="text-muted small mb-0">o haz clic para seleccionar</p>
+                                <div class="upload-placeholder text-center p-5">
+                                    <div class="upload-icon-wrapper mb-3">
+                                        <i class="ti ti-cloud-upload fs-1 text-primary"></i>
+                                    </div>
+                                    <h6 class="fw-bold mb-1">Cargar Imagen</h6>
+                                    <p class="text-muted small mb-0">Arrastre aquí o haga clic para seleccionar</p>
                                 </div>
                             </div>
+                            
                             <!-- Zona de Recorte -->
-                            <div id="news-crop-zone-modal" class="news-crop-zone d-none">
-                                <div class="crop-header d-flex justify-content-between align-items-center mb-2">
-                                    <span class="small text-muted"><i class="ti ti-hand-grab me-1"></i>Arrastra para enmarcar</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="resetNewsImageModal()">
+                            <div id="news-crop-zone-modal" class="news-crop-zone-modern d-none">
+                                <div class="crop-header d-flex justify-content-between align-items-center mb-3">
+                                    <span class="small text-muted fw-medium"><i class="ti ti-hand-grab me-2"></i>Arrastra para ajustar el encuadre</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold" onclick="resetNewsImageModal()">
                                         <i class="ti ti-refresh me-1"></i>Cambiar
                                     </button>
                                 </div>
-                                <div class="news-crop-viewport">
+                                <div class="news-crop-viewport-modern shadow-sm">
                                     <div class="news-crop-frame" id="news-crop-frame-modal">
                                         <img id="news-preview-modal" src="" alt="Vista previa" draggable="false">
                                     </div>
                                 </div>
-                                <div class="crop-hint text-center mt-2">
-                                    <small class="text-muted">Esta es la parte visible de la imagen</small>
+                                <div class="text-center mt-3">
+                                    <span class="badge bg-light text-muted fw-normal rounded-pill px-3 py-2 border">Vista previa de la posición focal</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary rounded-pill fw-bold py-2">
-                            <i class="ti ti-check me-2"></i>Publicar Noticia
+                    
+                    <!-- Botones de Acción -->
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                            <i class="ti ti-check-double me-2"></i>Publicar Noticia
                         </button>
-                        <button type="button" class="btn btn-light rounded-pill fw-bold text-muted" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none shadow-none" data-bs-dismiss="modal">Cancelar</button>
                     </div>
                 </form>
             </div>
@@ -72,31 +89,82 @@
 </div>
 
 <style>
-.news-drop-zone {
-    border: 2px dashed var(--bs-gray-300);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+/* Colores y Estilos del Modal */
+.bg-card { background: #ffffff; }
+[data-bs-theme="dark"] .bg-card { background: #1a1d21; }
+
+.modern-input-group {
     background: var(--bs-gray-100);
+    border: 1px solid var(--bs-gray-200);
+    border-radius: 12px;
+    transition: all 0.2s ease;
 }
-.news-drop-zone:hover, .news-drop-zone.dragover {
+[data-bs-theme="dark"] .modern-input-group {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.modern-input-group:focus-within {
+    background: #fff;
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.1);
+}
+[data-bs-theme="dark"] .modern-input-group:focus-within { background: rgba(255, 255, 255, 0.08); }
+
+.modern-input-group .form-control:focus { box-shadow: none; border: none; }
+.modern-input-group .form-control { color: inherit; }
+
+/* Zona de Carga Modernizada */
+.news-drop-zone-modern {
+    border: 2px dashed var(--bs-gray-300);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--bs-gray-100);
+    overflow: hidden;
+}
+[data-bs-theme="dark"] .news-drop-zone-modern {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+}
+.news-drop-zone-modern:hover, .news-drop-zone-modern.dragover {
     border-color: var(--bs-primary);
     background: rgba(59, 130, 246, 0.05);
+    transform: scale(1.01);
 }
-.news-crop-zone {
-    border: 1px solid var(--bs-gray-300);
-    border-radius: 12px;
-    padding: 12px;
-    background: var(--bs-gray-100);
+
+.upload-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    background: #fff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
-.news-crop-viewport {
+[data-bs-theme="dark"] .upload-icon-wrapper { background: rgba(255, 255, 255, 0.1); }
+
+/* Cropper Modernizado */
+.news-crop-zone-modern {
+    border: 1px solid var(--bs-gray-200);
+    border-radius: 16px;
+    padding: 16px;
+    background: #fff;
+}
+[data-bs-theme="dark"] .news-crop-zone-modern {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.news-crop-viewport-modern {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 220px;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;
     background: #000;
 }
+
 .news-crop-frame {
     position: absolute;
     top: 0;
@@ -105,15 +173,17 @@
     height: 100%;
     cursor: grab;
 }
-.news-crop-frame:active {
-    cursor: grabbing;
-}
+.news-crop-frame:active { cursor: grabbing; }
+
 .news-crop-frame img {
     position: absolute;
     max-width: none;
     user-select: none;
     -webkit-user-drag: none;
 }
+
+.hover-lift { transition: transform 0.2s ease; }
+.hover-lift:hover { transform: translateY(-3px); }
 </style>
 
 <script>

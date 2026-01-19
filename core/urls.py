@@ -181,4 +181,10 @@ urlpatterns = [
         views.player_public_profile,
         name="player_public_profile",
     ),
+    # 🔌 API - Jugadores por categoría
+    path(
+        "api/jugadores-por-categoria/",
+        views_api.get_players_by_category,
+        name="api_players_by_category",
+    ),
 ]
