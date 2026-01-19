@@ -1030,6 +1030,10 @@ class JugadorForm(forms.ModelForm):
 
 
 class NoticiaForm(forms.ModelForm):
+    imagen_pos_x = forms.IntegerField(widget=forms.HiddenInput(), initial=50, required=False)
+    imagen_pos_y = forms.IntegerField(widget=forms.HiddenInput(), initial=50, required=False)
+
     class Meta:
         model = Noticia
-        fields = ["titulo", "cuerpo", "imagen"]
+        fields = ["titulo", "cuerpo", "imagen", "imagen_pos_x", "imagen_pos_y"]
+

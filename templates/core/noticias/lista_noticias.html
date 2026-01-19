@@ -27,10 +27,7 @@
                         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card">
                             {% if noticia.imagen %}
                                 <div style="height: 180px; overflow: hidden;">
-                                    <img src="{{ noticia.imagen.url }}"
-                                         class="w-100 h-100"
-                                         style="object-fit: cover"
-                                         alt="{{ noticia.titulo }}">
+                                    <img src="{{ noticia.imagen.url }}" class="w-100 h-100" style="object-fit: cover; object-position: {{ noticia.imagen_position }}" alt="{{ noticia.titulo }}">
                                 </div>
                             {% else %}
                                 <div class="bg-light d-flex align-items-center justify-content-center"
@@ -38,7 +35,7 @@
                                     <i class="ti ti-news fs-1 text-muted opacity-25"></i>
                                 </div>
                             {% endif %}
-                            <div class="card-body p-4">
+                            <div class="card-body p-4 d-flex flex-column">
                                 <div class="d-flex align-items-center gap-2 mb-3 text-muted small">
                                     <i class="ti ti-calendar"></i> {{ noticia.fecha_publicacion|date:"d M, Y" }}
                                     <span class="mx-1">•</span>
@@ -46,20 +43,16 @@
                                 </div>
                                 <h5 class="fw-bold mb-3">{{ noticia.titulo }}</h5>
                                 <p class="text-muted small mb-4">{{ noticia.cuerpo|truncatewords:20 }}</p>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-grow-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editNoticiaModal{{ noticia.id }}">
-                                        <i class="ti ti-edit me-1"></i>Editar
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold flex-grow-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#deleteNoticiaModal{{ noticia.id }}">
-                                        <i class="ti ti-trash me-1"></i>Eliminar
-                                    </button>
-                                    <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold flex-grow-1 w-100 mt-1"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#previewModal{{ noticia.id }}">
+                                <div class="mt-auto">
+                                    <div class="d-flex gap-2 mb-2">
+                                        <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-fill" data-bs-toggle="modal" data-bs-target="#editNoticiaModal{{ noticia.id }}">
+                                            <i class="ti ti-edit me-1"></i>Editar
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold flex-fill" data-bs-toggle="modal" data-bs-target="#deleteNoticiaModal{{ noticia.id }}">
+                                            <i class="ti ti-trash me-1"></i>Eliminar
+                                        </button>
+                                    </div>
+                                    <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold w-100" data-bs-toggle="modal" data-bs-target="#previewModal{{ noticia.id }}">
                                         <i class="ti ti-eye me-1"></i>Vista previa
                                     </button>
                                 </div>
@@ -67,83 +60,70 @@
                         </div>
                     </div>
                     <!-- Modal Editar Noticia -->
-                    <div class="modal fade"
-                         id="editNoticiaModal{{ noticia.id }}"
-                         tabindex="-1"
-                         aria-hidden="true">
+                    <div class="modal fade" id="editNoticiaModal{{ noticia.id }}" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-lg modal-dialog-centered">
                             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                                 <div class="modal-header bg-primary py-3">
-                                    <h5 class="modal-title fw-bold text-white">
-                                        <i class="ti ti-edit me-2"></i>Editar Noticia
-                                    </h5>
-                                    <button type="button"
-                                            class="btn-close btn-close-white"
-                                            data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
+                                    <h5 class="modal-title fw-bold text-white"><i class="ti ti-edit me-2"></i>Editar Noticia</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <div class="modal-body p-4 p-md-5">
-                                    <form action="{% url 'core:admin_edit_noticia' noticia.id %}"
-                                          method="POST"
-                                          enctype="multipart/form-data"
-                                          class="modern-form">
+                                <div class="modal-body p-4">
+                                    <form action="{% url 'core:admin_edit_noticia' noticia.id %}" method="POST" enctype="multipart/form-data" id="editNoticiaForm{{ noticia.id }}">
                                         {% csrf_token %}
-                                        <div class="mb-4">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título</label>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Título</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0"><i class="ti ti-type"></i></span>
-                                                <input type="text"
-                                                       name="titulo"
-                                                       class="form-control bg-light border-start-0"
-                                                       value="{{ noticia.titulo }}"
-                                                       required>
+                                                <input type="text" name="titulo" class="form-control bg-light border-start-0" value="{{ noticia.titulo }}" required>
                                             </div>
                                         </div>
-                                        <div class="mb-4">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Contenido</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="ti ti-align-left"></i></span>
-                                                <textarea name="cuerpo"
-                                                          rows="8"
-                                                          class="form-control bg-light border-start-0"
-                                                          required>{{ noticia.cuerpo }}</textarea>
+                                                <textarea name="cuerpo" rows="6" class="form-control bg-light border-start-0" required>{{ noticia.cuerpo }}</textarea>
                                             </div>
                                         </div>
-                                        <div class="mb-4">
-                                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen</label>
-                                            <div class="image-upload-wrapper">
-                                                <div class="image-drop-zone has-image"
-                                                     onclick="document.getElementById('edit-image-{{ noticia.id }}').click()">
-                                                    <input type="file"
-                                                           name="imagen"
-                                                           id="edit-image-{{ noticia.id }}"
-                                                           class="d-none"
-                                                           accept="image/*"
-                                                           onchange="previewImageModal(this, 'edit-preview-{{ noticia.id }}', 'edit-overlay-{{ noticia.id }}')">
-                                                    <div class="text-center p-4">
-                                                        <div class="upload-icon mb-3">
-                                                            <i class="ti ti-cloud-upload fs-1 text-primary"></i>
-                                                        </div>
-                                                        <div class="upload-text">
-                                                            <p class="fw-bold mb-1">Cambiar imagen</p>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold text-muted small text-uppercase mb-1">Imagen</label>
+                                            <input type="hidden" name="imagen_pos_x" id="edit-pos-x-{{ noticia.id }}" value="{{ noticia.imagen_pos_x }}">
+                                            <input type="hidden" name="imagen_pos_y" id="edit-pos-y-{{ noticia.id }}" value="{{ noticia.imagen_pos_y }}">
+                                            <div class="image-crop-edit-container" id="crop-container-{{ noticia.id }}">
+                                                {% if noticia.imagen %}
+                                                <!-- Si ya tiene imagen, mostrar el cropper directamente -->
+                                                <div class="image-crop-zone">
+                                                    <div class="crop-header d-flex justify-content-between align-items-center mb-2">
+                                                        <span class="small text-muted"><i class="ti ti-hand-grab me-1"></i>Arrastra para enmarcar</span>
+                                                        <label class="btn btn-sm btn-outline-secondary rounded-pill px-3 mb-0" style="cursor: pointer;">
+                                                            <i class="ti ti-refresh me-1"></i>Cambiar
+                                                            <input type="file" name="imagen" id="edit-file-{{ noticia.id }}" accept="image/*" class="d-none" onchange="handleEditImageChange(this, {{ noticia.id }})">
+                                                        </label>
+                                                    </div>
+                                                    <div class="crop-viewport" id="viewport-{{ noticia.id }}">
+                                                        <div class="crop-frame" id="frame-{{ noticia.id }}">
+                                                            <img id="edit-preview-{{ noticia.id }}" src="{{ noticia.imagen.url }}" alt="Vista previa" draggable="false">
                                                         </div>
                                                     </div>
-                                                    <div id="edit-overlay-{{ noticia.id }}" class="image-preview-overlay">
-                                                        <img id="edit-preview-{{ noticia.id }}"
-                                                             src="{{ noticia.imagen.url }}"
-                                                             alt="Vista previa">
+                                                    <div class="crop-hint text-center mt-2">
+                                                        <small class="text-muted">Esta es la parte visible de la imagen</small>
                                                     </div>
                                                 </div>
+                                                {% else %}
+                                                <!-- Si no tiene imagen, mostrar dropzone -->
+                                                <div class="image-drop-zone" id="dropzone-{{ noticia.id }}" onclick="document.getElementById('edit-file-{{ noticia.id }}').click()">
+                                                    <input type="file" name="imagen" id="edit-file-{{ noticia.id }}" accept="image/*" class="d-none" onchange="handleEditImageChange(this, {{ noticia.id }})">
+                                                    <div class="text-center p-4">
+                                                        <i class="ti ti-cloud-upload fs-1 text-primary mb-2"></i>
+                                                        <p class="fw-bold mb-1">Arrastra una imagen aquí</p>
+                                                        <p class="text-muted small mb-0">o haz clic para seleccionar</p>
+                                                    </div>
+                                                </div>
+                                                {% endif %}
                                             </div>
                                         </div>
-                                        <div class="d-grid gap-2 mt-5">
-                                            <button type="submit"
-                                                    class="btn btn-primary btn-lg rounded-pill fw-bold shadow">
-                                                <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-light btn-lg rounded-pill fw-bold text-muted"
-                                                    data-bs-dismiss="modal">Cancelar</button>
+                                        <div class="d-grid gap-2 mt-4">
+                                            <button type="submit" class="btn btn-primary rounded-pill fw-bold py-2"><i class="ti ti-device-floppy me-2"></i>Guardar Cambios</button>
+                                            <button type="button" class="btn btn-light rounded-pill fw-bold text-muted" data-bs-dismiss="modal">Cancelar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -363,5 +343,162 @@
             previewImageModal(input, zone.querySelector('img').id, zone.querySelector('.image-preview-overlay').id);
         }, false);
     });
+
+    // ===== CROPPER PARA EDICIÓN =====
+    function handleEditImageChange(input, noticiaId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('edit-preview-' + noticiaId);
+                preview.src = e.target.result;
+                preview.onload = function() {
+                    initCropper(noticiaId);
+                };
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function initCropper(noticiaId) {
+        const frame = document.getElementById('frame-' + noticiaId);
+        const preview = document.getElementById('edit-preview-' + noticiaId);
+        const posXInput = document.getElementById('edit-pos-x-' + noticiaId);
+        const posYInput = document.getElementById('edit-pos-y-' + noticiaId);
+        
+        if (!frame || !preview) return;
+
+        const frameWidth = frame.offsetWidth;
+        const frameHeight = frame.offsetHeight;
+        
+        // Escalar imagen para cubrir el frame
+        const imgRatio = preview.naturalWidth / preview.naturalHeight;
+        const frameRatio = frameWidth / frameHeight;
+        
+        let imgWidth, imgHeight;
+        if (imgRatio > frameRatio) {
+            imgHeight = frameHeight;
+            imgWidth = imgHeight * imgRatio;
+        } else {
+            imgWidth = frameWidth;
+            imgHeight = imgWidth / imgRatio;
+        }
+        
+        preview.style.width = imgWidth + 'px';
+        preview.style.height = imgHeight + 'px';
+        
+        // Posicionar según valores guardados
+        const savedPctX = parseInt(posXInput.value) || 50;
+        const savedPctY = parseInt(posYInput.value) || 50;
+        
+        let imgX = -(savedPctX / 100 * imgWidth - frameWidth / 2);
+        let imgY = -(savedPctY / 100 * imgHeight - frameHeight / 2);
+        
+        // Limitar posición
+        const minX = frameWidth - imgWidth;
+        const minY = frameHeight - imgHeight;
+        imgX = Math.max(minX, Math.min(0, imgX));
+        imgY = Math.max(minY, Math.min(0, imgY));
+        
+        preview.style.left = imgX + 'px';
+        preview.style.top = imgY + 'px';
+
+        // Drag functionality
+        let isDragging = false;
+        let startX, startY, currentImgX = imgX, currentImgY = imgY;
+
+        frame.onmousedown = function(e) {
+            isDragging = true;
+            startX = e.clientX - currentImgX;
+            startY = e.clientY - currentImgY;
+            e.preventDefault();
+        };
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            
+            let newX = e.clientX - startX;
+            let newY = e.clientY - startY;
+            
+            newX = Math.max(minX, Math.min(0, newX));
+            newY = Math.max(minY, Math.min(0, newY));
+            
+            currentImgX = newX;
+            currentImgY = newY;
+            preview.style.left = newX + 'px';
+            preview.style.top = newY + 'px';
+            
+            // Actualizar valores de posición
+            const centerX = -newX + frameWidth / 2;
+            const centerY = -newY + frameHeight / 2;
+            posXInput.value = Math.max(0, Math.min(100, Math.round((centerX / imgWidth) * 100)));
+            posYInput.value = Math.max(0, Math.min(100, Math.round((centerY / imgHeight) * 100)));
+        });
+
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+    }
+
+    // Inicializar croppers cuando se abren los modales
+    document.querySelectorAll('[id^="editNoticiaModal"]').forEach(modal => {
+        modal.addEventListener('shown.bs.modal', function() {
+            const noticiaId = this.id.replace('editNoticiaModal', '');
+            const preview = document.getElementById('edit-preview-' + noticiaId);
+            if (preview && preview.src) {
+                if (preview.complete) {
+                    initCropper(noticiaId);
+                } else {
+                    preview.onload = function() {
+                        initCropper(noticiaId);
+                    };
+                }
+            }
+        });
+    });
     </script>
+    <style>
+    .image-crop-zone {
+        border: 1px solid var(--bs-gray-300);
+        border-radius: 12px;
+        padding: 12px;
+        background: var(--bs-gray-100);
+    }
+    .crop-viewport {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #000;
+    }
+    .crop-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+    }
+    .crop-frame:active {
+        cursor: grabbing;
+    }
+    .crop-frame img {
+        position: absolute;
+        max-width: none;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+    .image-drop-zone {
+        border: 2px dashed var(--bs-gray-300);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: var(--bs-gray-100);
+    }
+    .image-drop-zone:hover {
+        border-color: var(--bs-primary);
+        background: rgba(59, 130, 246, 0.05);
+    }
+    </style>
 {% endblock %}
+

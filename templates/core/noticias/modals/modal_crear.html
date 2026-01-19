@@ -1,123 +1,240 @@
 {% load static %}
 <!-- Modal Crear Noticia (Shared) -->
-<div class="modal fade"
-     id="createNoticiaModal"
-     tabindex="-1"
-     aria-hidden="true">
+<div class="modal fade" id="createNoticiaModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="modal-header bg-primary py-3">
                 <h5 class="modal-title fw-bold text-white">
                     <i class="ti ti-plus me-2"></i>Nueva Noticia
                 </h5>
-                <button type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body p-4 p-md-5">
-                <form action="{% url 'core:admin_create_noticia' %}"
-                      method="POST"
-                      enctype="multipart/form-data"
-                      class="modern-form">
+            <div class="modal-body p-4">
+                <form action="{% url 'core:admin_create_noticia' %}" method="POST" enctype="multipart/form-data" id="noticiaFormModal">
                     {% csrf_token %}
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título</label>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-1">Título</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="ti ti-type"></i></span>
-                            {{ form.titulo }}
+                            <input type="text" name="titulo" class="form-control bg-light border-start-0" placeholder="Título de la noticia" required>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-1">Contenido</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="ti ti-align-left"></i></span>
-                            {{ form.cuerpo }}
+                            <textarea name="cuerpo" class="form-control bg-light border-start-0" rows="5" placeholder="Escribe el contenido de la noticia..." required></textarea>
                         </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen</label>
-                        <div class="image-upload-wrapper">
-                            <div id="news-drop-zone-modal"
-                                 class="image-drop-zone"
-                                 onclick="this.querySelector('input[type=file]').click()">
-                                <div class="d-none">{{ form.imagen }}</div>
-                                <div class="text-center p-4">
-                                    <div class="upload-icon mb-3">
-                                        <i class="ti ti-cloud-upload fs-1 text-primary"></i>
-                                    </div>
-                                    <div class="upload-text">
-                                        <p class="fw-bold mb-1">Arrastra una imagen aquí</p>
-                                        <p class="text-muted small mb-0">o haz clic para seleccionar</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-1">Imagen</label>
+                        <input type="hidden" id="news-pos-x-modal" name="imagen_pos_x" value="50">
+                        <input type="hidden" id="news-pos-y-modal" name="imagen_pos_y" value="50">
+                        <div class="image-crop-container">
+                            <!-- Zona de Drop -->
+                            <div id="news-drop-zone-modal" class="news-drop-zone" onclick="document.getElementById('news-file-input-modal').click()">
+                                <input type="file" id="news-file-input-modal" name="imagen" accept="image/*" class="d-none">
+                                <div class="upload-placeholder text-center p-4">
+                                    <i class="ti ti-cloud-upload fs-1 text-primary mb-2"></i>
+                                    <p class="fw-bold mb-1">Arrastra una imagen aquí</p>
+                                    <p class="text-muted small mb-0">o haz clic para seleccionar</p>
+                                </div>
+                            </div>
+                            <!-- Zona de Recorte -->
+                            <div id="news-crop-zone-modal" class="news-crop-zone d-none">
+                                <div class="crop-header d-flex justify-content-between align-items-center mb-2">
+                                    <span class="small text-muted"><i class="ti ti-hand-grab me-1"></i>Arrastra para enmarcar</span>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="resetNewsImageModal()">
+                                        <i class="ti ti-refresh me-1"></i>Cambiar
+                                    </button>
+                                </div>
+                                <div class="news-crop-viewport">
+                                    <div class="news-crop-frame" id="news-crop-frame-modal">
+                                        <img id="news-preview-modal" src="" alt="Vista previa" draggable="false">
                                     </div>
                                 </div>
-                                <div id="news-overlay-modal" class="image-preview-overlay d-none">
-                                    <img id="news-preview-modal" src="" alt="Vista previa">
-                                    <div class="preview-actions">
-                                        <span class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold">
-                                            <i class="ti ti-refresh me-2"></i>Cambiar Foto
-                                        </span>
-                                    </div>
+                                <div class="crop-hint text-center mt-2">
+                                    <small class="text-muted">Esta es la parte visible de la imagen</small>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="d-grid gap-2 mt-5">
-                        <button type="submit"
-                                class="btn btn-primary btn-lg rounded-pill fw-bold shadow">
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary rounded-pill fw-bold py-2">
                             <i class="ti ti-check me-2"></i>Publicar Noticia
                         </button>
-                        <button type="button"
-                                class="btn btn-light btn-lg rounded-pill fw-bold text-muted"
-                                data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-light rounded-pill fw-bold text-muted" data-bs-dismiss="modal">Cancelar</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.news-drop-zone {
+    border: 2px dashed var(--bs-gray-300);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--bs-gray-100);
+}
+.news-drop-zone:hover, .news-drop-zone.dragover {
+    border-color: var(--bs-primary);
+    background: rgba(59, 130, 246, 0.05);
+}
+.news-crop-zone {
+    border: 1px solid var(--bs-gray-300);
+    border-radius: 12px;
+    padding: 12px;
+    background: var(--bs-gray-100);
+}
+.news-crop-viewport {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #000;
+}
+.news-crop-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+}
+.news-crop-frame:active {
+    cursor: grabbing;
+}
+.news-crop-frame img {
+    position: absolute;
+    max-width: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+</style>
+
 <script>
-    (function () {
-        const dropZone = document.getElementById('news-drop-zone-modal');
-        if (!dropZone) return;
+(function() {
+    const dropZone = document.getElementById('news-drop-zone-modal');
+    const cropZone = document.getElementById('news-crop-zone-modal');
+    const fileInput = document.getElementById('news-file-input-modal');
+    const preview = document.getElementById('news-preview-modal');
+    const posXInput = document.getElementById('news-pos-x-modal');
+    const posYInput = document.getElementById('news-pos-y-modal');
+    const cropFrame = document.getElementById('news-crop-frame-modal');
+    
+    if (!dropZone || !cropFrame) return;
 
-        const fileInput = dropZone.querySelector('input[type="file"]');
-        const preview = document.getElementById('news-preview-modal');
-        const overlay = document.getElementById('news-overlay-modal');
+    let isDragging = false;
+    let startX, startY, imgX = 0, imgY = 0;
+    let imgWidth, imgHeight, frameWidth, frameHeight;
 
-        fileInput.addEventListener('change', function () {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    overlay.classList.remove('d-none');
-                    dropZone.classList.add('has-image');
-                }
-                reader.readAsDataURL(this.files[0]);
-            }
-        });
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.onload = function() {
+                    setupCropperModal();
+                };
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, e => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, false);
-        });
+    function setupCropperModal() {
+        dropZone.classList.add('d-none');
+        cropZone.classList.remove('d-none');
+        
+        frameWidth = cropFrame.offsetWidth;
+        frameHeight = cropFrame.offsetHeight;
+        
+        const imgRatio = preview.naturalWidth / preview.naturalHeight;
+        const frameRatio = frameWidth / frameHeight;
+        
+        if (imgRatio > frameRatio) {
+            imgHeight = frameHeight;
+            imgWidth = imgHeight * imgRatio;
+        } else {
+            imgWidth = frameWidth;
+            imgHeight = imgWidth / imgRatio;
+        }
+        
+        preview.style.width = imgWidth + 'px';
+        preview.style.height = imgHeight + 'px';
+        
+        imgX = (frameWidth - imgWidth) / 2;
+        imgY = (frameHeight - imgHeight) / 2;
+        updatePositionModal();
+    }
 
-        zoneEvents = ['dragenter', 'dragover'];
-        zoneEvents.forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-        });
+    function updatePositionModal() {
+        preview.style.left = imgX + 'px';
+        preview.style.top = imgY + 'px';
+        
+        const centerX = -imgX + frameWidth / 2;
+        const centerY = -imgY + frameHeight / 2;
+        posXInput.value = Math.max(0, Math.min(100, Math.round((centerX / imgWidth) * 100)));
+        posYInput.value = Math.max(0, Math.min(100, Math.round((centerY / imgHeight) * 100)));
+    }
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-        });
+    cropFrame.addEventListener('mousedown', function(e) {
+        isDragging = true;
+        startX = e.clientX - imgX;
+        startY = e.clientY - imgY;
+        e.preventDefault();
+    });
 
-        dropZone.addEventListener('drop', e => {
-            if (e.dataTransfer.files.length > 0) {
-                fileInput.files = e.dataTransfer.files;
-                fileInput.dispatchEvent(new Event('change'));
-            }
+    document.addEventListener('mousemove', function(e) {
+        if (!isDragging) return;
+        
+        const minX = frameWidth - imgWidth;
+        const minY = frameHeight - imgHeight;
+        
+        imgX = Math.max(minX, Math.min(0, e.clientX - startX));
+        imgY = Math.max(minY, Math.min(0, e.clientY - startY));
+        
+        updatePositionModal();
+    });
+
+    document.addEventListener('mouseup', function() {
+        isDragging = false;
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
         }, false);
-    })();
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', e => {
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    }, false);
+
+    window.resetNewsImageModal = function() {
+        fileInput.value = '';
+        preview.src = '';
+        cropZone.classList.add('d-none');
+        dropZone.classList.remove('d-none');
+        posXInput.value = 50;
+        posYInput.value = 50;
+        imgX = 0;
+        imgY = 0;
+    };
+})();
 </script>

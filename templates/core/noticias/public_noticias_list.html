@@ -16,9 +16,7 @@
                         <article class="card h-100 border-0 shadow-lg overflow-hidden card-noticia">
                             {% if noticia.imagen %}
                                 <div class="noticia-img-wrapper">
-                                    <img src="{{ noticia.imagen.url }}"
-                                         class="card-img-top noticia-img"
-                                         alt="{{ noticia.titulo }}">
+                                    <img src="{{ noticia.imagen.url }}" class="card-img-top noticia-img" alt="{{ noticia.titulo }}" style="object-position: {{ noticia.imagen_position }}">
                                 </div>
                             {% else %}
                                 <div class="noticia-img-placeholder d-flex align-items-center justify-content-center bg-light text-muted">
@@ -60,11 +58,7 @@
                                 <div class="modal-body p-0">
                                     {% if noticia.imagen %}
                                         <div class="modal-hero-wrapper">
-                                            <img src="{{ noticia.imagen.url }}"
-                                                 class="w-100"
-                                                 alt="{{ noticia.titulo }}"
-                                                 style="height: 400px;
-                                                        object-fit: cover">
+                                            <img src="{{ noticia.imagen.url }}" class="w-100" alt="{{ noticia.titulo }}" style="height: 400px; object-fit: cover; object-position: {{ noticia.imagen_position }}">
                                             <div class="modal-hero-overlay"></div>
                                         </div>
                                     {% endif %}

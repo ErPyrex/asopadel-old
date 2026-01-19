@@ -174,11 +174,35 @@ def admin_create_court(request):
 @user_passes_test(is_admin)
 def admin_edit_court(request, cancha_id):
     cancha = get_object_or_404(Cancha, id=cancha_id)
-    form = CanchaForm(request.POST or None, request.FILES or None, instance=cancha)
-    if form.is_valid():
-        form.save()
+    if request.method == "POST":
+        # Manejar datos del modal o del formulario
+        cancha.nombre = request.POST.get("nombre", cancha.nombre)
+        cancha.estado = request.POST.get("estado", cancha.estado)
+        cancha.ubicacion = request.POST.get("ubicacion", cancha.ubicacion)
+        cancha.descripcion = request.POST.get("descripcion", cancha.descripcion)
+        
+        # Precio
+        precio = request.POST.get("precio_hora")
+        if precio:
+            cancha.precio_hora = float(precio)
+        
+        # Horarios
+        apertura = request.POST.get("horario_apertura")
+        cierre = request.POST.get("horario_cierre")
+        if apertura:
+            cancha.horario_apertura = apertura
+        if cierre:
+            cancha.horario_cierre = cierre
+        
+        # Imagen
+        if request.FILES.get("imagen"):
+            cancha.imagen = request.FILES.get("imagen")
+        
+        cancha.save()
         messages.success(request, "Cancha actualizada exitosamente.")
         return redirect("core:admin_canchas_list")
+    
+    form = CanchaForm(instance=cancha)
     return render(
         request, "core/canchas/crear_cancha.html", {"form": form, "cancha": cancha}
     )
@@ -747,13 +771,28 @@ def admin_noticias_list(request):
 @login_required
 @user_passes_test(is_admin)
 def admin_create_noticia(request):
-    form = NoticiaForm(request.POST or None, request.FILES or None, prefix="news")
-    if form.is_valid():
-        noticia = form.save(commit=False)
-        noticia.autor = request.user
-        noticia.save()
-        messages.success(request, "Noticia publicada exitosamente.")
-        return redirect("core:admin_noticias_list")
+    if request.method == "POST":
+        # Intentar con prefijo primero, luego sin prefijo (del modal)
+        titulo = request.POST.get("news-titulo") or request.POST.get("titulo")
+        cuerpo = request.POST.get("news-cuerpo") or request.POST.get("cuerpo")
+        imagen = request.FILES.get("news-imagen") or request.FILES.get("imagen")
+        pos_x = request.POST.get("news-imagen_pos_x") or request.POST.get("imagen_pos_x") or 50
+        pos_y = request.POST.get("news-imagen_pos_y") or request.POST.get("imagen_pos_y") or 50
+        
+        if titulo and cuerpo:
+            noticia = Noticia(
+                titulo=titulo,
+                cuerpo=cuerpo,
+                imagen=imagen,
+                imagen_pos_x=int(pos_x),
+                imagen_pos_y=int(pos_y),
+                autor=request.user
+            )
+            noticia.save()
+            messages.success(request, "Noticia publicada exitosamente.")
+            return redirect("core:admin_noticias_list")
+    
+    form = NoticiaForm(prefix="news")
     return render(request, "core/noticias/crear_noticia.html", {"form": form})
 
 
@@ -761,11 +800,25 @@ def admin_create_noticia(request):
 @user_passes_test(is_admin)
 def admin_edit_noticia(request, noticia_id):
     noticia = get_object_or_404(Noticia, id=noticia_id)
-    form = NoticiaForm(request.POST or None, request.FILES or None, instance=noticia)
-    if form.is_valid():
-        form.save()
+    if request.method == "POST":
+        noticia.titulo = request.POST.get("titulo", noticia.titulo)
+        noticia.cuerpo = request.POST.get("cuerpo", noticia.cuerpo)
+        
+        # Manejar posición de imagen
+        if request.POST.get("imagen_pos_x"):
+            noticia.imagen_pos_x = int(request.POST.get("imagen_pos_x", 50))
+        if request.POST.get("imagen_pos_y"):
+            noticia.imagen_pos_y = int(request.POST.get("imagen_pos_y", 50))
+        
+        # Manejar imagen
+        if request.FILES.get("imagen"):
+            noticia.imagen = request.FILES.get("imagen")
+        
+        noticia.save()
         messages.success(request, "Noticia actualizada exitosamente.")
         return redirect("core:admin_noticias_list")
+    
+    form = NoticiaForm(instance=noticia)
     return render(
         request, "core/noticias/crear_noticia.html", {"form": form, "noticia": noticia}
     )
@@ -785,9 +838,7 @@ def admin_delete_noticia(request, noticia_id):
 
 
 def home(request):
-    noticias = Noticia.objects.order_by("-fecha_publicacion")[
-        :1
-    ]  # solo la más reciente
+    noticias = Noticia.objects.order_by("-fecha_publicacion", "-id")[:1]  # la más reciente
     canchas = Cancha.objects.all()
     torneos = Torneo.objects.order_by("-fecha_inicio")[
         :5

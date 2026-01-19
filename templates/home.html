@@ -134,11 +134,7 @@
                                 <div class="row g-0">
                                     {% if noticia.imagen %}
                                         <div class="col-md-4">
-                                            <img src="{{ noticia.imagen.url }}"
-                                                 class="img-fluid h-100"
-                                                 alt="{{ noticia.titulo }}"
-                                                 style="object-fit: cover;
-                                                        min-height: 200px">
+                                            <img src="{{ noticia.imagen.url }}" class="img-fluid h-100" alt="{{ noticia.titulo }}" style="object-fit: cover; object-position: {{ noticia.imagen_position }}; min-height: 200px">
                                         </div>
                                     {% endif %}
                                     <div class="{% if noticia.imagen %}col-md-8{% else %}col-12{% endif %} p-4 p-md-5 d-flex flex-column justify-content-center">
@@ -170,11 +166,7 @@
                                     <div class="modal-body p-0">
                                         {% if noticia.imagen %}
                                             <div class="modal-hero-wrapper-home">
-                                                <img src="{{ noticia.imagen.url }}"
-                                                     class="w-100"
-                                                     alt="{{ noticia.titulo }}"
-                                                     style="height: 400px;
-                                                            object-fit: cover">
+                                                <img src="{{ noticia.imagen.url }}" class="w-100" alt="{{ noticia.titulo }}" style="height: 400px; object-fit: cover; object-position: {{ noticia.imagen_position }}">
                                             </div>
                                         {% endif %}
                                         <div class="p-4 p-md-5">
