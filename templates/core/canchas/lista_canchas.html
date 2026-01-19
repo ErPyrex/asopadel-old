@@ -20,15 +20,15 @@
             </div>
         </div>
         <!-- Filtros Rápidos -->
-        <div class="d-flex gap-2 mb-4 overflow-auto pb-2">
-            <button class="btn btn-light rounded-pill px-4 fw-bold active border shadow-sm">Todas</button>
-            <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Disponibles</button>
-            <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm">Mantenimiento</button>
+        <div class="d-flex gap-2 mb-4 overflow-auto pb-2" id="court-filters">
+            <button class="btn btn-light rounded-pill px-4 fw-bold active border shadow-sm filter-btn" data-filter="all">Todas</button>
+            <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm filter-btn" data-filter="disponible">Disponibles</button>
+            <button class="btn btn-light rounded-pill px-4 fw-bold border shadow-sm filter-btn" data-filter="mantenimiento">Mantenimiento</button>
         </div>
         <!-- Lista de canchas -->
-        <div class="row g-4">
+        <div class="row g-4" id="courts-container">
             {% for cancha in canchas %}
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 court-card" data-status="{{ cancha.estado }}">
                     <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card transition-hover">
                         <!-- Imagen con Badge de Estado -->
                         <div class="position-relative" style="height: 200px;">
@@ -214,4 +214,24 @@
         font-size: 5rem;
     }
     </style>
+    <script>
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Cambiar botón activo
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            
+            // Filtrar tarjetas
+            document.querySelectorAll('.court-card').forEach(card => {
+                if (filter === 'all' || card.dataset.status === filter) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+    </script>
 {% endblock %}
