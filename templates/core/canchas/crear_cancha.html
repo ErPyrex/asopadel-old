@@ -1,185 +1,185 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-  {% if cancha %}
-    Editar Cancha - {{ cancha.nombre }}
-  {% else %}
-    Nueva Cancha
-  {% endif %}
-  - ASOPADEL
+    {% if cancha %}
+        Editar Cancha - {{ cancha.nombre }}
+    {% else %}
+        Nueva Cancha
+    {% endif %}
+    - ASOPADEL
 {% endblock %}
 {% block content %}
-  <div class="container-fluid px-lg-5 py-4">
-    <nav aria-label="breadcrumb" class="mb-4">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a href="{% url 'core:admin_dashboard' %}"
-             class="text-decoration-none text-muted small">Panel</a>
-        </li>
-        <li class="breadcrumb-item">
-          <a href="{% url 'core:admin_canchas_list' %}"
-             class="text-decoration-none text-muted small">Canchas</a>
-        </li>
-        <li class="breadcrumb-item active fw-bold text-primary small"
-            aria-current="page">
-          {% if cancha %}
-            Editar{%
-            else %}Nueva
-          {% endif %}
-        </li>
-      </ol>
-    </nav>
-    <div class="row justify-content-center">
-      <div class="col-lg-11 col-xl-10">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="row g-0">
-            <div class="col-lg-4 bg-primary p-5 text-white d-none d-lg-flex flex-column justify-content-between">
-              <div>
-                <div class="bg-white bg-opacity-25 rounded-3 p-3 d-inline-block mb-4">
-                  <i class="ti ti-ball-tennis fs-1"></i>
-                </div>
-                <h2 class="display-6 fw-bold mb-3">
-                  {% if cancha %}
-                    Actualizar
-                  {% else %}
-                    Registrar
-                  {% endif %}
-                </h2>
-                <p class="opacity-75 fs-5">Configura los detalles técnicos de tus instalaciones.</p>
-              </div>
-              <div class="mt-auto opacity-50 small">ASOPADEL Facilities v2.0</div>
-            </div>
-            <div class="col-lg-8 p-4 p-md-5 bg-card">
-              {% if form.errors %}
-                <div class="alert alert-danger rounded-4 border-0 mb-4 small">
-                  <strong>Corrija los siguientes errores:</strong>
-                  <ul class="mb-0">
-                    {% for field, errors in form.errors.items %}
-                      {% for error in errors %}
-                        <li>
-                          {{
-                          error }}
-                        </li>
-                      {% endfor %}
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
-              <form method="POST" enctype="multipart/form-data" class="modern-form">
-                {% csrf_token %}
-                <div class="row g-4">
-                  <div class="col-md-7">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="ti ti-id-badge-2"></i></span>
-                      {{ form.nombre }}
-                    </div>
-                  </div>
-                  <div class="col-md-5">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Estado</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="ti ti-activity"></i></span>
-                      {{ form.estado }}
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ubicación</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="ti ti-map-pin"></i></span>
-                      {{ form.ubicacion }}
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">
-                      Precio /
-                      Hora
-                    </label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="ti ti-currency-dollar"></i></span>
-                      {{ form.precio_hora }}
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apertura</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="ti ti-clock"></i></span>
-                      {{ form.horario_apertura }}
-                    </div>
-                  </div>
-                  <div class="col-md-4">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cierre</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0"><i class="ti ti-clock-pause"></i></span>
-                      {{ form.horario_cierre }}
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="ti ti-align-left"></i></span>
-                      {{ form.descripcion }}
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">
-                      Imagen
-                      Representativa
-                    </label>
-                    <div class="image-upload-wrapper">
-                      <div id="court-drop-zone"
-                           class="image-drop-zone {% if cancha and cancha.imagen %}has-image{% endif %}"
-                           onclick="document.getElementById('id_imagen').click()">
-                        <div class="d-none">{{ form.imagen }}</div>
-                        <div class="drop-zone-content text-center p-4">
-                          <div class="upload-icon mb-3">
-                            <i class="ti ti-camera-plus fs-1 text-primary"></i>
-                          </div>
-                          <div class="upload-text">
-                            <p class="fw-bold mb-1">
-                              {% if cancha and cancha.imagen %}
-                                Actualizar
-                                Imagen
-                              {% else %}
-                                Subir Foto
-                              {% endif %}
-                            </p>
-                            <p class="text-muted small mb-0">PDF, JPG o PNG. Tamaño máx 5MB.</p>
-                          </div>
-                        </div>
-                        <div id="court-image-overlay"
-                             class="image-preview-overlay {% if not cancha or not cancha.imagen %}d-none{% endif %}">
-                          <img id="court-preview-img"
-                               src="{% if cancha and cancha.imagen %}{{ cancha.imagen.url }}{% endif %}"
-                               alt="Vista previa">
-                          <div class="preview-actions">
-                            <span class="btn btn-primary rounded-pill px-4 fw-bold"><i class="ti ti-refresh me-2"></i>Cambiar Foto</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <hr class="my-5 opacity-10">
-                <div class="d-flex flex-column flex-md-row gap-3">
-                  <button type="submit"
-                          class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+    <div class="container-fluid px-lg-5 py-4">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'core:admin_dashboard' %}"
+                       class="text-decoration-none text-muted small">Panel</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'core:admin_canchas_list' %}"
+                       class="text-decoration-none text-muted small">Canchas</a>
+                </li>
+                <li class="breadcrumb-item active fw-bold text-primary small"
+                    aria-current="page">
                     {% if cancha %}
-                      Guardar Cambios
-                    {% else %}
-                      Registrar Cancha
+                        Editar{%
+                        else %}Nueva
                     {% endif %}
-                  </button>
-                  <a href="{% url 'core:admin_canchas_list' %}"
-                     class="btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold">Cancelar</a>
+                </li>
+            </ol>
+        </nav>
+        <div class="row justify-content-center">
+            <div class="col-lg-11 col-xl-10">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="row g-0">
+                        <div class="col-lg-4 bg-primary p-5 text-white d-none d-lg-flex flex-column justify-content-between">
+                            <div>
+                                <div class="bg-white bg-opacity-25 rounded-3 p-3 d-inline-block mb-4">
+                                    <i class="ti ti-ball-tennis fs-1"></i>
+                                </div>
+                                <h2 class="display-6 fw-bold mb-3">
+                                    {% if cancha %}
+                                        Actualizar
+                                    {% else %}
+                                        Registrar
+                                    {% endif %}
+                                </h2>
+                                <p class="opacity-75 fs-5">Configura los detalles técnicos de tus instalaciones.</p>
+                            </div>
+                            <div class="mt-auto opacity-50 small">ASOPADEL Facilities v2.0</div>
+                        </div>
+                        <div class="col-lg-8 p-4 p-md-5 bg-card">
+                            {% if form.errors %}
+                                <div class="alert alert-danger rounded-4 border-0 mb-4 small">
+                                    <strong>Corrija los siguientes errores:</strong>
+                                    <ul class="mb-0">
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <li>
+                                                    {{
+                                                    error }}
+                                                </li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            <form method="POST" enctype="multipart/form-data" class="modern-form">
+                                {% csrf_token %}
+                                <div class="row g-4">
+                                    <div class="col-md-7">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-id-badge-2"></i></span>
+                                            {{ form.nombre }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Estado</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-activity"></i></span>
+                                            {{ form.estado }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ubicación</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-map-pin"></i></span>
+                                            {{ form.ubicacion }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                            Precio /
+                                            Hora
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-currency-dollar"></i></span>
+                                            {{ form.precio_hora }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apertura</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-clock"></i></span>
+                                            {{ form.horario_apertura }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cierre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0"><i class="ti ti-clock-pause"></i></span>
+                                            {{ form.horario_cierre }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light border-end-0 align-items-start pt-2"><i class="ti ti-align-left"></i></span>
+                                            {{ form.descripcion }}
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                                            Imagen
+                                            Representativa
+                                        </label>
+                                        <div class="image-upload-wrapper">
+                                            <div id="court-drop-zone"
+                                                 class="image-drop-zone {% if cancha and cancha.imagen %}has-image{% endif %}"
+                                                 onclick="document.getElementById('id_imagen').click()">
+                                                <div class="d-none">{{ form.imagen }}</div>
+                                                <div class="drop-zone-content text-center p-4">
+                                                    <div class="upload-icon mb-3">
+                                                        <i class="ti ti-camera-plus fs-1 text-primary"></i>
+                                                    </div>
+                                                    <div class="upload-text">
+                                                        <p class="fw-bold mb-1">
+                                                            {% if cancha and cancha.imagen %}
+                                                                Actualizar
+                                                                Imagen
+                                                            {% else %}
+                                                                Subir Foto
+                                                            {% endif %}
+                                                        </p>
+                                                        <p class="text-muted small mb-0">PDF, JPG o PNG. Tamaño máx 5MB.</p>
+                                                    </div>
+                                                </div>
+                                                <div id="court-image-overlay"
+                                                     class="image-preview-overlay {% if not cancha or not cancha.imagen %}d-none{% endif %}">
+                                                    <img id="court-preview-img"
+                                                         src="{% if cancha and cancha.imagen %}{{ cancha.imagen.url }}{% endif %}"
+                                                         alt="Vista previa">
+                                                    <div class="preview-actions">
+                                                        <span class="btn btn-primary rounded-pill px-4 fw-bold"><i class="ti ti-refresh me-2"></i>Cambiar Foto</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr class="my-5 opacity-10">
+                                <div class="d-flex flex-column flex-md-row gap-3">
+                                    <button type="submit"
+                                            class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                                        {% if cancha %}
+                                            Guardar Cambios
+                                        {% else %}
+                                            Registrar Cancha
+                                        {% endif %}
+                                    </button>
+                                    <a href="{% url 'core:admin_canchas_list' %}"
+                                       class="btn btn-outline-secondary btn-lg rounded-pill px-4 fw-bold">Cancelar</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-              </form>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <style>
+    <style>
     .modern-form .input-group-text {
         border-radius: 12px 0 0 12px;
         color: var(--color-primary);
@@ -242,8 +242,8 @@
     .image-drop-zone:hover .preview-actions {
         opacity: 1;
     }
-  </style>
-  <script>
+    </style>
+    <script>
     function previewCourtImage(input) {
         const preview = document.getElementById('court-preview-img');
         const overlay = document.getElementById('court-image-overlay');
@@ -259,5 +259,5 @@
         }
     }
     document.getElementById('id_imagen')?.addEventListener('change', function () { previewCourtImage(this); });
-  </script>
+    </script>
 {% endblock %}

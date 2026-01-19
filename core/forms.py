@@ -395,7 +395,7 @@ class PartidoSchedulingForm(forms.ModelForm):
         es_casual = cleaned_data.get("es_casual")
         torneo = cleaned_data.get("torneo")
 
-        # Validate tournament
+        # 1. Validar Torneo/Casual
         if es_casual:
             cleaned_data["torneo"] = None
         else:
@@ -405,46 +405,69 @@ class PartidoSchedulingForm(forms.ModelForm):
                     "Debe seleccionar un torneo o marcar la opción de 'Partido Casual'.",
                 )
 
-        # Get players
+        # 2. Validar Jugadores
         eq1_j1 = cleaned_data.get("equipo1_jugador1")
         eq1_j2 = cleaned_data.get("equipo1_jugador2")
         eq2_j1 = cleaned_data.get("equipo2_jugador1")
         eq2_j2 = cleaned_data.get("equipo2_jugador2")
 
-        # Collect all selected players (excluding None)
         all_players = [p for p in [eq1_j1, eq1_j2, eq2_j1, eq2_j2] if p]
 
-        # Validate: At least 2 players total
         if len(all_players) < 2:
-            raise forms.ValidationError(
-                "Debe seleccionar al menos 2 jugadores (1 por equipo)"
-            )
+            raise forms.ValidationError("Debe seleccionar al menos 2 jugadores (1 por equipo)")
 
-        # Validate: No duplicate players
         if len(all_players) != len(set(all_players)):
-            raise forms.ValidationError(
-                "No puede seleccionar el mismo jugador en múltiples posiciones"
-            )
+            raise forms.ValidationError("No puede seleccionar el mismo jugador en múltiples posiciones")
 
-        # Validate: Both teams must have at least 1 player
         if not eq1_j1:
-            self.add_error(
-                "equipo1_jugador1", "El Equipo 1 debe tener al menos un jugador"
-            )
+            self.add_error("equipo1_jugador1", "El Equipo 1 debe tener al menos un jugador")
         if not eq2_j1:
-            self.add_error(
-                "equipo2_jugador1", "El Equipo 2 debe tener al menos un jugador"
-            )
+            self.add_error("equipo2_jugador1", "El Equipo 2 debe tener al menos un jugador")
 
-        # Validate: Team balance (both teams should have same number of players)
         equipo1_count = sum([1 for p in [eq1_j1, eq1_j2] if p])
         equipo2_count = sum([1 for p in [eq2_j1, eq2_j2] if p])
 
         if equipo1_count != equipo2_count:
             raise forms.ValidationError(
-                f"Ambos equipos deben tener la misma cantidad de jugadores. "
-                f"Equipo 1: {equipo1_count}, Equipo 2: {equipo2_count}"
+                f"Ambos equipos deben tener la misma cantidad de jugadores. Equipo 1: {equipo1_count}, Equipo 2: {equipo2_count}"
             )
+
+        # 3. Validación de Disponibilidad de Cancha
+        cancha = cleaned_data.get("cancha")
+        fecha = cleaned_data.get("fecha")
+        hora_str = cleaned_data.get("hora")
+
+        if cancha and fecha and hora_str:
+            import datetime
+            
+            # El sistema asume que un partido dura 2 horas
+            hora_inicio = datetime.datetime.strptime(hora_str, "%H:%M").time()
+            dummy_date = datetime.date.today()
+            dt_inicio = datetime.datetime.combine(dummy_date, hora_inicio)
+            dt_fin = dt_inicio + datetime.timedelta(hours=2)
+            hora_fin = dt_fin.time()
+
+            # Verificar otros partidos
+            partidos_conflicto = Partido.objects.filter(
+                cancha=cancha, fecha=fecha, hora=hora_str
+            ).exclude(estado="cancelado")
+            
+            if self.instance and self.instance.pk:
+                partidos_conflicto = partidos_conflicto.exclude(pk=self.instance.pk)
+            
+            if partidos_conflicto.exists():
+                raise forms.ValidationError(f"La cancha ya tiene un partido programado a las {hora_str}")
+
+            # Verificar reservas de jugadores
+            reservas_conflicto = ReservaCancha.objects.filter(
+                cancha=cancha, fecha=fecha
+            ).exclude(estado="cancelada")
+
+            for r in reservas_conflicto:
+                if hora_inicio < r.hora_fin and hora_fin > r.hora_inicio:
+                    raise forms.ValidationError(
+                        f"Hay una reserva de jugador de {r.hora_inicio.strftime('%H:%M')} a {r.hora_fin.strftime('%H:%M')} en esta cancha."
+                    )
 
         return cleaned_data
 
@@ -604,18 +627,6 @@ class ReservaCanchaForm(forms.ModelForm):
 
     def clean_hora_inicio(self):
         hora_inicio = self.cleaned_data.get("hora_inicio")
-        if not hora_inicio:
-            return hora_inicio
-
-        import datetime
-
-        limit_start = datetime.time(8, 0)
-        limit_end = datetime.time(22, 0)
-
-        if hora_inicio < limit_start or hora_inicio > limit_end:
-            raise forms.ValidationError(
-                "Las reservas deben ser entre 8:00 AM y 10:00 PM"
-            )
         return hora_inicio
 
     def clean(self):
@@ -627,12 +638,16 @@ class ReservaCanchaForm(forms.ModelForm):
 
         if hora_inicio and hora_fin:
             if hora_fin <= hora_inicio:
-                raise forms.ValidationError(
-                    "La hora de fin debe ser posterior a la de inicio"
-                )
+                raise forms.ValidationError("La hora de fin debe ser posterior a la de inicio")
 
             # Duración
             import datetime
+            from django.utils import timezone
+            now = timezone.now()
+
+            # Validación de tiempo pasado (si es hoy)
+            if fecha == now.date() and hora_inicio < now.time():
+                raise forms.ValidationError("No puedes reservar una hora que ya ha pasado.")
 
             dummy_date = datetime.date.today()
             dt_inicio = datetime.datetime.combine(dummy_date, hora_inicio)
@@ -644,8 +659,16 @@ class ReservaCanchaForm(forms.ModelForm):
             if duracion > 4:
                 raise forms.ValidationError("La reserva no puede exceder las 4 horas")
 
+            # Validación de Horario de la Cancha
+            if cancha:
+                if hora_inicio < cancha.horario_apertura or hora_fin > cancha.horario_cierre:
+                    raise forms.ValidationError(
+                        f"La cancha {cancha.nombre} solo opera de {cancha.horario_apertura.strftime('%H:%M')} a {cancha.horario_cierre.strftime('%H:%M')}"
+                    )
+
             # Conflictos de Solapamiento
             if cancha and fecha:
+                # 1. Verificar otras reservas
                 reservas = ReservaCancha.objects.filter(
                     cancha=cancha, fecha=fecha
                 ).exclude(estado="cancelada")
@@ -654,10 +677,26 @@ class ReservaCanchaForm(forms.ModelForm):
                     reservas = reservas.exclude(pk=self.instance.pk)
 
                 for r in reservas:
-                    # Lógica de solapamiento: (StartA < EndB) and (EndA > StartB)
                     if hora_inicio < r.hora_fin and hora_fin > r.hora_inicio:
                         raise forms.ValidationError(
-                            f"Conflicto: Ya existe una reserva de {r.hora_inicio} a {r.hora_fin}"
+                            f"Conflicto: Ya existe una reserva de {r.hora_inicio.strftime('%H:%M')} a {r.hora_fin.strftime('%H:%M')}"
+                        )
+
+                # 2. Verificar partidos programados (asumimos 2 horas de duración)
+                from competitions.models import Partido
+                partidos = Partido.objects.filter(
+                    cancha=cancha, fecha=fecha
+                ).exclude(estado="cancelado")
+
+                for p in partidos:
+                    p_inicio = p.hora
+                    p_dt_inicio = datetime.datetime.combine(dummy_date, p_inicio)
+                    p_dt_fin = p_dt_inicio + datetime.timedelta(hours=2)
+                    p_fin = p_dt_fin.time()
+
+                    if hora_inicio < p_fin and hora_fin > p_inicio:
+                        raise forms.ValidationError(
+                            f"Conflicto: Hay un partido programado de {p_inicio.strftime('%H:%M')} a {p_fin.strftime('%H:%M')}"
                         )
 
         return cleaned_data

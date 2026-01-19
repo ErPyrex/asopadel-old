@@ -169,22 +169,25 @@
                         </div>
                     </div>
                     <!-- Árbitros, Canchas, Jugadores en una fila compacta -->
-                    <div class="col-md-4">
-                        <div class="card card-static shadow-sm border-0">
-                            <div class="card-body p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h6 class="fw-bold mb-0">
-                                        <i class="bi bi-person-badge me-2 text-success"></i>Árbitros
-                                    </h6>
-                                    <a href="{% url 'core:admin_arbitros_list' %}"
-                                       class="text-primary small text-decoration-none">Ver</a>
+                    {% if user.is_superuser %}
+                        <div class="col-md-4">
+                            <div class="card card-static shadow-sm border-0">
+                                <div class="card-body p-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h6 class="fw-bold mb-0">
+                                            <i class="bi bi-person-badge me-2 text-success"></i>Árbitros
+                                        </h6>
+                                        <a href="{% url 'core:admin_arbitros_list' %}"
+                                           class="text-primary small text-decoration-none">Ver</a>
+                                    </div>
+                                    <a href="{% url 'users:admin_management' %}"
+                                       class="btn btn-outline-primary btn-sm w-100 fw-bold">
+                                        <i class="bi bi-arrow-up-circle me-1"></i>Promover árbitro
+                                    </a>
                                 </div>
-                                <a href="{% url 'core:admin_create_arbitro' %}"
-                                   class="btn btn-success btn-sm w-100">Nuevo
-                                árbitro</a>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                     <div class="col-md-4">
                         <div class="card card-static shadow-sm border-0">
                             <div class="card-body p-3">
@@ -211,8 +214,10 @@
                                     <a href="{% url 'core:admin_player_list' %}"
                                        class="text-primary small text-decoration-none">Ver</a>
                                 </div>
-                                <a href="{% url 'core:admin_create_player' %}"
-                                   class="btn btn-success btn-sm w-100">Registrar jugador</a>
+                                <button type="button"
+                                        class="btn btn-success btn-sm w-100"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#createPlayerModal">Registrar jugador</button>
                             </div>
                         </div>
                     </div>
@@ -255,4 +260,5 @@
     </style>
     {% include 'core/noticias/modals/modal_crear.html' with form=noticia_form %}
     {% include 'core/canchas/modals/modal_crear.html' %}
+    {% include 'core/jugadores/modals/modal_crear.html' %}
 {% endblock %}

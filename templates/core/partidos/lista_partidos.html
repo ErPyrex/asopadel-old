@@ -408,7 +408,6 @@
                 </button>
             </div>
         </div>
-
         <!-- Barra de Filtros Glassmorphism -->
         <div class="card filter-card mb-5">
             <div class="card-body p-4">
@@ -452,7 +451,6 @@
                 </form>
             </div>
         </div>
-
         <!-- Listado de Partidos con Estetica Elite -->
         {% if partidos %}
             <div class="table-container-premium table-responsive">
@@ -489,7 +487,8 @@
                                         <div class="team-v2">
                                             {% for j in partido.equipo1.all %}
                                                 <div class="player-pill-v2 team-1">
-                                                    <i class="ti ti-user text-primary opacity-75" style="font-size: 0.75rem;"></i>
+                                                    <i class="ti ti-user text-primary opacity-75"
+                                                       style="font-size: 0.75rem"></i>
                                                     {{ j.get_full_name }}
                                                 </div>
                                             {% empty %}
@@ -536,70 +535,75 @@
                                         <div class="text-muted fw-bold">-- : --</div>
                                     {% endif %}
                                 </td>
-                                 <td class="text-end pe-4">
-                                     <div class="d-flex justify-content-end gap-3">
-                                         <!-- Ver detalle (abre modal) -->
-                                         <button type="button"
-                                                 class="action-btn btn-view"
-                                                 title="Ver detalles del encuentro"
-                                                 data-bs-toggle="modal"
-                                                 data-bs-target="#detailModal{{ partido.id }}">
-                                             <i class="ti ti-list-details"></i>
-                                         </button>
-                                         
-                                         {% if request.user.is_staff or request.user.is_superuser %}
-                                             <!-- Editar (Programación) -->
-                                             <button type="button"
-                                                     class="action-btn btn-edit"
-                                                     title="Editar programación"
-                                                     data-bs-toggle="modal"
-                                                     data-bs-target="#editModal{{ partido.id }}">
-                                                 <i class="ti ti-pencil"></i>
-                                             </button>
-                                             
-                                             {% if partido.estado == 'pendiente' or partido.estado == 'confirmado' %}
-                                                 <!-- Registrar resultado -->
-                                                 <button type="button"
-                                                         class="action-btn"
-                                                         title="Registrar Resultado"
-                                                         style="background: rgba(16, 185, 129, 0.08); color: #10b981; border-color: rgba(16, 185, 129, 0.15)"
-                                                         data-bs-toggle="modal"
-                                                         data-bs-target="#resultModal{{ partido.id }}">
-                                                     <i class="ti ti-pennant"></i>
-                                                 </button>
-                                                 
-                                                 <!-- Cancelar partido -->
-                                                 <button type="button"
-                                                         class="action-btn"
-                                                         title="Cancelar Partido"
-                                                         style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.15)"
-                                                         data-bs-toggle="modal"
-                                                         data-bs-target="#cancelModal{{ partido.id }}">
-                                                     <i class="ti ti-circle-x"></i>
-                                                 </button>
-                                             {% elif partido.estado == 'finalizado' %}
-                                                 <!-- Editar resultado: admins siempre, árbitros max 2 ediciones -->
-                                                 {% if request.user.is_staff or request.user.is_superuser or partido.ediciones_resultado < 2 %}
-                                                     <button type="button"
-                                                             class="action-btn"
-                                                             title="Editar Resultado{% if not request.user.is_staff and not request.user.is_superuser %} ({{ 2|add:partido.ediciones_resultado|default:2 }} restantes){% endif %}"
-                                                             style="background: rgba(245, 158, 11, 0.08); color: #f59e0b; border-color: rgba(245, 158, 11, 0.15)"
-                                                             data-bs-toggle="modal"
-                                                             data-bs-target="#editResultModal{{ partido.id }}">
-                                                         <i class="ti ti-history"></i>
-                                                     </button>
-                                                 {% else %}
-                                                     <!-- Árbitro sin ediciones restantes -->
-                                                     <span class="action-btn"
-                                                           title="Sin correcciones disponibles"
-                                                           style="background: rgba(100, 100, 100, 0.1); color: #64748b; cursor: not-allowed">
-                                                         <i class="ti ti-lock"></i>
-                                                     </span>
-                                                 {% endif %}
-                                             {% endif %}
-                                         {% endif %}
-                                     </div>
-                                 </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-3">
+                                        <!-- Ver detalle (abre modal) -->
+                                        <button type="button"
+                                                class="action-btn btn-view"
+                                                title="Ver detalles del encuentro"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#detailModal{{ partido.id }}">
+                                            <i class="ti ti-list-details"></i>
+                                        </button>
+                                        {% if request.user.is_staff or request.user.is_superuser %}
+                                            <!-- Editar (Programación) -->
+                                            <button type="button"
+                                                    class="action-btn btn-edit"
+                                                    title="Editar programación"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#editModal{{ partido.id }}">
+                                                <i class="ti ti-pencil"></i>
+                                            </button>
+                                            {% if partido.estado == 'pendiente' or partido.estado == 'confirmado' %}
+                                                <!-- Registrar resultado -->
+                                                <button type="button"
+                                                        class="action-btn"
+                                                        title="Registrar Resultado"
+                                                        style="background: rgba(16, 185, 129, 0.08);
+                                                               color: #10b981;
+                                                               border-color: rgba(16, 185, 129, 0.15)"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#resultModal{{ partido.id }}">
+                                                    <i class="ti ti-pennant"></i>
+                                                </button>
+                                                <!-- Cancelar partido -->
+                                                <button type="button"
+                                                        class="action-btn"
+                                                        title="Cancelar Partido"
+                                                        style="background: rgba(239, 68, 68, 0.08);
+                                                               color: #ef4444;
+                                                               border-color: rgba(239, 68, 68, 0.15)"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#cancelModal{{ partido.id }}">
+                                                    <i class="ti ti-circle-x"></i>
+                                                </button>
+                                            {% elif partido.estado == 'finalizado' %}
+                                                <!-- Editar resultado: admins siempre, árbitros max 2 ediciones -->
+                                                {% if request.user.is_staff or request.user.is_superuser or partido.ediciones_resultado < 2 %}
+                                                    <button type="button"
+                                                            class="action-btn"
+                                                            title="Editar Resultado{% if not request.user.is_staff and not request.user.is_superuser %} ({{ 2|add:partido.ediciones_resultado|default:2 }} restantes){% endif %}"
+                                                            style="background: rgba(245, 158, 11, 0.08);
+                                                                   color: #f59e0b;
+                                                                   border-color: rgba(245, 158, 11, 0.15)"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#editResultModal{{ partido.id }}">
+                                                        <i class="ti ti-history"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <!-- Árbitro sin ediciones restantes -->
+                                                    <span class="action-btn"
+                                                          title="Sin correcciones disponibles"
+                                                          style="background: rgba(100, 100, 100, 0.1);
+                                                                 color: #64748b;
+                                                                 cursor: not-allowed">
+                                                        <i class="ti ti-lock"></i>
+                                                    </span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </td>
                             </tr>
                             <!-- Modal Ver Detalles del Partido -->
                             <div class="modal fade"
@@ -645,11 +649,12 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
                                             <!-- Información del Encuentro -->
                                             <div class="row g-4 mb-5">
                                                 <div class="col-md-4">
-                                                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08)">
+                                                    <div class="p-4 rounded-4 h-100"
+                                                         style="background: rgba(255,255,255,0.03);
+                                                                border: 1px solid rgba(255,255,255,0.08)">
                                                         <div class="text-muted small text-uppercase fw-bold mb-2">
                                                             <i class="ti ti-calendar-event me-2 text-primary"></i> Fecha
                                                         </div>
@@ -657,15 +662,21 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08)">
+                                                    <div class="p-4 rounded-4 h-100"
+                                                         style="background: rgba(255,255,255,0.03);
+                                                                border: 1px solid rgba(255,255,255,0.08)">
                                                         <div class="text-muted small text-uppercase fw-bold mb-2">
                                                             <i class="ti ti-clock me-2 text-primary"></i> Hora
                                                         </div>
-                                                        <div class="text-white fw-bold fs-5">{{ partido.hora|time:"H:i" }} <span class="text-muted small fw-normal">hs</span></div>
+                                                        <div class="text-white fw-bold fs-5">
+                                                            {{ partido.hora|time:"H:i" }} <span class="text-muted small fw-normal">hs</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08)">
+                                                    <div class="p-4 rounded-4 h-100"
+                                                         style="background: rgba(255,255,255,0.03);
+                                                                border: 1px solid rgba(255,255,255,0.08)">
                                                         <div class="text-muted small text-uppercase fw-bold mb-2">
                                                             <i class="ti ti-map-pin me-2 text-primary"></i> Cancha
                                                         </div>
@@ -673,7 +684,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
                                             <!-- Duelo de Titanes -->
                                             <div class="mb-5">
                                                 <h6 class="text-muted small text-uppercase fw-bold mb-4 d-flex align-items-center">
@@ -682,8 +692,8 @@
                                                 <div class="row g-4">
                                                     <!-- Equipo 1 -->
                                                     <div class="col-md-6">
-                                                        <div class="p-4 rounded-4 h-100 shadow-sm" 
-                                                             style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.02)); 
+                                                        <div class="p-4 rounded-4 h-100 shadow-sm"
+                                                             style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(14, 165, 233, 0.02));
                                                                     border: 1px solid rgba(14, 165, 233, 0.25)">
                                                             <div class="d-flex justify-content-between align-items-center mb-4">
                                                                 <span class="fw-black text-primary fs-5">EQUIPO 1</span>
@@ -696,9 +706,7 @@
                                                             <div class="d-flex flex-column gap-3">
                                                                 {% for jugador in partido.equipo1.all %}
                                                                     <div class="d-flex align-items-center gap-3 p-2 rounded-3 hover-effect-light">
-                                                                        <div class="avatar-premium bg-primary text-white">
-                                                                            {{ jugador.first_name|first }}{{ jugador.last_name|first }}
-                                                                        </div>
+                                                                        <div class="avatar-premium bg-primary text-white">{{ jugador.first_name|first }}{{ jugador.last_name|first }}</div>
                                                                         <div>
                                                                             <div class="text-white fw-bold">{{ jugador.get_full_name }}</div>
                                                                             <div class="d-flex align-items-center gap-2">
@@ -716,8 +724,8 @@
                                                     </div>
                                                     <!-- Equipo 2 -->
                                                     <div class="col-md-6">
-                                                        <div class="p-4 rounded-4 h-100 shadow-sm" 
-                                                             style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.02)); 
+                                                        <div class="p-4 rounded-4 h-100 shadow-sm"
+                                                             style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.02));
                                                                     border: 1px solid rgba(239, 68, 68, 0.25)">
                                                             <div class="d-flex justify-content-between align-items-center mb-4">
                                                                 <span class="fw-black text-danger fs-5">EQUIPO 2</span>
@@ -730,9 +738,7 @@
                                                             <div class="d-flex flex-column gap-3">
                                                                 {% for jugador in partido.equipo2.all %}
                                                                     <div class="d-flex align-items-center gap-3 p-2 rounded-3 hover-effect-light">
-                                                                        <div class="avatar-premium bg-danger text-white">
-                                                                            {{ jugador.first_name|first }}{{ jugador.last_name|first }}
-                                                                        </div>
+                                                                        <div class="avatar-premium bg-danger text-white">{{ jugador.first_name|first }}{{ jugador.last_name|first }}</div>
                                                                         <div>
                                                                             <div class="text-white fw-bold">{{ jugador.get_full_name }}</div>
                                                                             <div class="d-flex align-items-center gap-2">
@@ -750,11 +756,12 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
                                             <!-- Oficiales y Resultados -->
                                             <div class="row g-4">
                                                 <div class="col-md-6">
-                                                    <div class="h-100 p-4 rounded-4" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08)">
+                                                    <div class="h-100 p-4 rounded-4"
+                                                         style="background: rgba(255,255,255,0.03);
+                                                                border: 1px solid rgba(255,255,255,0.08)">
                                                         <div class="text-muted small text-uppercase fw-bold mb-3 d-flex align-items-center">
                                                             <i class="ti ti-gavel me-2 text-warning"></i> Autoridad del Encuentro
                                                         </div>
@@ -774,23 +781,22 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="h-100 p-4 rounded-4 text-center d-flex flex-column justify-content-center" 
-                                                         style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); 
+                                                    <div class="h-100 p-4 rounded-4 text-center d-flex flex-column justify-content-center"
+                                                         style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
                                                                 border: 1px solid rgba(16, 185, 129, 0.25)">
                                                         <div class="text-muted small text-uppercase fw-bold mb-2">Marcador Final</div>
                                                         {% if partido.estado == 'finalizado' %}
                                                             <div class="text-white fw-black display-6 font-monospace">{{ partido.marcador }}</div>
                                                         {% else %}
-                                                            <div class="badge bg-warning bg-opacity-10 text-warning px-4 py-2 mt-2">
-                                                                EN ESPERA DE RESULTADO
-                                                            </div>
+                                                            <div class="badge bg-warning bg-opacity-10 text-warning px-4 py-2 mt-2">EN ESPERA DE RESULTADO</div>
                                                         {% endif %}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <!-- Footer -->
-                                        <div class="modal-footer border-0 py-3 px-4" style="background: rgba(0,0,0,0.2)">
+                                        <div class="modal-footer border-0 py-3 px-4"
+                                             style="background: rgba(0,0,0,0.2)">
                                             {% if request.user.is_staff or request.user.is_superuser %}
                                                 <button type="button"
                                                         class="btn btn-warning px-4 py-2"
@@ -1088,8 +1094,7 @@
                                                 <h5 class="text-white fw-bold">¿Cancelar este partido?</h5>
                                                 <p class="text-muted">Esta acción marcará el partido como cancelado. No se efectuará.</p>
                                             </div>
-                                            <div class="p-3 rounded-3 mb-4"
-                                                 style="background: rgba(255,255,255,0.03)">
+                                            <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.03)">
                                                 <div class="text-muted small">
                                                     Partido del <strong class="text-white">{{ partido.fecha|date:"d M, Y" }}</strong>
                                                 </div>
@@ -1140,8 +1145,7 @@
                                                   id="resultForm{{ partido.id }}">
                                                 {% csrf_token %}
                                                 <!-- Info del partido -->
-                                                <div class="p-3 rounded-3 mb-4"
-                                                     style="background: rgba(255,255,255,0.03)">
+                                                <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.03)">
                                                     <div class="text-muted small">{{ partido.fecha|date:"d M, Y" }} · {{ partido.hora|time:"H:i" }}</div>
                                                     <div class="text-white fw-bold">{{ partido.torneo.nombre|default:"Partido Casual" }}</div>
                                                 </div>
@@ -1231,8 +1235,7 @@
                                             <form method="POST" action="{% url 'core:admin_edit_result' partido.id %}">
                                                 {% csrf_token %}
                                                 <!-- Info del partido -->
-                                                <div class="p-3 rounded-3 mb-4"
-                                                     style="background: rgba(255,255,255,0.03)">
+                                                <div class="p-3 rounded-3 mb-4" style="background: rgba(255,255,255,0.03)">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <div>
                                                             <div class="text-muted small">{{ partido.fecha|date:"d M, Y" }}</div>

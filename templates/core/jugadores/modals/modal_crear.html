@@ -1,0 +1,183 @@
+<!-- Modal Registrar Jugador -->
+<div class="modal fade"
+     id="createPlayerModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+             style="background: var(--card-bg, #0f172a)">
+            <!-- Header -->
+            <div class="modal-header py-3 border-0"
+                 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                         style="width: 36px;
+                                height: 36px">
+                        <i class="ti ti-user-plus fs-5"></i>
+                    </div>
+                    Registrar Nuevo Jugador
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5"
+                 style="background: var(--card-bg, #0f172a)">
+                <form action="{% url 'core:admin_create_player' %}"
+                      method="POST"
+                      id="createPlayerForm">
+                    {% csrf_token %}
+                    <!-- Datos Personales -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="ti ti-id-badge text-success"></i>
+                            <span class="text-muted small text-uppercase fw-bold">Datos Personales</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cédula *</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-id text-success"></i></span>
+                                    <input type="text"
+                                           name="cedula"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           pattern="[1-9][0-9]{6,9}"
+                                           title="Solo números, sin puntos ni guiones"
+                                           placeholder="Ej: 12345678"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Email *</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-mail text-success"></i></span>
+                                    <input type="email"
+                                           name="email"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           placeholder="correo@ejemplo.com"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre *</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-success"></i></span>
+                                    <input type="text"
+                                           name="first_name"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}"
+                                           placeholder="Ej: Juan"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apellido *</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-success"></i></span>
+                                    <input type="text"
+                                           name="last_name"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}"
+                                           placeholder="Ej: Pérez"
+                                           required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Teléfono</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-phone text-success"></i></span>
+                                    <input type="tel"
+                                           name="telefono"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           placeholder="Ej: 0414-1234567">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contraseña *</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-lock text-success"></i></span>
+                                    <input type="password"
+                                           name="password"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}"
+                                           title="Mínimo 8 caracteres: mayúscula, minúscula, número y símbolo"
+                                           placeholder="Contraseña segura"
+                                           required>
+                                </div>
+                                <small class="text-muted d-block mt-1 ps-2">Min. 8 caracteres, mayúscula, minúscula, número y símbolo</small>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Datos de Jugador -->
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <i class="ti ti-trophy text-success"></i>
+                            <span class="text-muted small text-uppercase fw-bold">Datos de Jugador</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-category text-success"></i></span>
+                                    <select name="categoria_jugador"
+                                            class="form-select border-0 py-2 bg-transparent">
+                                        <option value="">Sin categoría</option>
+                                        <option value="juvenil">Juvenil</option>
+                                        <option value="adulto">Adulto</option>
+                                        <option value="senior">Senior</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ranking Inicial</label>
+                                <div class="input-group modern-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-chart-line text-success"></i></span>
+                                    <input type="number"
+                                           name="ranking"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           value="0"
+                                           min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botones -->
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="submit"
+                                class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
+                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                       color: white">
+                            <i class="ti ti-user-check me-2"></i>Registrar Jugador
+                        </button>
+                        <button type="button"
+                                class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+#createPlayerModal .modern-input-group {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+#createPlayerModal .modern-input-group:focus-within {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #10b981;
+    box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
+}
+#createPlayerModal .modern-input-group .form-control,
+#createPlayerModal .modern-input-group .form-select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+#createPlayerModal .modern-input-group .form-select option {
+    background: #1e293b;
+}
+</style>

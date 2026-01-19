@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Panel del Árbitro{% endblock %}
 {% block content %}
-<style>
+    <style>
   .panel-header {
     background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.1));
     border: 1px solid rgba(14, 165, 233, 0.2);
@@ -95,95 +95,97 @@
     color: var(--aso-primary);
     opacity: 0.7;
   }
-</style>
-
-<div class="container py-5">
-  <!-- Header del Panel -->
-  <div class="panel-header">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-      <div>
-        <h2 class="display-5 mb-2">Panel del Árbitro</h2>
-        <p class="text-muted mb-0">Gestiona tus torneos, agenda encuentros y registra resultados.</p>
-      </div>
-      <div class="d-flex gap-2 align-items-center">
-        <span class="text-muted me-2">Bienvenido, <strong class="text-white">{{ user.first_name }}</strong></span>
-      </div>
-    </div>
-  </div>
-  
-  <div class="row g-4">
-    <!-- Gestión de Partidos -->
-    <div class="col-lg-6">
-      <div class="action-card h-100">
-        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
-          <i class="ti ti-calendar-event text-primary"></i> Gestión de Partidos
-        </h5>
-        <p class="text-muted small mb-4">Agenda nuevos encuentros, visualiza la programación o registra los marcadores finales.</p>
-        <div class="d-grid gap-3">
-          <button type="button" 
-                  class="btn btn-action btn-action-primary"
-                  data-bs-toggle="modal"
-                  data-bs-target="#createMatchModal">
-            <i class="ti ti-calendar-plus"></i> Agendar Nuevo Partido
-          </button>
-          <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-action btn-action-secondary">
-            <i class="ti ti-list-details"></i> Ver Todos los Partidos
-          </a>
-          <a href="{% url 'core:admin_pending_results_list' %}" class="btn btn-action btn-action-warning">
-            <i class="ti ti-clipboard-check"></i> Cargar Resultados Pendientes
-          </a>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Torneos Asignados -->
-    <div class="col-lg-6">
-      <div class="stat-card h-100">
-        <h5><i class="ti ti-trophy me-2"></i>Torneos Asignados</h5>
-        {% if torneos %}
-          <div class="d-flex flex-column gap-2">
-            {% for torneo in torneos %}
-              <div class="list-item-modern">
-                <i class="ti ti-tournament"></i>
-                <span class="text-white fw-medium">{{ torneo.nombre }}</span>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-muted small mb-0">No tienes torneos asignados actualmente.</p>
-        {% endif %}
-      </div>
-    </div>
-    
-    <!-- Estado de Canchas -->
-    <div class="col-12">
-      <div class="stat-card">
-        <h5><i class="ti ti-ball-tennis me-2"></i>Estado de Canchas</h5>
-        {% if canchas %}
-          <div class="row g-3">
-            {% for cancha in canchas %}
-              <div class="col-md-4 col-lg-3">
-                <div class="list-item-modern">
-                  <i class="ti ti-map-pin"></i>
-                  <div>
-                    <span class="text-white fw-medium d-block">{{ cancha.nombre }}</span>
-                    <span class="small {% if cancha.estado == 'disponible' %}text-success{% elif cancha.estado == 'mantenimiento' %}text-warning{% else %}text-danger{% endif %}">
-                      {{ cancha.estado|title }}
-                    </span>
-                  </div>
+    </style>
+    <div class="container py-5">
+        <!-- Header del Panel -->
+        <div class="panel-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="display-5 mb-2">Panel del Árbitro</h2>
+                    <p class="text-muted mb-0">Gestiona tus torneos, agenda encuentros y registra resultados.</p>
                 </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-muted small mb-0">No hay canchas registradas en el sistema.</p>
-        {% endif %}
-      </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="text-muted me-2">Bienvenido, <strong class="text-white">{{ user.first_name }}</strong></span>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4">
+            <!-- Gestión de Partidos -->
+            <div class="col-lg-6">
+                <div class="action-card h-100">
+                    <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="ti ti-calendar-event text-primary"></i> Gestión de Partidos
+                    </h5>
+                    <p class="text-muted small mb-4">
+                        Agenda nuevos encuentros, visualiza la programación o registra los marcadores finales.
+                    </p>
+                    <div class="d-grid gap-3">
+                        <button type="button"
+                                class="btn btn-action btn-action-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createMatchModal">
+                            <i class="ti ti-calendar-plus"></i> Agendar Nuevo Partido
+                        </button>
+                        <a href="{% url 'core:admin_partidos_list' %}"
+                           class="btn btn-action btn-action-secondary">
+                            <i class="ti ti-list-details"></i> Ver Todos los Partidos
+                        </a>
+                        <a href="{% url 'core:admin_pending_results_list' %}"
+                           class="btn btn-action btn-action-warning">
+                            <i class="ti ti-clipboard-check"></i> Cargar Resultados Pendientes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Torneos Asignados -->
+            <div class="col-lg-6">
+                <div class="stat-card h-100">
+                    <h5>
+                        <i class="ti ti-trophy me-2"></i>Torneos Asignados
+                    </h5>
+                    {% if torneos %}
+                        <div class="d-flex flex-column gap-2">
+                            {% for torneo in torneos %}
+                                <div class="list-item-modern">
+                                    <i class="ti ti-tournament"></i>
+                                    <span class="text-white fw-medium">{{ torneo.nombre }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No tienes torneos asignados actualmente.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Estado de Canchas -->
+            <div class="col-12">
+                <div class="stat-card">
+                    <h5>
+                        <i class="ti ti-ball-tennis me-2"></i>Estado de Canchas
+                    </h5>
+                    {% if canchas %}
+                        <div class="row g-3">
+                            {% for cancha in canchas %}
+                                <div class="col-md-4 col-lg-3">
+                                    <div class="list-item-modern">
+                                        <i class="ti ti-map-pin"></i>
+                                        <div>
+                                            <span class="text-white fw-medium d-block">{{ cancha.nombre }}</span>
+                                            <span class="small {% if cancha.estado == 'disponible' %}text-success{% elif cancha.estado == 'mantenimiento' %}text-warning{% else %}text-danger{% endif %}">
+                                                {{ cancha.estado|title }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No hay canchas registradas en el sistema.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
-
-<!-- Modal para Crear Partido -->
-{% include 'core/partidos/partials/_create_match_modal.html' %}
-
+    <!-- Modal para Crear Partido -->
+    {% include 'core/partidos/partials/_create_match_modal.html' %}
 {% endblock %}
