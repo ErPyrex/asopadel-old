@@ -1,55 +1,504 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Mi Perfil | ASOPADEL{% endblock %}
-{% block back_url %}
-  <a href="{% url 'core:home' %}"
-     class="btn-back-custom"
-     aria-label="Volver">
-    <i class="ti ti-chevron-left"></i>
-  </a>
+{% block extra_head %}
+    <!-- NO BORRAR: Estilos críticos para la página de perfil -->
+    <style>
+  #profile-main-card {
+    border-radius: 28px !important;
+    background: #1a1d21 !important; /* Forzamos fondo oscuro premium si el tema es oscuro */
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3) !important;
+    overflow: hidden !important;
+    margin: 2rem auto !important;
+    max-width: 800px !important;
+  }
+
+  /* Ajuste para tema claro si aplica */
+  [data-bs-theme="light"] #profile-main-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .perfil-header-gradient {
+    height: 160px !important;
+    background: linear-gradient(135deg, #0061ff 0%, #60efff 100%) !important;
+    position: relative !important;
+    width: 100% !important;
+  }
+
+  /* Contenedor del Avatar - TOTALMENTE CENTRADO */
+  .avatar-center-wrapper {
+    position: absolute !important;
+    bottom: -60px !important;
+    left: 0 !important;
+    right: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    z-index: 100 !important;
+    pointer-events: none !important;
+  }
+
+  .avatar-outer-circle {
+    width: 130px !important;
+    height: 130px !important;
+    border-radius: 50% !important;
+    background: #1a1d21 !important;
+    border: 5px solid #1a1d21 !important;
+    position: relative !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    display: block !important;
+    margin: 0 auto !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  [data-bs-theme="light"] .avatar-outer-circle {
+    background: #ffffff !important;
+    border: 5px solid #ffffff !important;
+  }
+
+  .avatar-outer-circle img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    display: block !important;
+  }
+
+  .avatar-placeholder-svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #2a2e35 !important;
+    color: #60efff !important;
+    font-size: 3.5rem !important;
+  }
+
+  .camera-hover-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0 !important;
+    transition: opacity 0.3s ease !important;
+    border-radius: 50% !important;
+  }
+
+  .avatar-outer-circle:hover .camera-hover-overlay {
+    opacity: 1 !important;
+  }
+
+  .camera-hover-overlay i {
+    color: white !important;
+    font-size: 2rem !important;
+  }
+
+  /* Cuerpo del Formulario */
+  .profile-form-body {
+    padding-top: 80px !important;
+    padding-bottom: 40px !important;
+  }
+
+  .perfil-label {
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    color: #94a3b8 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .perfil-input {
+    border-radius: 12px !important;
+    padding: 0.8rem 1rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    font-weight: 500 !important;
+  }
+
+  [data-bs-theme="light"] .perfil-input {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
+  }
+
+  .perfil-input:focus {
+    border-color: #0061ff !important;
+    box-shadow: 0 0 0 4px rgba(0, 97, 255, 0.2) !important;
+  }
+
+  .perfil-input[readonly] {
+    opacity: 0.6 !important;
+    cursor: default !important;
+  }
+
+  .perfil-input.locked {
+    opacity: 0.4 !important;
+    cursor: not-allowed !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Botones */
+  .btn-premium-blue {
+    background: linear-gradient(135deg, #0061ff 0%, #60efff 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 0.8rem 1.5rem !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .btn-premium-blue:hover {
+    transform: translateY(-2px) !important;
+    color: white !important;
+  }
+
+  .btn-outline-edit {
+    border: 1px solid #0061ff !important;
+    color: #60efff !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    padding: 0.4rem 1rem !important;
+  }
+
+  /* Modales */
+  .modal-aso-premium {
+    border-radius: 20px !important;
+    overflow: hidden !important;
+  }
+
+  .crop-viewport-wrap {
+    width: 240px !important;
+    height: 240px !important;
+    margin: 0 auto !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    position: relative !important;
+    background: #000 !important;
+  }
+
+  .crop-frame-adjust {
+    position: absolute !important;
+    width: 100% !important;
+    height: 100% !important;
+    cursor: grab !important;
+  }
+
+  .crop-frame-adjust:active { cursor: grabbing !important; }
+
+  .crop-frame-adjust img {
+    position: absolute !important;
+    max-width: none !important;
+    user-select: none !important;
+  }
+    </style>
 {% endblock %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm ranking-card overflow-hidden">
-        <div style="height: 6px;
-                    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary))"></div>
-        <div class="card-body p-4 p-md-5">
-          <div class="d-flex align-items-center mb-5">
-            <div class="icon-holder me-3" style="width: 60px; height: 60px;">
-              <i class="ti ti-user-circle fs-1"></i>
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div id="profile-main-card">
+                    <!-- Header con el Avatar -->
+                    <div class="perfil-header-gradient">
+                        <div class="avatar-center-wrapper">
+                            <div class="avatar-outer-circle"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#modalFoto">
+                                {% if usuario.foto %}
+                                    <img src="{{ usuario.foto.url }}" id="imgPerfilActual" alt="Foto">
+                                {% else %}
+                                    <div class="avatar-placeholder-svg" id="placeholderPerfil">
+                                        <i class="ti ti-user"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="camera-hover-overlay">
+                                    <i class="ti ti-camera"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body px-4 px-md-5 profile-form-body">
+                        <!-- Cabecera de info -->
+                        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+                            <div class="text-start">
+                                <h2 class="fw-bold text-white mb-0" id="userNameLabel">{{ usuario.get_full_name }}</h2>
+                                <p class="text-muted small mb-0">CI: {{ usuario.cedula }}</p>
+                            </div>
+                            <button type="button" id="btnToggleEditar" class="btn btn-outline-edit">
+                                <i class="ti ti-edit me-1"></i><span>Editar Datos</span>
+                            </button>
+                        </div>
+                        <!-- Formulario -->
+                        <form id="formPerfil"
+                              action="{% url 'users:perfil' %}"
+                              method="POST"
+                              enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="perfil-label">Nombre</label>
+                                    <input type="text"
+                                           name="first_name"
+                                           class="form-control perfil-input"
+                                           value="{{ usuario.first_name }}"
+                                           data-edit="true"
+                                           readonly
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="perfil-label">Apellido</label>
+                                    <input type="text"
+                                           name="last_name"
+                                           class="form-control perfil-input"
+                                           value="{{ usuario.last_name }}"
+                                           data-edit="true"
+                                           readonly
+                                           required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="perfil-label">Cédula (Fijo)</label>
+                                    <input type="text"
+                                           class="form-control perfil-input locked"
+                                           value="{{ usuario.cedula }}"
+                                           readonly
+                                           disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="perfil-label">Email (Fijo)</label>
+                                    <input type="email"
+                                           class="form-control perfil-input locked"
+                                           value="{{ usuario.email }}"
+                                           readonly
+                                           disabled>
+                                </div>
+                                <div class="col-12">
+                                    <label class="perfil-label">Teléfono</label>
+                                    <input type="text"
+                                           name="telefono"
+                                           class="form-control perfil-input"
+                                           value="{{ usuario.telefono|default:'' }}"
+                                           data-edit="true"
+                                           readonly
+                                           placeholder="No asignado">
+                                </div>
+                                <div class="col-12">
+                                    <label class="perfil-label">Biografía</label>
+                                    <textarea name="biografia"
+                                              class="form-control perfil-input"
+                                              rows="3"
+                                              data-edit="true"
+                                              readonly
+                                              placeholder="Cuéntanos algo sobre ti...">{{ usuario.biografia|default:'' }}</textarea>
+                                </div>
+                            </div>
+                            <!-- Input oculto para recibir el blob de la imagen -->
+                            <input type="file"
+                                   name="foto"
+                                   id="inputFotoHidden"
+                                   class="d-none"
+                                   accept="image/*">
+                            <div class="mt-5 d-none" id="areaGuardar">
+                                <button type="button" class="btn btn-premium-blue w-100 py-3" id="btnGuardar">
+                                    <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div>
-              <h2 class="fw-bold mb-0">Mi Perfil</h2>
-              <p class="text-muted mb-0">Gestiona tu información personal</p>
-            </div>
-          </div>
-          <div class="row g-4">
-            <div class="col-md-6">
-              <label class="form-label text-muted small text-uppercase fw-bold">Nombre Completo</label>
-              <div class="p-3 bg-light rounded-3 border">{{ user.get_full_name|default:user.username }}</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-muted small text-uppercase fw-bold">Cédula</label>
-              <div class="p-3 bg-light rounded-3 border">{{ user.cedula }}</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-muted small text-uppercase fw-bold">Correo Electrónico</label>
-              <div class="p-3 bg-light rounded-3 border">{{ user.email }}</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label text-muted small text-uppercase fw-bold">Teléfono</label>
-              <div class="p-3 bg-light rounded-3 border">{{ user.telefono|default:"No registrado" }}</div>
-            </div>
-          </div>
-          <div class="mt-5 pt-4 border-top">
-            <p class="text-muted small">
-              <i class="ti ti-info-circle me-1"></i> Para cambios en tu información oficial, contacta con
-              administración.
-            </p>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+    <!-- Modal Foto -->
+    <div class="modal fade" id="modalFoto" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-aso-premium"
+                 style="max-width: 400px;
+                        margin: auto">
+                <div class="modal-header bg-dark border-0">
+                    <h6 class="modal-title text-white">Actualizar Foto</h6>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body bg-dark p-4">
+                    <!-- Paso 1 -->
+                    <div id="step-select">
+                        <div class="drop-zone-select text-center p-5 border border-dashed rounded-3 cursor-pointer"
+                             onclick="document.getElementById('file-input-raw').click()"
+                             style="border-color: rgba(255,255,255,0.2) !important">
+                            <input type="file" id="file-input-raw" class="d-none" accept="image/*">
+                            <i class="ti ti-upload fs-1 text-primary mb-2"></i>
+                            <p class="text-white small fw-bold">Subir Imagen</p>
+                        </div>
+                    </div>
+                    <!-- Paso 2 -->
+                    <div id="step-crop" class="d-none">
+                        <div class="crop-viewport-wrap">
+                            <div class="crop-frame-adjust" id="frameAdjust">
+                                <img id="imgToCrop" src="" alt="Recorte" draggable="false">
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="button"
+                                    class="btn btn-secondary flex-fill rounded-3"
+                                    id="btnBackToSelect">Cambiar</button>
+                            <button type="button"
+                                    class="btn btn-primary flex-fill rounded-3"
+                                    id="btnApplyCrop">Listo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Confirmar -->
+    <div class="modal fade" id="modalConfirm" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content modal-aso-premium">
+                <div class="modal-body p-4 text-center">
+                    <i class="ti ti-question-mark fs-1 text-warning mb-3"></i>
+                    <h5 class="fw-bold">¿Guardar todo?</h5>
+                    <p class="text-muted small">Se actualizarán tus datos de perfil.</p>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="button"
+                                class="btn btn-success rounded-3 py-2 fw-bold"
+                                id="btnConfirmFinal">Sí, guardar</button>
+                        <button type="button"
+                                class="btn btn-light rounded-3 py-2"
+                                data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. Toggle Editar
+  const btnToggle = document.getElementById('btnToggleEditar');
+  const areaGuardar = document.getElementById('areaGuardar');
+  const inputsEdit = document.querySelectorAll('[data-edit="true"]');
+  let editMode = false;
+
+  btnToggle.addEventListener('click', () => {
+    editMode = !editMode;
+    if (editMode) {
+      btnToggle.classList.replace('btn-outline-edit', 'btn-danger');
+      btnToggle.innerHTML = '<i class="ti ti-x me-1"></i><span>Cancelar</span>';
+      areaGuardar.classList.remove('d-none');
+      inputsEdit.forEach(i => i.removeAttribute('readonly'));
+      inputsEdit[0].focus();
+    } else {
+      btnToggle.classList.replace('btn-danger', 'btn-outline-edit');
+      btnToggle.innerHTML = '<i class="ti ti-edit me-1"></i><span>Editar Datos</span>';
+      areaGuardar.classList.add('d-none');
+      inputsEdit.forEach(i => i.setAttribute('readonly', true));
+    }
+  });
+
+  // 2. Guardado con Modal
+  const btnGuardar = document.getElementById('btnGuardar');
+  const modalC = new bootstrap.Modal(document.getElementById('modalConfirm'));
+  btnGuardar.addEventListener('click', () => modalC.show());
+  document.getElementById('btnConfirmFinal').addEventListener('click', () => document.getElementById('formPerfil').submit());
+
+  // 3. Foto Lógica
+  const mFoto = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalFoto'));
+  const fileRaw = document.getElementById('file-input-raw');
+  const imgCrop = document.getElementById('imgToCrop');
+  const frameAdj = document.getElementById('frameAdjust');
+  const sSelect = document.getElementById('step-select');
+  const sCrop = document.getElementById('step-crop');
+  const btnApply = document.getElementById('btnApplyCrop');
+  const inputH = document.getElementById('inputFotoHidden');
+
+  let dragging = false;
+  let sx, sy, ix = 0, iy = 0;
+  let iw, ih, fSize = 240;
+
+  fileRaw.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      const r = new FileReader();
+      r.onload = e => {
+        imgCrop.src = e.target.result;
+        imgCrop.onload = () => {
+          sSelect.classList.add('d-none');
+          sCrop.classList.remove('d-none');
+          initCrop();
+        };
+      };
+      r.readAsDataURL(this.files[0]);
+    }
+  });
+
+  function initCrop() {
+    const r = imgCrop.naturalWidth / imgCrop.naturalHeight;
+    if (r > 1) { ih = fSize; iw = fSize * r; } 
+    else { iw = fSize; ih = fSize / r; }
+    imgCrop.style.width = iw + 'px';
+    imgCrop.style.height = ih + 'px';
+    ix = (fSize - iw) / 2;
+    iy = (fSize - ih) / 2;
+    updateImg();
+  }
+
+  function updateImg() {
+    imgCrop.style.left = ix + 'px';
+    imgCrop.style.top = iy + 'px';
+  }
+
+  frameAdj.addEventListener('mousedown', e => {
+    dragging = true; sx = e.clientX - ix; sy = e.clientY - iy;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    ix = Math.min(0, Math.max(fSize - iw, e.clientX - sx));
+    iy = Math.min(0, Math.max(fSize - ih, e.clientY - sy));
+    updateImg();
+  });
+  document.addEventListener('mouseup', () => dragging = false);
+
+  btnApply.addEventListener('click', () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400; canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+    const sc = imgCrop.naturalWidth / iw;
+    ctx.drawImage(imgCrop, -ix * sc, -iy * sc, fSize * sc, fSize * sc, 0, 0, 400, 400);
+
+    canvas.toBlob(blob => {
+      const f = new File([blob], 'user.jpg', { type: 'image/jpeg' });
+      const dt = new DataTransfer(); dt.items.add(f);
+      inputH.files = dt.files;
+
+      const mainI = document.getElementById('imgPerfilActual');
+      const pl = document.getElementById('placeholderPerfil');
+      if (mainI) mainI.src = URL.createObjectURL(blob);
+      else if (pl) {
+        const ni = document.createElement('img'); ni.src = URL.createObjectURL(blob);
+        ni.id = 'imgPerfilActual'; pl.parentElement.insertBefore(ni, pl); pl.remove();
+      }
+      mFoto.hide();
+      if (!editMode) btnToggle.click();
+    }, 'image/jpeg', 0.9);
+  });
+
+  document.getElementById('btnBackToSelect').addEventListener('click', () => {
+    sCrop.classList.add('d-none'); sSelect.classList.remove('d-none'); fileRaw.value = '';
+  });
+});
+    </script>
 {% endblock %}
