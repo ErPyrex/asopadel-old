@@ -1,0 +1,294 @@
+<!-- Modal Editar Jugador -->
+<div class="modal fade"
+     id="editPlayerModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+             style="background: var(--card-bg, #0f172a)">
+            <!-- Header -->
+            <div class="modal-header py-3 border-0"
+                 style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%)">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                         style="width: 36px;
+                                height: 36px">
+                        <i class="ti ti-user-edit fs-5"></i>
+                    </div>
+                    Editar Jugador
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5"
+                 style="background: var(--card-bg, #0f172a)">
+                <form id="editPlayerForm" method="POST" action="">
+                    {% csrf_token %}
+                    <!-- Info del jugador -->
+                    <div class="mb-4 p-3 rounded-3"
+                         style="background: rgba(245, 158, 11, 0.08);
+                                border: 1px solid rgba(245, 158, 11, 0.2)">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-warning bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                 style="width: 48px;
+                                        height: 48px;
+                                        font-size: 1rem"
+                                 id="editPlayerAvatar">--</div>
+                            <div>
+                                <div class="text-white fw-bold" id="editPlayerDisplayName">Nombre del Jugador</div>
+                                <div class="text-muted small">
+                                    Cédula: <span id="editPlayerCedula">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-4">
+                        <i class="ti ti-info-circle me-1"></i>
+                        Solo modifica los campos que deseas actualizar. Los demás mantendrán su valor actual.
+                    </p>
+                    <!-- Campos Editables -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-warning"></i></span>
+                                <input type="text"
+                                       name="first_name"
+                                       id="editFirstName"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apellido</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-warning"></i></span>
+                                <input type="text"
+                                       name="last_name"
+                                       id="editLastName"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Email</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-mail text-warning"></i></span>
+                                <input type="email"
+                                       name="email"
+                                       id="editEmail"
+                                       class="form-control border-0 py-2 bg-transparent">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Teléfono</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-phone text-warning"></i></span>
+                                <input type="tel"
+                                       name="telefono"
+                                       id="editTelefono"
+                                       class="form-control border-0 py-2 bg-transparent">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-category text-warning"></i></span>
+                                <select name="categoria_jugador"
+                                        id="editCategoria"
+                                        class="form-select border-0 py-2 bg-transparent">
+                                    <option value="">Sin categoría</option>
+                                    <option value="juvenil">Juvenil</option>
+                                    <option value="adulto">Adulto</option>
+                                    <option value="senior">Senior</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ranking</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-chart-line text-warning"></i></span>
+                                <input type="number"
+                                       name="ranking"
+                                       id="editRanking"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       min="0">
+                            </div>
+                        </div>
+                        {% if request.user.is_superuser %}
+                            <div class="col-12 mt-4">
+                                <div class="p-3 rounded-3"
+                                     style="background: rgba(239, 68, 68, 0.08);
+                                            border: 1px solid rgba(239, 68, 68, 0.2)">
+                                    <label class="form-label fw-bold text-danger small text-uppercase mb-2">
+                                        <i class="ti ti-lock me-1"></i>Nueva Contraseña (Solo Superadmin)
+                                    </label>
+                                    <div class="input-group edit-input-group">
+                                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-key text-danger"></i></span>
+                                        <input type="password"
+                                               name="new_password"
+                                               id="editPassword"
+                                               class="form-control border-0 py-2 bg-transparent"
+                                               placeholder="Dejar vacío para no cambiar"
+                                               pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{8,}"
+                                               title="Mínimo 8 caracteres: mayúscula, minúscula, número y símbolo">
+                                    </div>
+                                    <small class="text-muted d-block mt-2">Dejar vacío si no desea cambiar la contraseña. Min. 8 caracteres con mayúscula, minúscula, número y símbolo.</small>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <!-- Botones -->
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="button"
+                                id="btnConfirmEditPlayer"
+                                class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
+                                style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                                       color: white">
+                            <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                        </button>
+                        <button type="button"
+                                class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Confirmación de Edición -->
+<div class="modal fade"
+     id="confirmEditPlayerModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+             style="background: var(--card-bg, #0f172a)">
+            <div class="modal-header py-3 border-0"
+                 style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <i class="ti ti-alert-circle me-2"></i>
+                    Confirmar Cambios
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4 text-center"
+                 style="background: var(--card-bg, #0f172a)">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                     style="width: 80px;
+                            height: 80px">
+                    <i class="ti ti-user-check text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="text-white fw-bold mb-2">¿Guardar los cambios?</h5>
+                <p class="text-muted mb-0">
+                    Los datos del jugador <strong id="confirmPlayerName" class="text-white">-</strong> serán actualizados.
+                </p>
+            </div>
+            <div class="modal-footer border-0 p-4 d-flex gap-3 justify-content-center"
+                 style="background: var(--card-bg, #0f172a)">
+                <button type="button"
+                        class="btn btn-outline-secondary px-4 py-2 rounded-pill"
+                        data-bs-dismiss="modal">
+                    <i class="ti ti-x me-1"></i>Cancelar
+                </button>
+                <button type="button"
+                        id="btnSubmitEditPlayer"
+                        class="btn btn-primary px-4 py-2 rounded-pill">
+                    <i class="ti ti-check me-1"></i>Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+#editPlayerModal .edit-input-group {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+#editPlayerModal .edit-input-group:focus-within {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.15);
+}
+#editPlayerModal .edit-input-group .form-control,
+#editPlayerModal .edit-input-group .form-select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+#editPlayerModal .edit-input-group .form-select option {
+    background: #1e293b;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editPlayerModal = document.getElementById('editPlayerModal');
+    const confirmEditModal = document.getElementById('confirmEditPlayerModal');
+    const editForm = document.getElementById('editPlayerForm');
+    const btnConfirmEdit = document.getElementById('btnConfirmEditPlayer');
+    const btnSubmitEdit = document.getElementById('btnSubmitEditPlayer');
+    
+    if (editPlayerModal) {
+        editPlayerModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget;
+            
+            // Obtener datos del botón
+            const playerId = button.getAttribute('data-player-id');
+            const playerName = button.getAttribute('data-player-name');
+            const firstName = button.getAttribute('data-first-name');
+            const lastName = button.getAttribute('data-last-name');
+            const email = button.getAttribute('data-email');
+            const telefono = button.getAttribute('data-telefono');
+            const categoria = button.getAttribute('data-categoria');
+            const ranking = button.getAttribute('data-ranking');
+            const editUrl = button.getAttribute('data-edit-url');
+            
+            // Actualizar avatar
+            const initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+            document.getElementById('editPlayerAvatar').textContent = initials;
+            document.getElementById('editPlayerDisplayName').textContent = playerName;
+            document.getElementById('editPlayerCedula').textContent = button.getAttribute('data-cedula');
+            
+            // Rellenar campos
+            document.getElementById('editFirstName').value = firstName;
+            document.getElementById('editLastName').value = lastName;
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editTelefono').value = telefono || '';
+            document.getElementById('editCategoria').value = categoria || '';
+            document.getElementById('editRanking').value = ranking || 0;
+            
+            // Configurar formulario
+            editForm.action = editUrl;
+            
+            // Guardar nombre para confirmación
+            document.getElementById('confirmPlayerName').textContent = playerName;
+        });
+    }
+    
+    if (btnConfirmEdit) {
+        btnConfirmEdit.addEventListener('click', function() {
+            // Cerrar modal de edición y abrir modal de confirmación
+            const editModalInstance = bootstrap.Modal.getInstance(editPlayerModal);
+            editModalInstance.hide();
+            
+            setTimeout(() => {
+                const confirmModalInstance = new bootstrap.Modal(confirmEditModal);
+                confirmModalInstance.show();
+            }, 300);
+        });
+    }
+    
+    if (btnSubmitEdit) {
+        btnSubmitEdit.addEventListener('click', function() {
+            editForm.submit();
+        });
+    }
+});
+</script>

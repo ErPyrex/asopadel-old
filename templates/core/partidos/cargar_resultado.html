@@ -1,111 +1,111 @@
 {% extends 'base.html' %}
 {% block title %}Registrar Marcador - ASOPADEL{% endblock %}
 {% block content %}
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card shadow-lg border-0 rounded-3">
-        <div class="card-header bg-success text-white py-3">
-          <h4 class="mb-0 fw-bold">
-            <i class="fas fa-flag-checkered me-2"></i>Registrar Resultado Final
-          </h4>
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-header bg-success text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-flag-checkered me-2"></i>Registrar Resultado Final
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Detalles del Partido -->
+                    <div class="alert alert-light border mb-4">
+                        <h5 class="alert-heading fw-bold text-center mb-3">
+                            {% if partido.torneo %}
+                                {{ partido.torneo.nombre }}
+                            {% else %}
+                                Partido Casual
+                            {% endif %}
+                        </h5>
+                        <div class="d-flex justify-content-between text-muted small mb-2">
+                            <span><i class="far fa-calendar me-1"></i> {{ partido.fecha|date:"d M Y" }}</span>
+                            <span><i class="far fa-clock me-1"></i> {{ partido.hora|time:"h:i A" }}</span>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6 text-center border-end">
+                                <p class="mb-1 text-uppercase fw-bold text-primary">Equipo 1</p>
+                                <ul class="list-unstyled mb-0">
+                                    {% for jugador in partido.equipo1.all %}
+                                        <li class="badge bg-white text-dark border p-2 mb-1 d-block mx-auto"
+                                            style="width: fit-content">{{ jugador.get_full_name }}</li>
+                                    {% empty %}
+                                        <li class="text-muted small">Sin jugadores</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-6 text-center">
+                                <p class="mb-1 text-uppercase fw-bold text-danger">Equipo 2</p>
+                                <ul class="list-unstyled mb-0">
+                                    {% for jugador in partido.equipo2.all %}
+                                        <li class="badge bg-white text-dark border p-2 mb-1 d-block mx-auto"
+                                            style="width: fit-content">{{ jugador.get_full_name }}</li>
+                                    {% empty %}
+                                        <li class="text-muted small">Sin jugadores</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                        <!-- Ganador Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-trophy text-warning me-2"></i>Equipo Ganador
+                            </label>
+                            <div class="card p-3 bg-light">
+                                {% for radio in form.equipo_ganador %}
+                                    <div class="form-check form-check-inline">
+                                        {{ radio.tag }}
+                                        <label class="form-check-label fw-bold" for="{{ radio.id_for_label }}">
+                                            {{ radio.choice_label }}
+                                            <small class="text-muted d-block font-weight-normal">
+                                                {% if radio.data.value == '1' %}
+                                                    {% for j in partido.equipo1.all %}
+                                                        {{ j.first_name }}
+                                                        {% if not forloop.last %},{% endif %}
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {% for j in partido.equipo2.all %}
+                                                        {{ j.first_name }}
+                                                        {% if not forloop.last %},{% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </small>
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text text-muted mt-2">
+                                <i class="fas fa-info-circle me-1"></i>Seleccione el equipo que ganó el partido
+                            </div>
+                            {% if form.equipo_ganador.errors %}
+                                <div class="text-danger small mt-1">{{ form.equipo_ganador.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <!-- Marcador Field -->
+                        <div class="mb-4">
+                            <label for="{{ form.marcador.id_for_label }}" class="form-label fw-bold">Marcador Final</label>
+                            {{ form.marcador }}
+                            <div class="form-text text-muted">
+                                <i class="fas fa-info-circle me-1"></i>Formato: Sets separados por coma (ej: 6-4, 6-3) o
+                                conteo simple (2-1)
+                            </div>
+                            {% if form.marcador.errors %}<div class="text-danger small mt-1">{{ form.marcador.errors }}</div>{% endif %}
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold">
+                                <i class="fas fa-save me-2"></i>Guardar Resultado
+                            </button>
+                            <a href="{% url 'core:admin_pending_results_list' %}"
+                               class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="card-body p-4">
-          <!-- Detalles del Partido -->
-          <div class="alert alert-light border mb-4">
-            <h5 class="alert-heading fw-bold text-center mb-3">
-              {% if partido.torneo %}
-                {{ partido.torneo.nombre }}
-              {% else %}
-                Partido Casual
-              {% endif %}
-            </h5>
-            <div class="d-flex justify-content-between text-muted small mb-2">
-              <span><i class="far fa-calendar me-1"></i> {{ partido.fecha|date:"d M Y" }}</span>
-              <span><i class="far fa-clock me-1"></i> {{ partido.hora|time:"h:i A" }}</span>
-            </div>
-            <div class="row mt-3">
-              <div class="col-6 text-center border-end">
-                <p class="mb-1 text-uppercase fw-bold text-primary">Equipo 1</p>
-                <ul class="list-unstyled mb-0">
-                  {% for jugador in partido.equipo1.all %}
-                    <li class="badge bg-white text-dark border p-2 mb-1 d-block mx-auto"
-                        style="width: fit-content">{{ jugador.get_full_name }}</li>
-                  {% empty %}
-                    <li class="text-muted small">Sin jugadores</li>
-                  {% endfor %}
-                </ul>
-              </div>
-              <div class="col-6 text-center">
-                <p class="mb-1 text-uppercase fw-bold text-danger">Equipo 2</p>
-                <ul class="list-unstyled mb-0">
-                  {% for jugador in partido.equipo2.all %}
-                    <li class="badge bg-white text-dark border p-2 mb-1 d-block mx-auto"
-                        style="width: fit-content">{{ jugador.get_full_name }}</li>
-                  {% empty %}
-                    <li class="text-muted small">Sin jugadores</li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
-          </div>
-          <form method="post" class="needs-validation" novalidate>
-            {% csrf_token %}
-            {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-            <!-- Ganador Selection -->
-            <div class="mb-4">
-              <label class="form-label fw-bold">
-                <i class="fas fa-trophy text-warning me-2"></i>Equipo Ganador
-              </label>
-              <div class="card p-3 bg-light">
-                {% for radio in form.equipo_ganador %}
-                  <div class="form-check form-check-inline">
-                    {{ radio.tag }}
-                    <label class="form-check-label fw-bold" for="{{ radio.id_for_label }}">
-                      {{ radio.choice_label }}
-                      <small class="text-muted d-block font-weight-normal">
-                        {% if radio.data.value == '1' %}
-                          {% for j in partido.equipo1.all %}
-                            {{ j.first_name }}
-                            {% if not forloop.last %},{% endif %}
-                          {% endfor %}
-                        {% else %}
-                          {% for j in partido.equipo2.all %}
-                            {{ j.first_name }}
-                            {% if not forloop.last %},{% endif %}
-                          {% endfor %}
-                        {% endif %}
-                      </small>
-                    </label>
-                  </div>
-                {% endfor %}
-              </div>
-              <div class="form-text text-muted mt-2">
-                <i class="fas fa-info-circle me-1"></i>Seleccione el equipo que ganó el partido
-              </div>
-              {% if form.equipo_ganador.errors %}
-                <div class="text-danger small mt-1">{{ form.equipo_ganador.errors }}</div>
-              {% endif %}
-            </div>
-            <!-- Marcador Field -->
-            <div class="mb-4">
-              <label for="{{ form.marcador.id_for_label }}" class="form-label fw-bold">Marcador Final</label>
-              {{ form.marcador }}
-              <div class="form-text text-muted">
-                <i class="fas fa-info-circle me-1"></i>Formato: Sets separados por coma (ej: 6-4, 6-3) o
-                conteo simple (2-1)
-              </div>
-              {% if form.marcador.errors %}<div class="text-danger small mt-1">{{ form.marcador.errors }}</div>{% endif %}
-            </div>
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-success btn-lg fw-bold">
-                <i class="fas fa-save me-2"></i>Guardar Resultado
-              </button>
-              <a href="{% url 'core:admin_pending_results_list' %}"
-                 class="btn btn-outline-secondary">Cancelar</a>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
-  </div>
 {% endblock %}

@@ -1,68 +1,191 @@
 {% extends 'base.html' %}
 {% block title %}Panel del Árbitro{% endblock %}
 {% block content %}
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body text-center">
-            <h5 class="card-title">Bienvenido, {{ user.first_name }}</h5>
-            <form method="POST" action="{% url 'users:logout' %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger btn-sm mt-2">Cerrar sesión</button>
-            </form>
-          </div>
-        </div>
-      </div>
-      <main class="col-md-9">
-        <h2>Panel del Árbitro</h2>
-        <p class="lead">Gestiona tus torneos y registra resultados.</p>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="card mb-4">
-              <div class="card-body">
-                <h5 class="card-title">Torneos asignados</h5>
-                {% if torneos %}
-                  <ul class="list-group">
-                    {% for torneo in torneos %}<li class="list-group-item">{{ torneo.nombre }}</li>{% endfor %}
-                  </ul>
-                {% else %}
-                  <p>No tienes torneos asignados.</p>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="card mb-4">
-              <div class="card-body">
-                <h5 class="card-title">Gestión de Partidos</h5>
-                <p>Agenda nuevos encuentros o registra los marcadores finales.</p>
-                <div class="d-grid gap-2">
-                  <a href="{% url 'core:admin_create_match' %}" class="btn btn-primary">
-                    <i class="fas fa-calendar-plus me-2"></i>Agendar Partido
-                  </a>
-                  <a href="{% url 'core:admin_pending_results_list' %}"
-                     class="btn btn-warning text-white">
-                    <i class="fas fa-check-square me-2"></i>Cargar Resultados
-                  </a>
+    <style>
+  .panel-header {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(99, 102, 241, 0.1));
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    border-radius: 24px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+  }
+  .panel-header h2 {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+  }
+  .stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  .stat-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(14, 165, 233, 0.3);
+    transform: translateY(-4px);
+  }
+  .stat-card h5 {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+  }
+  .action-card {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(99, 102, 241, 0.05));
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+  }
+  .btn-action {
+    border-radius: 14px;
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .btn-action:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+  .btn-action-primary {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    border: none;
+    color: white;
+  }
+  .btn-action-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+  }
+  .btn-action-secondary:hover {
+    background: rgba(14, 165, 233, 0.1);
+    border-color: #0ea5e9;
+    color: #0ea5e9;
+  }
+  .btn-action-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: white;
+  }
+  .list-item-modern {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+  }
+  .list-item-modern:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .list-item-modern i {
+    color: var(--aso-primary);
+    opacity: 0.7;
+  }
+    </style>
+    <div class="container py-5">
+        <!-- Header del Panel -->
+        <div class="panel-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="display-5 mb-2">Panel del Árbitro</h2>
+                    <p class="text-muted mb-0">Gestiona tus torneos, agenda encuentros y registra resultados.</p>
                 </div>
-              </div>
+                <div class="d-flex gap-2 align-items-center">
+                    <span class="text-muted me-2">Bienvenido, <strong class="text-white">{{ user.first_name }}</strong></span>
+                </div>
             </div>
-          </div>
         </div>
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Estado de canchas</h5>
-            {% if canchas %}
-              <ul class="list-group">
-                {% for cancha in canchas %}<li class="list-group-item">{{ cancha.nombre }} - {{ cancha.estado }}</li>{% endfor %}
-              </ul>
-            {% else %}
-              <p>No hay canchas registradas.</p>
-            {% endif %}
-          </div>
+        <div class="row g-4">
+            <!-- Gestión de Partidos -->
+            <div class="col-lg-6">
+                <div class="action-card h-100">
+                    <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="ti ti-calendar-event text-primary"></i> Gestión de Partidos
+                    </h5>
+                    <p class="text-muted small mb-4">
+                        Agenda nuevos encuentros, visualiza la programación o registra los marcadores finales.
+                    </p>
+                    <div class="d-grid gap-3">
+                        <button type="button"
+                                class="btn btn-action btn-action-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#createMatchModal">
+                            <i class="ti ti-calendar-plus"></i> Agendar Nuevo Partido
+                        </button>
+                        <a href="{% url 'core:admin_partidos_list' %}"
+                           class="btn btn-action btn-action-secondary">
+                            <i class="ti ti-list-details"></i> Ver Todos los Partidos
+                        </a>
+                        <a href="{% url 'core:admin_pending_results_list' %}"
+                           class="btn btn-action btn-action-warning">
+                            <i class="ti ti-clipboard-check"></i> Cargar Resultados Pendientes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Torneos Asignados -->
+            <div class="col-lg-6">
+                <div class="stat-card h-100">
+                    <h5>
+                        <i class="ti ti-trophy me-2"></i>Torneos Asignados
+                    </h5>
+                    {% if torneos %}
+                        <div class="d-flex flex-column gap-2">
+                            {% for torneo in torneos %}
+                                <div class="list-item-modern">
+                                    <i class="ti ti-tournament"></i>
+                                    <span class="text-white fw-medium">{{ torneo.nombre }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No tienes torneos asignados actualmente.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Estado de Canchas -->
+            <div class="col-12">
+                <div class="stat-card">
+                    <h5>
+                        <i class="ti ti-ball-tennis me-2"></i>Estado de Canchas
+                    </h5>
+                    {% if canchas %}
+                        <div class="row g-3">
+                            {% for cancha in canchas %}
+                                <div class="col-md-4 col-lg-3">
+                                    <div class="list-item-modern">
+                                        <i class="ti ti-map-pin"></i>
+                                        <div>
+                                            <span class="text-white fw-medium d-block">{{ cancha.nombre }}</span>
+                                            <span class="small {% if cancha.estado == 'disponible' %}text-success{% elif cancha.estado == 'mantenimiento' %}text-warning{% else %}text-danger{% endif %}">
+                                                {{ cancha.estado|title }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small mb-0">No hay canchas registradas en el sistema.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-      </main>
     </div>
-  </div>
+    <!-- Modal para Crear Partido -->
+    {% include 'core/partidos/partials/_create_match_modal.html' %}
 {% endblock %}

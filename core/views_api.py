@@ -8,13 +8,17 @@ from datetime import datetime, timedelta
 def get_court_availability(request, cancha_id):
     """
     API para obtener eventos de disponibilidad para FullCalendar.
-    Retorna reservas confirmadas y pendientes como eventos ocupados.
+    Retorna reservas confirmadas, pendientes y PARTIDOS programados como eventos ocupados.
+    También entrega las horas de operación de la cancha.
     """
     try:
+        from facilities.models import Cancha
+        from competitions.models import Partido
+        
+        cancha = Cancha.objects.get(id=cancha_id)
         start_date_str = request.GET.get("start")
         end_date_str = request.GET.get("end")
 
-        # FullCalendar envía ISO string (YYYY-MM-DD)
         if start_date_str:
             start_date = datetime.fromisoformat(start_date_str.split("T")[0]).date()
         else:
@@ -25,33 +29,56 @@ def get_court_availability(request, cancha_id):
         else:
             end_date = start_date + timedelta(days=30)
 
+        # 1. Reservas de jugadores
         reservas = ReservaCancha.objects.filter(
             cancha_id=cancha_id, fecha__range=[start_date, end_date]
         ).exclude(estado="cancelada")
 
         events = []
         for r in reservas:
-            # Color coding: Pendiente (Naranja), Confirmada (Red)
             color = "#dc3545" if r.estado == "confirmada" else "#ffc107"
             title = "Reservado" if r.estado == "confirmada" else "Pendiente"
-
-            # Si es el propio usuario, mostrar "Mi Reserva"
             if r.jugador == request.user:
                 title = "Mi Reserva"
-                color = "#198754"  # Verde
+                color = "#198754"
 
-            events.append(
-                {
-                    "title": title,
-                    "start": f"{r.fecha}T{r.hora_inicio}",
-                    "end": f"{r.fecha}T{r.hora_fin}",
-                    "color": color,
-                    "card_id": r.id,
-                }
-            )
+            events.append({
+                "title": title,
+                "start": f"{r.fecha}T{r.hora_inicio}",
+                "end": f"{r.fecha}T{r.hora_fin}",
+                "color": color,
+                "extendedProps": {"type": "reserva"}
+            })
 
-        return JsonResponse(events, safe=False)
+        # 2. Partidos programados
+        partidos = Partido.objects.filter(
+            cancha_id=cancha_id, fecha__range=[start_date, end_date]
+        ).exclude(estado="cancelado")
+
+        for p in partidos:
+            # Asumimos 2 horas de duración
+            dummy_date = datetime.today().date()
+            dt_inicio = datetime.combine(dummy_date, p.hora)
+            dt_fin = dt_inicio + timedelta(hours=2)
+            
+            events.append({
+                "title": f"Partido: {p.torneo.nombre if p.torneo else 'Casual'}",
+                "start": f"{p.fecha}T{p.hora}",
+                "end": f"{p.fecha}T{dt_fin.time()}",
+                "color": "#6f42c1", # Púrpura para partidos
+                "extendedProps": {"type": "partido"}
+            })
+
+        return JsonResponse({
+            "events": events,
+            "businessHours": {
+                "start": cancha.horario_apertura.strftime("%H:%M"),
+                "end": cancha.horario_cierre.strftime("%H:%M"),
+            }
+        }, safe=False)
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         return JsonResponse({"error": str(e)}, status=400)
 
 

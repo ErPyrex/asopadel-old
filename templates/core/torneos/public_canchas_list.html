@@ -1,75 +1,75 @@
 {% extends 'base.html' %}
 {% block title %}Canchas disponibles{% endblock %}
 {% block back_url %}
-  <a href="{% url 'core:home' %}"
-     class="btn-back-custom"
-     aria-label="Volver">
-    <i class="ti ti-chevron-left"></i>
-  </a>
+    <a href="{% url 'core:home' %}"
+       class="btn-back-custom"
+       aria-label="Volver">
+        <i class="ti ti-chevron-left"></i>
+    </a>
 {% endblock %}
 {% block content %}
-  <div class="container py-4">
-    <div class="home-section-header mb-5">
-      <div class="icon-holder"
-           style="background: var(--ui-icon-bg);
-                  color: var(--color-primary)">
-        <i class="ti ti-building-pavilion fs-3"></i>
-      </div>
-      <div>
-        <h2 class="section-title-modern">Todas las canchas registradas</h2>
-        <p class="text-muted mb-0">Explora las sedes disponibles para tu próximo partido.</p>
-      </div>
-    </div>
-    <div class="row g-4">
-      {% for cancha in canchas %}
-        <div class="col-md-4">
-          <div class="card h-100 border-0 shadow-sm ranking-card overflow-hidden"
-               onclick="window.location.href='{% url 'core:public_court_detail' cancha.id %}'"
-               style="cursor: pointer">
-            {% if cancha.imagen %}
-              <div class="position-relative">
-                <img src="{{ cancha.imagen.url }}"
-                     class="card-img-top"
-                     alt="{{ cancha.nombre }}"
-                     style="height: 220px;
-                            object-fit: cover">
-                <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-dark text-white">
-                  <span class="badge {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} border-0 shadow-sm">
-                    {{ cancha.get_estado_display }}
-                  </span>
-                </div>
-              </div>
-            {% else %}
-              <div class="bg-light text-muted d-flex align-items-center justify-content-center"
-                   style="height: 220px">
-                <i class="ti ti-photo fs-1 opacity-25"></i>
-              </div>
-            {% endif %}
-            <div class="card-body p-4">
-              <h5 class="fw-bold mb-2 text-heading">{{ cancha.nombre }}</h5>
-              <p class="text-muted small mb-0 d-flex align-items-center gap-1">
-                <i class="ti ti-map-pin text-primary"></i> {{ cancha.ubicacion }}
-              </p>
+    <div class="container py-4">
+        <div class="home-section-header mb-5">
+            <div class="icon-holder"
+                 style="background: var(--ui-icon-bg);
+                        color: var(--color-primary)">
+                <i class="ti ti-building-pavilion fs-3"></i>
             </div>
-          </div>
+            <div>
+                <h2 class="section-title-modern">Todas las canchas registradas</h2>
+                <p class="text-muted mb-0">Explora las sedes disponibles para tu próximo partido.</p>
+            </div>
         </div>
-      {% empty %}
-        <div class="col-12 text-center py-5">
-          <div class="icon-holder mx-auto mb-3"
-               style="width: 80px;
-                      height: 80px;
-                      background: var(--color-light);
-                      color: var(--color-primary)">
-            <i class="ti ti-mood-empty fs-1"></i>
-          </div>
-          <p class="text-muted">No hay canchas registradas aún en nuestro sistema.</p>
+        <div class="row g-4">
+            {% for cancha in canchas %}
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm ranking-card overflow-hidden"
+                         onclick="window.location.href='{% url 'core:public_court_detail' cancha.id %}'"
+                         style="cursor: pointer">
+                        {% if cancha.imagen %}
+                            <div class="position-relative">
+                                <img src="{{ cancha.imagen.url }}"
+                                     class="card-img-top"
+                                     alt="{{ cancha.nombre }}"
+                                     style="height: 220px;
+                                            object-fit: cover">
+                                <div class="position-absolute bottom-0 start-0 w-100 p-3 bg-gradient-dark text-white">
+                                    <span class="badge {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} border-0 shadow-sm">
+                                        {{ cancha.get_estado_display }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="bg-light text-muted d-flex align-items-center justify-content-center"
+                                 style="height: 220px">
+                                <i class="ti ti-photo fs-1 opacity-25"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body p-4">
+                            <h5 class="fw-bold mb-2 text-heading">{{ cancha.nombre }}</h5>
+                            <p class="text-muted small mb-0 d-flex align-items-center gap-1">
+                                <i class="ti ti-map-pin text-primary"></i> {{ cancha.ubicacion }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="icon-holder mx-auto mb-3"
+                         style="width: 80px;
+                                height: 80px;
+                                background: var(--color-light);
+                                color: var(--color-primary)">
+                        <i class="ti ti-mood-empty fs-1"></i>
+                    </div>
+                    <p class="text-muted">No hay canchas registradas aún en nuestro sistema.</p>
+                </div>
+            {% endfor %}
         </div>
-      {% endfor %}
     </div>
-  </div>
-  <style>
+    <style>
     .bg-gradient-dark {
         background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
     }
-  </style>
+    </style>
 {% endblock %}

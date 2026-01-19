@@ -1,134 +1,246 @@
 {% extends 'base.html' %}
-{% block title %}Jugadores registrados{% endblock %}
+{% load static %}
+{% block title %}Gestión de Jugadores - ASOPADEL{% endblock %}
 {% block content %}
-  <div class="container">
-    <h2 class="text-center mb-4">Jugadores Registrados</h2>
-    <div class="d-flex justify-content-between mb-4">
-      <form method="get" class="d-flex">
-        <input type="text"
-               name="q"
-               placeholder="Buscar por nombre..."
-               value="{{ query }}"
-               class="form-control me-2">
-        <button type="submit" class="btn btn-primary">Buscar</button>
-      </form>
-    </div>
-    <div class="card shadow-lg">
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Cédula</th>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Categoría</th>
-                <th>Ranking</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for jugador in jugadores %}
-                <tr>
-                  <td>{{ jugador.cedula }}</td>
-                  <td>{{ jugador.first_name }} {{ jugador.last_name }}</td>
-                  <td>{{ jugador.email }}</td>
-                  <td>{{ jugador.telefono }}</td>
-                  <td>
-                    <form method="POST"
-                          action="{% url 'core:admin_update_player_category' jugador.id %}"
-                          class="d-flex align-items-center">
-                      {% csrf_token %}
-                      <select name="categoria"
-                              class="form-select form-select-sm me-2"
-                              onchange="this.form.submit()">
-                        <option value="" {% if not jugador.categoria_jugador %}selected{% endif %}>
-                          Sin
-                          categoría
-                        </option>
-                        {# FIXED - FORMATTER SAFE #}
-                        {% for codigo, nombre in categorias %}
-                          {% if jugador.categoria_jugador == codigo %}
-                            <option value="{{ codigo }}" selected>{{ nombre }}</option>
-                          {% else %}
-                            <option value="{{ codigo }}">{{ nombre }}</option>
-                          {% endif %}
+    <div class="container-fluid px-lg-5 py-4">
+        <!-- Header de Sección -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+            <div>
+                <h1 class="fw-extrabold display-5 mb-1 d-flex align-items-center">
+                    <i class="ti ti-users text-primary me-3"></i>Jugadores
+                </h1>
+                <p class="text-muted fs-5 mb-0">Listado completo y gestión de deportistas registrados.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'users:register' %}"
+                   class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm hover-lift">
+                    <i class="ti ti-plus me-2"></i>Registrar Jugador
+                </a>
+            </div>
+        </div>
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="row mb-4">
+            <div class="col-md-6 col-lg-4">
+                <form method="get" class="modern-search-wrapper">
+                    <div class="input-group modern-input-group shadow-sm">
+                        <span class="input-group-text border-0 bg-transparent ps-3">
+                            <i class="ti ti-search text-primary"></i>
+                        </span>
+                        <input type="text"
+                               name="q"
+                               value="{{ query }}"
+                               class="form-control border-0 bg-transparent py-2"
+                               placeholder="Nombre, apellido o cédula...">
+                        <button type="submit" class="btn btn-primary rounded-pill m-1 px-3">Buscar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Tabla de Jugadores Premium -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden ranking-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr class="text-muted small text-uppercase">
+                            <th class="ps-4 py-3">Jugador</th>
+                            <th class="py-3">Cédula</th>
+                            <th class="py-3">Categoría</th>
+                            <th class="py-3">Ranking</th>
+                            <th class="text-end pe-4 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for jugador in jugadores %}
+                            <tr class="transition-hover">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3 py-2">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold"
+                                             style="width: 42px;
+                                                    height: 42px">
+                                            {{ jugador.first_name|first }}{{ jugador.last_name|first }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold h6 mb-0">{{ jugador.get_full_name }}</div>
+                                            <small class="text-muted">{{ jugador.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border rounded-pill px-3">{{ jugador.cedula }}</span>
+                                </td>
+                                <td>
+                                    <form method="POST"
+                                          action="{% url 'core:admin_update_player_category' jugador.id %}"
+                                          class="d-flex align-items-center">
+                                        {% csrf_token %}
+                                        <select name="categoria"
+                                                class="form-select form-select-sm rounded-pill border-0 bg-light px-3"
+                                                style="min-width: 140px"
+                                                onchange="this.form.submit()">
+                                            <option value="" {% if not jugador.categoria_jugador %}selected{% endif %}>Sin categoría</option>
+                                            {% for codigo, nombre in categorias %}
+                                                <option value="{{ codigo }}"
+                                                        {% if jugador.categoria_jugador == codigo %}selected{% endif %}>
+                                                    {{ nombre }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-trophy text-warning"></i>
+                                        <span class="fw-bold text-primary">{{ jugador.ranking }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editPlayerModal"
+                                                data-player-id="{{ jugador.id }}"
+                                                data-player-name="{{ jugador.get_full_name }}"
+                                                data-cedula="{{ jugador.cedula }}"
+                                                data-first-name="{{ jugador.first_name }}"
+                                                data-last-name="{{ jugador.last_name }}"
+                                                data-email="{{ jugador.email }}"
+                                                data-telefono="{{ jugador.telefono }}"
+                                                data-categoria="{{ jugador.categoria_jugador }}"
+                                                data-ranking="{{ jugador.ranking }}"
+                                                data-edit-url="{% url 'core:admin_edit_player' jugador.id %}">
+                                            <i class="ti ti-edit me-1"></i>Editar
+                                        </button>
+                                        {% if request.user.is_superuser %}
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deletePlayerModal"
+                                                    data-player-name="{{ jugador.get_full_name }}"
+                                                    data-delete-url="{% url 'core:admin_delete_player' jugador.id %}">
+                                                <i class="ti ti-trash me-1"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <div class="mb-3">
+                                        <i class="ti ti-users-off fs-display-1 opacity-25"></i>
+                                    </div>
+                                    <h5 class="fw-bold">No se encontraron jugadores</h5>
+                                    <p class="mb-0">Prueba con otro término de búsqueda.</p>
+                                </td>
+                            </tr>
                         {% endfor %}
-                      </select>
-                    </form>
-                  </td>
-                  <td>{{ jugador.ranking }}</td>
-                  <td>
-                    <a href="{% url 'core:admin_edit_player' jugador.id %}"
-                       class="btn btn-warning btn-sm">Editar</a>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Paginación -->
+        {% if jugadores.paginator.num_pages > 1 %}
+            <div class="mt-5">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center gap-2">
+                        {% if jugadores.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-circle shadow-sm"
+                                   href="?q={{ query }}&page={{ jugadores.previous_page_number }}">
+                                    <i class="ti ti-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <span class="page-link border-0 rounded-circle shadow-sm px-3">{{ jugadores.number }}</span>
+                        </li>
+                        {% if jugadores.has_next %}
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-circle shadow-sm"
+                                   href="?q={{ query }}&page={{ jugadores.next_page_number }}">
+                                    <i class="ti ti-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+    <!-- Modal de Confirmación de Eliminación -->
+    <div class="modal fade"
+         id="deletePlayerModal"
+         tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header bg-danger py-3 border-0">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                        <i class="ti ti-alert-triangle fs-4 me-2"></i>Confirmar Eliminación
+                    </h5>
                     <button type="button"
-                            class="btn btn-danger btn-sm"
-                            data-bs-toggle="modal"
-                            data-bs-target="#deletePlayerModal"
-                            data-player-name="{{ jugador.first_name }} {{ jugador.last_name }}"
-                            data-delete-url="{% url 'core:admin_delete_player' jugador.id %}">Eliminar</button>
-                  </td>
-                </tr>
-              {% empty %}
-                <tr>
-                  <td colspan="6" class="text-center">No hay jugadores registrados.</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 p-md-5 text-center bg-card">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                         style="width: 80px;
+                                height: 80px">
+                        <i class="ti ti-trash text-danger" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">¿Estás seguro?</h4>
+                    <p class="text-muted mb-4">
+                        Esta acción eliminará permanentemente al jugador <strong id="modalPlayerName" class="text-dark"></strong> y no podrá deshacerse.
+                    </p>
+                    <form id="deletePlayerForm" method="POST" action="">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit"
+                                    class="btn btn-danger btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                                Eliminar permanentemente
+                            </button>
+                            <button type="button"
+                                    class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <!-- Modal de Confirmación de Eliminación -->
-  <div class="modal fade"
-       id="deletePlayerModal"
-       tabindex="-1"
-       aria-labelledby="deletePlayerModalLabel"
-       aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header bg-danger text-white">
-          <h5 class="modal-title" id="deletePlayerModalLabel">Confirmar Eliminación</h5>
-          <button type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>
-            ¿Estás seguro de que deseas eliminar al jugador <strong id="modalPlayerName"></strong>?
-          </p>
-          <p class="text-muted small">Esta acción es permanente y no se puede deshacer.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <form id="deletePlayerForm" method="POST" action="">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Eliminar Jugador</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  <script>
-    const deletePlayerModal = document.getElementById('deletePlayerModal')
-    if (deletePlayerModal) {
-        deletePlayerModal.addEventListener('show.bs.modal', event => {
-            // Botón que disparó el modal
-            const button = event.relatedTarget
-            // Extraer info de los atributos data-*
-            const playerName = button.getAttribute('data-player-name')
-            const deleteUrl = button.getAttribute('data-delete-url')
-
-            // Actualizar el contenido del modal
-            const modalBodyName = deletePlayerModal.querySelector('#modalPlayerName')
-            const modalForm = deletePlayerModal.querySelector('#deletePlayerForm')
-
-            modalBodyName.textContent = playerName
-            modalForm.action = deleteUrl
-        })
+    {% include 'core/jugadores/modals/modal_editar.html' %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deletePlayerModal = document.getElementById('deletePlayerModal');
+        if (deletePlayerModal) {
+            deletePlayerModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const playerName = button.getAttribute('data-player-name');
+                const deleteUrl = button.getAttribute('data-delete-url');
+                
+                deletePlayerModal.querySelector('#modalPlayerName').textContent = playerName;
+                deletePlayerModal.querySelector('#deletePlayerForm').action = deleteUrl;
+            });
+        }
+    });
+    </script>
+    <style>
+    .modern-input-group {
+        background: var(--bg-card);
+        border: 1px solid var(--color-border);
+        border-radius: 50px;
+        transition: all 0.2s ease;
     }
-  </script>
+    .modern-input-group:focus-within {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    }
+    .transition-hover {
+        transition: all 0.2s ease;
+    }
+    .transition-hover:hover {
+        background-color: var(--color-light) !important;
+    }
+    </style>
 {% endblock %}

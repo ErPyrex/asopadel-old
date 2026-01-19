@@ -1,224 +1,225 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-  {% if torneo %}
-    Editar Torneo - {{ torneo.nombre }}
-  {% else %}
-    Nuevo Torneo
-  {% endif %}
-  - Administrador
+    {% if torneo %}
+        Editar Torneo - {{ torneo.nombre }}
+    {% else %}
+        Nuevo Torneo
+    {% endif %}
+    - Administrador
 {% endblock %}
 {% block content %}
-  <div class="container-fluid px-lg-5 py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-11 col-xl-10">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="row g-0">
-            <!-- Sidebar informativo (Lado Izquierdo) -->
-            <div class="col-lg-4 bg-primary p-5 text-white d-none d-lg-flex flex-column justify-content-between position-relative overflow-hidden">
-              <!-- Decoración de fondo -->
-              <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10"
-                   style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png')"></div>
-              <div class="position-relative z-1">
-                <div class="bg-white bg-opacity-25 rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-4"
-                     style="width: 70px;
-                            height: 70px">
-                  <i class="ti ti-trophy fs-1"></i>
+    <div class="container-fluid px-lg-5 py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-11 col-xl-10">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="row g-0">
+                        <!-- Sidebar informativo (Lado Izquierdo) -->
+                        <div class="col-lg-4 bg-primary p-5 text-white d-none d-lg-flex flex-column justify-content-between position-relative overflow-hidden">
+                            <!-- Decoración de fondo -->
+                            <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10"
+                                 style="background-image: url('https://www.transparenttextures.com/patterns/cubes.png')">
+                            </div>
+                            <div class="position-relative z-1">
+                                <div class="bg-white bg-opacity-25 rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-4"
+                                     style="width: 70px;
+                                            height: 70px">
+                                    <i class="ti ti-trophy fs-1"></i>
+                                </div>
+                                <h2 class="display-6 fw-bold mb-3">
+                                    {% if torneo %}
+                                        Editar Torneo
+                                    {% else %}
+                                        Nuevo Torneo
+                                    {% endif %}
+                                </h2>
+                                <p class="opacity-75 fs-5">Define el desafío, establece las bases y organiza la competencia definitiva del club.</p>
+                                <ul class="list-unstyled mt-5">
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="ti ti-check bg-white bg-opacity-25 rounded-circle p-1 me-2"
+                                           style="font-size: 0.8rem"></i>
+                                        Categorías Personalizadas
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="ti ti-check bg-white bg-opacity-25 rounded-circle p-1 me-2"
+                                           style="font-size: 0.8rem"></i>
+                                        Gestión de Jugadores
+                                    </li>
+                                    <li class="mb-3 d-flex align-items-center">
+                                        <i class="ti ti-check bg-white bg-opacity-25 rounded-circle p-1 me-2"
+                                           style="font-size: 0.8rem"></i>
+                                        Control de Fechas
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mt-auto position-relative z-1">
+                                <div class="d-flex align-items-center opacity-50 small">
+                                    <i class="ti ti-shield-check me-2"></i>
+                                    <span>Panel de Administración Seguro</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Formulario principal (Lado Derecho) -->
+                        <div class="col-lg-8 p-4 p-md-5 bg-card">
+                            {% if form.errors %}
+                                <div class="alert alert-danger rounded-4 border-0 mb-4 p-4 shadow-sm">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="ti ti-alert-circle fs-4 me-2"></i>
+                                        <strong class="fs-5">Por favor, corrija los siguientes errores:</strong>
+                                    </div>
+                                    <ul class="mb-0 mt-2">
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}<li class="mb-1">{{ field|title }}: {{ error }}</li>{% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            <form method="POST" class="modern-form">
+                                {% csrf_token %}
+                                <div class="row g-4">
+                                    <!-- Nombre -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre del Torneo</label>
+                                        <div class="input-group modern-input-group">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
+                                            <input type="text"
+                                                   name="nombre"
+                                                   class="form-control border-0 py-2 bg-transparent"
+                                                   value="{{ form.nombre.value|default:'' }}"
+                                                   placeholder="Ej: Torneo Apertura 2024"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <!-- Fechas -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Inicio</label>
+                                        <div class="input-group modern-input-group">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-event text-primary"></i></span>
+                                            <input type="date"
+                                                   name="fecha_inicio"
+                                                   class="form-control border-0 py-2 bg-transparent"
+                                                   value="{{ form.fecha_inicio.value|date:'Y-m-d'|default:'' }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Fin</label>
+                                        <div class="input-group modern-input-group">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-check text-primary"></i></span>
+                                            <input type="date"
+                                                   name="fecha_fin"
+                                                   class="form-control border-0 py-2 bg-transparent"
+                                                   value="{{ form.fecha_fin.value|date:'Y-m-d'|default:'' }}"
+                                                   required>
+                                        </div>
+                                    </div>
+                                    <!-- Categoría y Árbitro -->
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
+                                        <div class="input-group modern-input-group">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-tags text-primary"></i></span>
+                                            <select name="categoria"
+                                                    class="form-select border-0 py-2 bg-transparent"
+                                                    required>
+                                                {% for cat in form.categoria.field.queryset %}
+                                                    <option value="{{ cat.id }}"
+                                                            {% if form.categoria.value|add:"0" == cat.id %}selected{% endif %}>
+                                                        {{ cat.nombre }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro Asignado</label>
+                                        <div class="input-group modern-input-group">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-shield text-primary"></i></span>
+                                            <select name="arbitro"
+                                                    class="form-select border-0 py-2 bg-transparent"
+                                                    required>
+                                                {% for arb in form.arbitro.field.queryset %}
+                                                    <option value="{{ arb.id }}"
+                                                            {% if form.arbitro.value|add:"0" == arb.id %}selected{% endif %}>
+                                                        {{ arb.get_full_name|default:arb.username }}
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- Descripción -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
+                                        <div class="input-group modern-input-group align-items-start pt-1">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                                            <textarea name="descripcion"
+                                                      class="form-control border-0 py-2 bg-transparent"
+                                                      rows="4"
+                                                      placeholder="Explique las reglas, lugar y objetivos del torneo..."
+                                                      required>{{ form.descripcion.value|default:'' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <!-- Premios -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Premios</label>
+                                        <div class="input-group modern-input-group align-items-start pt-1">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-gift text-primary"></i></span>
+                                            <textarea name="premios"
+                                                      class="form-control border-0 py-2 bg-transparent"
+                                                      rows="3"
+                                                      placeholder="Indique trofeos, premios en metálico o puntos...">{{ form.premios.value|default:'' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <!-- Jugadores Inscritos -->
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Jugadores Inscritos</label>
+                                        <div class="input-group modern-input-group align-items-start pt-1">
+                                            <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-users text-primary"></i></span>
+                                            <select name="jugadores_inscritos"
+                                                    class="form-select border-0 py-2 bg-transparent"
+                                                    multiple
+                                                    style="min-height: 150px">
+                                                {% for jugador in form.fields.jugadores_inscritos.queryset %}
+                                                    <option value="{{ jugador.id }}"
+                                                            {% if jugador.id in form.jugadores_inscritos.value %}selected{% endif %}>
+                                                        {{ jugador.get_full_name|default:jugador.username }} ({{ jugador.cedula }})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="form-text mt-2 small opacity-75">
+                                            <i class="ti ti-info-circle me-1"></i>
+                                            Mantenga presionada la tecla <strong>Ctrl</strong> (o Cmd en Mac) para seleccionar múltiples jugadores.
+                                        </div>
+                                    </div>
+                                    <!-- Acciones -->
+                                    <div class="col-12">
+                                        <hr class="my-4 opacity-50">
+                                        <div class="d-flex flex-column flex-md-row gap-3">
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm order-md-2 hover-lift">
+                                                <i class="ti ti-device-floppy me-2"></i>
+                                                {% if torneo %}
+                                                    Guardar Cambios
+                                                {% else %}
+                                                    Crear Torneo
+                                                {% endif %}
+                                            </button>
+                                            <button type="button"
+                                                    onclick="history.back()"
+                                                    class="btn btn-light btn-lg rounded-pill px-4 fw-bold order-md-1">
+                                                <i class="ti ti-arrow-left me-2"></i>Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <h2 class="display-6 fw-bold mb-3">
-                  {% if torneo %}
-                    Editar Torneo
-                  {% else %}
-                    Nuevo Torneo
-                  {% endif %}
-                </h2>
-                <p class="opacity-75 fs-5">Define el desafío, establece las bases y organiza la competencia definitiva del club.</p>
-                <ul class="list-unstyled mt-5">
-                  <li class="mb-3 d-flex align-items-center">
-                    <i class="ti ti-check bg-white bg-opacity-25 rounded-circle p-1 me-2"
-                       style="font-size: 0.8rem"></i>
-                    Categorías Personalizadas
-                  </li>
-                  <li class="mb-3 d-flex align-items-center">
-                    <i class="ti ti-check bg-white bg-opacity-25 rounded-circle p-1 me-2"
-                       style="font-size: 0.8rem"></i>
-                    Gestión de Jugadores
-                  </li>
-                  <li class="mb-3 d-flex align-items-center">
-                    <i class="ti ti-check bg-white bg-opacity-25 rounded-circle p-1 me-2"
-                       style="font-size: 0.8rem"></i>
-                    Control de Fechas
-                  </li>
-                </ul>
-              </div>
-              <div class="mt-auto position-relative z-1">
-                <div class="d-flex align-items-center opacity-50 small">
-                  <i class="ti ti-shield-check me-2"></i>
-                  <span>Panel de Administración Seguro</span>
-                </div>
-              </div>
             </div>
-            <!-- Formulario principal (Lado Derecho) -->
-            <div class="col-lg-8 p-4 p-md-5 bg-card">
-              {% if form.errors %}
-                <div class="alert alert-danger rounded-4 border-0 mb-4 p-4 shadow-sm">
-                  <div class="d-flex align-items-center mb-2">
-                    <i class="ti ti-alert-circle fs-4 me-2"></i>
-                    <strong class="fs-5">Por favor, corrija los siguientes errores:</strong>
-                  </div>
-                  <ul class="mb-0 mt-2">
-                    {% for field, errors in form.errors.items %}
-                      {% for error in errors %}<li class="mb-1">{{ field|title }}: {{ error }}</li>{% endfor %}
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endif %}
-              <form method="POST" class="modern-form">
-                {% csrf_token %}
-                <div class="row g-4">
-                  <!-- Nombre -->
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre del Torneo</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
-                      <input type="text"
-                             name="nombre"
-                             class="form-control border-0 py-2 bg-transparent"
-                             value="{{ form.nombre.value|default:'' }}"
-                             placeholder="Ej: Torneo Apertura 2024"
-                             required>
-                    </div>
-                  </div>
-                  <!-- Fechas -->
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Inicio</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-event text-primary"></i></span>
-                      <input type="date"
-                             name="fecha_inicio"
-                             class="form-control border-0 py-2 bg-transparent"
-                             value="{{ form.fecha_inicio.value|date:'Y-m-d'|default:'' }}"
-                             required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Fin</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-check text-primary"></i></span>
-                      <input type="date"
-                             name="fecha_fin"
-                             class="form-control border-0 py-2 bg-transparent"
-                             value="{{ form.fecha_fin.value|date:'Y-m-d'|default:'' }}"
-                             required>
-                    </div>
-                  </div>
-                  <!-- Categoría y Árbitro -->
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-tags text-primary"></i></span>
-                      <select name="categoria"
-                              class="form-select border-0 py-2 bg-transparent"
-                              required>
-                        {% for cat in form.categoria.field.queryset %}
-                          <option value="{{ cat.id }}"
-                                  {% if form.categoria.value|add:"0" == cat.id %}selected{% endif %}>
-                            {{ cat.nombre }}
-                          </option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro Asignado</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-shield text-primary"></i></span>
-                      <select name="arbitro"
-                              class="form-select border-0 py-2 bg-transparent"
-                              required>
-                        {% for arb in form.arbitro.field.queryset %}
-                          <option value="{{ arb.id }}"
-                                  {% if form.arbitro.value|add:"0" == arb.id %}selected{% endif %}>
-                            {{ arb.get_full_name|default:arb.username }}
-                          </option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                  </div>
-                  <!-- Descripción -->
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
-                    <div class="input-group modern-input-group align-items-start pt-1">
-                      <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
-                      <textarea name="descripcion"
-                                class="form-control border-0 py-2 bg-transparent"
-                                rows="4"
-                                placeholder="Explique las reglas, lugar y objetivos del torneo..."
-                                required>{{ form.descripcion.value|default:'' }}</textarea>
-                    </div>
-                  </div>
-                  <!-- Premios -->
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Premios</label>
-                    <div class="input-group modern-input-group align-items-start pt-1">
-                      <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-gift text-primary"></i></span>
-                      <textarea name="premios"
-                                class="form-control border-0 py-2 bg-transparent"
-                                rows="3"
-                                placeholder="Indique trofeos, premios en metálico o puntos...">{{ form.premios.value|default:'' }}</textarea>
-                    </div>
-                  </div>
-                  <!-- Jugadores Inscritos -->
-                  <div class="col-12">
-                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Jugadores Inscritos</label>
-                    <div class="input-group modern-input-group align-items-start pt-1">
-                      <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-users text-primary"></i></span>
-                      <select name="jugadores_inscritos"
-                              class="form-select border-0 py-2 bg-transparent"
-                              multiple
-                              style="min-height: 150px">
-                        {% for jugador in form.fields.jugadores_inscritos.queryset %}
-                          <option value="{{ jugador.id }}"
-                                  {% if jugador.id in form.jugadores_inscritos.value %}selected{% endif %}>
-                            {{ jugador.get_full_name|default:jugador.username }} ({{ jugador.cedula }})
-                          </option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                    <div class="form-text mt-2 small opacity-75">
-                      <i class="ti ti-info-circle me-1"></i>
-                      Mantenga presionada la tecla <strong>Ctrl</strong> (o Cmd en Mac) para seleccionar múltiples jugadores.
-                    </div>
-                  </div>
-                  <!-- Acciones -->
-                  <div class="col-12">
-                    <hr class="my-4 opacity-50">
-                    <div class="d-flex flex-column flex-md-row gap-3">
-                      <button type="submit"
-                              class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm order-md-2 hover-lift">
-                        <i class="ti ti-device-floppy me-2"></i>
-                        {% if torneo %}
-                          Guardar Cambios
-                        {% else %}
-                          Crear Torneo
-                        {% endif %}
-                      </button>
-                      <button type="button"
-                              onclick="history.back()"
-                              class="btn btn-light btn-lg rounded-pill px-4 fw-bold order-md-1">
-                        <i class="ti ti-arrow-left me-2"></i>Cancelar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
-  <style>
+    <style>
     /* Estilos base del sistema */
     .bg-card { background: #ffffff; }
     [data-bs-theme="dark"] .bg-card { background: #1a1d21; }
@@ -270,5 +271,5 @@
         background-color: var(--bs-primary) !important;
         color: white;
     }
-  </style>
+    </style>
 {% endblock %}

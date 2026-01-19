@@ -5,156 +5,156 @@
      tabindex="-1"
      aria-labelledby="createCourtModalLabel"
      aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <!-- Header Moderno con Gradiente -->
-      <div class="modal-header bg-primary py-3 border-0">
-        <h5 class="modal-title fw-bold text-white d-flex align-items-center"
-            id="createCourtModalLabel">
-          <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
-               style="width: 32px;
-                      height: 32px">
-            <i class="ti ti-ball-tennis fs-5"></i>
-          </div>
-          Registrar Nueva Cancha
-        </h5>
-        <button type="button"
-                class="btn-close btn-close-white"
-                data-bs-dismiss="modal"
-                aria-label="Close"></button>
-      </div>
-      <div class="modal-body p-4 p-md-5 bg-card">
-        <form action="{% url 'core:admin_create_court' %}"
-              method="POST"
-              enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="row g-4">
-            <!-- Nombre -->
-            <div class="col-md-7">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre de la Cancha</label>
-              <div class="input-group modern-input-group">
-                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-id-badge-2 text-primary"></i></span>
-                <input type="text"
-                       name="court-nombre"
-                       class="form-control border-0 py-2 bg-transparent"
-                       placeholder="Ej: Cancha Central"
-                       required>
-              </div>
-            </div>
-            <!-- Estado -->
-            <div class="col-md-5">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Estado Inicial</label>
-              <div class="input-group modern-input-group">
-                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-activity text-primary"></i></span>
-                <select name="court-estado"
-                        class="form-select border-0 py-2 bg-transparent"
-                        required>
-                  <option value="disponible" selected>Disponible</option>
-                  <option value="mantenimiento">Mantenimiento</option>
-                  <option value="reservada">Reservada</option>
-                </select>
-              </div>
-            </div>
-            <!-- Ubicación -->
-            <div class="col-12">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ubicación Física</label>
-              <div class="input-group modern-input-group">
-                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-map-pin text-primary"></i></span>
-                <input type="text"
-                       name="court-ubicacion"
-                       class="form-control border-0 py-2 bg-transparent"
-                       placeholder="Dirección o referencia de la ubicación"
-                       required>
-              </div>
-            </div>
-            <!-- Grid de Detalles -->
-            <div class="col-md-4">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Precio / Hora</label>
-              <div class="input-group modern-input-group">
-                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-currency-dollar text-primary"></i></span>
-                <input type="number"
-                       name="court-precio_hora"
-                       class="form-control border-0 py-2 bg-transparent"
-                       placeholder="0.00"
-                       step="0.01"
-                       required>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario Apertura</label>
-              <div class="input-group modern-input-group">
-                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
-                <input type="time"
-                       name="court-horario_apertura"
-                       class="form-control border-0 py-2 bg-transparent"
-                       required>
-              </div>
-            </div>
-            <div class="col-md-4">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario Cierre</label>
-              <div class="input-group modern-input-group">
-                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock-pause text-primary"></i></span>
-                <input type="time"
-                       name="court-horario_cierre"
-                       class="form-control border-0 py-2 bg-transparent"
-                       required>
-              </div>
-            </div>
-            <!-- Descripción -->
-            <div class="col-12">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
-              <div class="input-group modern-input-group align-items-start pt-1">
-                <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
-                <textarea name="court-descripcion"
-                          class="form-control border-0 py-2 bg-transparent"
-                          rows="3"
-                          placeholder="Detalles de la cancha..."
-                          required></textarea>
-              </div>
-            </div>
-            <!-- Imagen -->
-            <div class="col-12">
-              <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de la Cancha</label>
-              <div class="image-crop-container">
-                <div id="court-drop-zone-modal"
-                     class="news-drop-zone-modern"
-                     onclick="this.querySelector('input[type=file]').click()">
-                  <div class="d-none">
-                    <input type="file" name="court-imagen" accept="image/*">
-                  </div>
-                  <div class="upload-placeholder text-center p-5">
-                    <div class="upload-icon-wrapper mb-3">
-                      <i class="ti ti-camera-plus fs-1 text-primary"></i>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header Moderno con Gradiente -->
+            <div class="modal-header bg-primary py-3 border-0">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center"
+                    id="createCourtModalLabel">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                         style="width: 32px;
+                                height: 32px">
+                        <i class="ti ti-ball-tennis fs-5"></i>
                     </div>
-                    <h6 class="fw-bold mb-1">Subir Foto</h6>
-                    <p class="text-muted small mb-0">Arrastre aquí o haga clic para seleccionar</p>
-                  </div>
-                  <div id="court-image-overlay-modal" class="image-preview-overlay d-none">
-                    <img id="court-preview-img-modal" src="" alt="Vista previa">
-                    <div class="preview-actions">
-                      <span class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold">
-                        <i class="ti ti-refresh me-2"></i>Cambiar Foto
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                    Registrar Nueva Cancha
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
             </div>
-          </div>
-          <!-- Botones de Acción -->
-          <div class="d-grid gap-3 mt-5">
-            <button type="submit"
-                    class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
-              <i class="ti ti-device-floppy me-2"></i>Guardar Cancha
-            </button>
-            <button type="button"
-                    class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
-                    data-bs-dismiss="modal">Cancelar</button>
-          </div>
-        </form>
-      </div>
+            <div class="modal-body p-4 p-md-5 bg-card">
+                <form action="{% url 'core:admin_create_court' %}"
+                      method="POST"
+                      enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <!-- Nombre -->
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre de la Cancha</label>
+                            <div class="input-group modern-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-id-badge-2 text-primary"></i></span>
+                                <input type="text"
+                                       name="court-nombre"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       placeholder="Ej: Cancha Central"
+                                       required>
+                            </div>
+                        </div>
+                        <!-- Estado -->
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Estado Inicial</label>
+                            <div class="input-group modern-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-activity text-primary"></i></span>
+                                <select name="court-estado"
+                                        class="form-select border-0 py-2 bg-transparent"
+                                        required>
+                                    <option value="disponible" selected>Disponible</option>
+                                    <option value="mantenimiento">Mantenimiento</option>
+                                    <option value="reservada">Reservada</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Ubicación -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ubicación Física</label>
+                            <div class="input-group modern-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-map-pin text-primary"></i></span>
+                                <input type="text"
+                                       name="court-ubicacion"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       placeholder="Dirección o referencia de la ubicación"
+                                       required>
+                            </div>
+                        </div>
+                        <!-- Grid de Detalles -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Precio / Hora</label>
+                            <div class="input-group modern-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-currency-dollar text-primary"></i></span>
+                                <input type="number"
+                                       name="court-precio_hora"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       placeholder="0.00"
+                                       step="0.01"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario Apertura</label>
+                            <div class="input-group modern-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
+                                <input type="time"
+                                       name="court-horario_apertura"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario Cierre</label>
+                            <div class="input-group modern-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock-pause text-primary"></i></span>
+                                <input type="time"
+                                       name="court-horario_cierre"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       required>
+                            </div>
+                        </div>
+                        <!-- Descripción -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
+                            <div class="input-group modern-input-group align-items-start pt-1">
+                                <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                                <textarea name="court-descripcion"
+                                          class="form-control border-0 py-2 bg-transparent"
+                                          rows="3"
+                                          placeholder="Detalles de la cancha..."
+                                          required></textarea>
+                            </div>
+                        </div>
+                        <!-- Imagen -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de la Cancha</label>
+                            <div class="image-crop-container">
+                                <div id="court-drop-zone-modal"
+                                     class="news-drop-zone-modern"
+                                     onclick="this.querySelector('input[type=file]').click()">
+                                    <div class="d-none">
+                                        <input type="file" name="court-imagen" accept="image/*">
+                                    </div>
+                                    <div class="upload-placeholder text-center p-5">
+                                        <div class="upload-icon-wrapper mb-3">
+                                            <i class="ti ti-camera-plus fs-1 text-primary"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-1">Subir Foto</h6>
+                                        <p class="text-muted small mb-0">Arrastre aquí o haga clic para seleccionar</p>
+                                    </div>
+                                    <div id="court-image-overlay-modal" class="image-preview-overlay d-none">
+                                        <img id="court-preview-img-modal" src="" alt="Vista previa">
+                                        <div class="preview-actions">
+                                            <span class="btn btn-primary rounded-pill px-4 shadow-lg fw-bold">
+                                                <i class="ti ti-refresh me-2"></i>Cambiar Foto
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botones de Acción -->
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="submit"
+                                class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                            <i class="ti ti-device-floppy me-2"></i>Guardar Cancha
+                        </button>
+                        <button type="button"
+                                class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <style>
 /* Los estilos base se comparten desde lista_canchas.html o se definen aquí si es necesario */

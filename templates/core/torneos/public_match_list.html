@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="container py-5">
+        <!-- Header -->
+        <div class="d-flex align-items-center justify-content-between mb-5">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-holder"
+                     style="background: rgba(16, 185, 129, 0.1);
+                            color: #10B981;
+                            width: 50px;
+                            height: 50px;
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center">
+                    <i class="ti ti-ball-tennis fs-3"></i>
+                </div>
+                <h1 class="h2 fw-bold mb-0">Todos los Partidos</h1>
+            </div>
+            <a href="{% url 'core:home' %}"
+               class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="ti ti-arrow-left me-1"></i>Volver al Inicio
+            </a>
+        </div>
+        <!-- Filtros Rápidos -->
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <button class="tag-filter-modern active" onclick="filterMatches('all', this)">Todos</button>
+            <button class="tag-filter-modern" onclick="filterMatches('finalizado', this)">Resultados</button>
+            <button class="tag-filter-modern"
+                    onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
+            <button class="tag-filter-modern" onclick="filterMatches('cancelado', this)">Cancelados</button>
+        </div>
+        <!-- Lista de Partidos -->
+        <div class="row g-4" id="match-list-container">
+            {% for partido in partidos %}
+                <div class="col-lg-6 match-item" data-status="{{ partido.estado }}">
+                    <div class="match-card-modern mb-0"
+                         style="cursor: pointer"
+                         data-bs-toggle="modal"
+                         data-bs-target="#matchModal"
+                         data-match-id="{{ partido.id }}"
+                         data-match-fecha="{{ partido.fecha|date:'Y-m-d' }}"
+                         data-match-hora="{{ partido.hora|time:'H:i' }}"
+                         data-match-estado="{{ partido.estado }}"
+                         data-match-estado-display="{{ partido.get_estado_display }}"
+                         data-match-equipo1="{% for j in partido.equipo1.all %}{{ j.first_name }} {{ j.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                         data-match-equipo2="{% for j in partido.equipo2.all %}{{ j.first_name }} {{ j.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                         data-match-cancha="{{ partido.cancha.nombre|default:'Por asignar' }}"
+                         data-match-ubicacion="{{ partido.cancha.ubicacion|default:'' }}"
+                         data-match-torneo="{{ partido.torneo.nombre|default:'Partido Amistoso' }}"
+                         data-match-marcador="{{ partido.marcador|default:'0-0' }}">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
+                                <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }} • {{ partido.hora|time:"H:i" }}
+                            </span>
+                            <span class="badge {% if partido.estado == 'finalizado' %}bg-success{% elif partido.estado == 'cancelado' %}bg-danger{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% elif partido.estado == 'cancelado' %}text-danger{% else %}text-primary{% endif %} px-3 py-2 rounded-pill small">
+                                {{ partido.get_estado_display }}
+                            </span>
+                        </div>
+                        <div class="row align-items-center g-0">
+                            <div class="col-5 text-end pe-3">
+                                <div class="fw-bold h6 mb-0 text-truncate">
+                                    {% for j in partido.equipo1.all %}
+                                        {{ j.first_name }}
+                                        {% if not forloop.last %},{% endif %}
+                                    {% empty %}
+                                        Equipo 1
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-2 text-center">
+                                {% if partido.estado == 'finalizado' %}
+                                    <div class="h4 fw-bold mb-0 text-primary">{{ partido.marcador|default:"0-0" }}</div>
+                                {% else %}
+                                    <div class="small fw-bold px-3 py-1 border rounded-pill bg-light text-muted">VS</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-5 ps-3">
+                                <div class="fw-bold h6 mb-0 text-truncate">
+                                    {% for j in partido.equipo2.all %}
+                                        {{ j.first_name }}
+                                        {% if not forloop.last %},{% endif %}
+                                    {% empty %}
+                                        Equipo 2
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="ti ti-mood-empty fs-display-1 text-muted opacity-25"></i>
+                    <p class="text-muted mt-3">No hay partidos registrados aún.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Modal Detalles de Partido (Copiado de home.html para consistencia) -->
+    <div class="modal fade" id="matchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                 style="background: var(--card-bg, #0f172a)">
+                <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <span id="matchModalStatusBadge"
+                          class="badge rounded-pill px-3 py-2 small fw-bold"></span>
+                    <button type="button"
+                            class="btn-close btn-close-white shadow-none"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 pt-2">
+                    <div class="text-center mb-4">
+                        <div id="matchModalTournament"
+                             class="text-primary small fw-bold text-uppercase mb-1"></div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-muted small">
+                            <i class="ti ti-calendar"></i> <span id="matchModalDate"></span>
+                            <span class="mx-1">•</span>
+                            <i class="ti ti-clock"></i> <span id="matchModalTime"></span>
+                        </div>
+                    </div>
+                    <div class="row align-items-center g-3 mb-4">
+                        <div class="col-5 text-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                 style="width: 50px;
+                                        height: 50px">
+                                <i class="ti ti-users text-primary fs-3"></i>
+                            </div>
+                            <div id="matchModalEquipo1" class="fw-bold text-white small"></div>
+                        </div>
+                        <div class="col-2 text-center">
+                            <div id="matchModalScoreContainer">
+                                <span id="matchModalScore" class="h2 fw-bold text-primary mb-0"></span>
+                            </div>
+                            <div id="matchModalVsContainer" class="d-none">
+                                <span class="badge bg-light text-muted rounded-pill px-3 py-1 fw-bold">VS</span>
+                            </div>
+                        </div>
+                        <div class="col-5 text-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                 style="width: 50px;
+                                        height: 50px">
+                                <i class="ti ti-users text-primary fs-3"></i>
+                            </div>
+                            <div id="matchModalEquipo2" class="fw-bold text-white small"></div>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-4"
+                         style="background: rgba(255,255,255,0.03);
+                                border: 1px solid rgba(255,255,255,0.05)">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="bg-info bg-opacity-10 p-2 rounded-3">
+                                <i class="ti ti-map-pin text-info fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold small">Ubicación</div>
+                                <div id="matchModalCancha" class="text-muted small"></div>
+                                <div id="matchModalUbicacion" class="text-muted x-small opacity-75"></div>
+                            </div>
+                        </div>
+                        <div id="matchModalInProgressRow" class="d-none">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-pill bg-success bg-opacity-10 border border-success border-opacity-20 animate-pulse">
+                                <span class="badge bg-success rounded-circle p-1 ms-1"></span>
+                                <span class="text-success small fw-bold">Partido en Progreso</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button"
+                            class="btn btn-secondary w-100 rounded-pill py-2 fw-bold border-0 shadow-sm"
+                            data-bs-dismiss="modal"
+                            style="background: rgba(255,255,255,0.05)">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+.tag-filter-modern {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--bs-body-color);
+    padding: 0.5rem 1.2rem;
+    border-radius: 100px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.tag-filter-modern:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-2px);
+}
+.tag-filter-modern.active {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+    box-shadow: 0 4px 12px rgba(var(--bs-primary-rgb), 0.3);
+}
+.match-card-modern {
+    background: var(--card-bg, #ffffff);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.dark-mode .match-card-modern {
+    background: #1e293b;
+    border-color: rgba(255,255,255,0.05);
+}
+.match-card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-color: var(--bs-primary);
+}
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .7; }
+}
+    </style>
+    <script>
+function filterMatches(status, btn) {
+    const items = document.querySelectorAll('.match-item');
+    const btns = document.querySelectorAll('.tag-filter-modern');
+    
+    btns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    items.forEach(item => {
+        if (status === 'all') {
+            item.classList.remove('d-none');
+        } else {
+            const allowed = status.split(',');
+            if (allowed.includes(item.dataset.status)) {
+                item.classList.remove('d-none');
+            } else {
+                item.classList.add('d-none');
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const matchModal = document.getElementById('matchModal');
+    if (matchModal) {
+        matchModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const data = button.dataset;
+            
+            document.getElementById('matchModalTournament').textContent = data.matchTorneo;
+            document.getElementById('matchModalDate').textContent = new Date(data.matchFecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('matchModalTime').textContent = data.matchHora + ' hs';
+            document.getElementById('matchModalEquipo1').textContent = data.matchEquipo1;
+            document.getElementById('matchModalEquipo2').textContent = data.matchEquipo2;
+            document.getElementById('matchModalCancha').textContent = data.matchCancha;
+            document.getElementById('matchModalUbicacion').textContent = data.matchUbicacion;
+            
+            const statusBadge = document.getElementById('matchModalStatusBadge');
+            statusBadge.textContent = data.matchEstadoDisplay;
+            
+            document.getElementById('matchModalScoreContainer').classList.add('d-none');
+            document.getElementById('matchModalVsContainer').classList.add('d-none');
+            document.getElementById('matchModalInProgressRow').classList.add('d-none');
+            
+            if (data.matchEstado === 'finalizado') {
+                statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-success bg-opacity-10 text-success';
+                document.getElementById('matchModalScoreContainer').classList.remove('d-none');
+                document.getElementById('matchModalScore').textContent = data.matchMarcador;
+            } else if (data.matchEstado === 'cancelado') {
+                statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-danger bg-opacity-10 text-danger';
+                document.getElementById('matchModalVsContainer').classList.remove('d-none');
+            } else {
+                statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-primary bg-opacity-10 text-primary';
+                document.getElementById('matchModalVsContainer').classList.remove('d-none');
+                
+                // Live check (same logic as home)
+                const matchDate = data.matchFecha;
+                const matchTimeStr = data.matchHora;
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                
+                if (matchDate === todayStr) {
+                    const [hours, minutes] = matchTimeStr.split(':').map(Number);
+                    const matchStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+                    const matchEnd = new Date(matchStart.getTime() + 90 * 60000);
+                    if (now >= matchStart && now <= matchEnd) {
+                        document.getElementById('matchModalInProgressRow').classList.remove('d-none');
+                        statusBadge.textContent = 'En Progreso';
+                        statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-warning bg-opacity-10 text-warning';
+                    }
+                }
+            }
+        });
+    }
+});
+    </script>
+{% endblock %}

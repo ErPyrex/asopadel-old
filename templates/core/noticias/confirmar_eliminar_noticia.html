@@ -1,42 +1,42 @@
 {% extends 'base.html' %}
 {% block title %}Confirmar eliminación{% endblock %}
 {% block back_url %}
-  <a href="{% url 'core:admin_noticias_list' %}" class="btn-back-custom">
-    <i class="ti ti-chevron-left"></i>
-  </a>
+    <a href="{% url 'core:admin_noticias_list' %}" class="btn-back-custom">
+        <i class="ti ti-chevron-left"></i>
+    </a>
 {% endblock %}
 {% block content %}
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-          <div class="card-body p-5 text-center">
-            <div class="icon-box mb-4 mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle"
-                 style="width: 80px;
-                        height: 80px">
-              <i class="ti ti-alert-triangle fs-1"></i>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-body p-5 text-center">
+                        <div class="icon-box mb-4 mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle"
+                             style="width: 80px;
+                                    height: 80px">
+                            <i class="ti ti-alert-triangle fs-1"></i>
+                        </div>
+                        <h2 class="fw-bold mb-3">¿Eliminar noticia?</h2>
+                        <p class="text-muted mb-4 fs-5">
+                            Estás a punto de eliminar la noticia:
+                            <br>
+                            <strong class="text-dark">"{{ noticia.titulo }}"</strong>.
+                            <br>
+                            Esta acción no se puede deshacer.
+                        </p>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="d-grid gap-3">
+                                <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold">
+                                    <i class="ti ti-trash me-2"></i>Sí, eliminar definitivamente
+                                </button>
+                                <a href="{% url 'core:admin_noticias_list' %}"
+                                   class="btn btn-light btn-lg rounded-pill fw-bold border">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <h2 class="fw-bold mb-3">¿Eliminar noticia?</h2>
-            <p class="text-muted mb-4 fs-5">
-              Estás a punto de eliminar la noticia:
-              <br>
-              <strong class="text-dark">"{{ noticia.titulo }}"</strong>.
-              <br>
-              Esta acción no se puede deshacer.
-            </p>
-            <form method="POST">
-              {% csrf_token %}
-              <div class="d-grid gap-3">
-                <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold">
-                  <i class="ti ti-trash me-2"></i>Sí, eliminar definitivamente
-                </button>
-                <a href="{% url 'core:admin_noticias_list' %}"
-                   class="btn btn-light btn-lg rounded-pill fw-bold border">Cancelar</a>
-              </div>
-            </form>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 {% endblock %}
