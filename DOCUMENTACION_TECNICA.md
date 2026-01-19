@@ -1,112 +1,75 @@
-# ASOPADEL BARINAS - Documentación Técnica Completa 🎾
+# ASOPADEL BARINAS - Documentación Técnica Integral 🎾
 
-## Tabla de Contenidos
+## 📋 1. Introducción
 
-1. [Introducción](#introducción)
-2. [Arquitectura del Sistema](#arquitectura-del-sistema)
-3. [Modelos de Datos](#modelos-de-datos)
-4. [Roles y Permisos](#roles-y-permisos)
-5. [Seguridad del Sistema](#seguridad-del-sistema)
-6. [Calidad y Testing](#calidad-y-testing)
-7. [Configuración y Despliegue](#configuración-y-despliegue)
-8. [Guías de Desarrollo](#guías-de-desarrollo)
+ASOPADEL BARINAS es una plataforma web "Premium" diseñada para centralizar y profesionalizar la gestión de la **Asociación de Pádel de Barinas**. El sistema permite una administración fluida de torneos, sistemas de ranking competitivos, gestión de instalaciones y un motor de noticias en tiempo real, todo bajo una arquitectura segura y escalable.
 
----
+### Core Tecnológico
 
-## Introducción
-
-ASOPADEL BARINAS es una aplicación web integral diseñada para la gestión de la **Asociación de Pádel de Barinas**. Permite centralizar la administración de jugadores, árbitros, torneos, canchas y noticias bajo una arquitectura segura y moderna.
-
-### Tecnologías Core
-
-- **Backend:** Django 5.x
-- **Base de Datos:** PostgreSQL (Producción) / SQLite o PG (Desarrollo)
-- **Servidor Web:** Gunicorn + WhiteNoise (Estáticos)
-- **Contenedores:** Docker & Docker Compose
-- **Despliegue:** Optimizado para Render.com
+- **Framework:** Django 5.x (Python)
+- **Base de Datos:** PostgreSQL (almacenamiento persistente)
+- **Estáticos:** WhiteNoise con compresión y manifestación cacheada.
+- **Entorno:** Contenedores Docker para reproducibilidad total.
+- **Infraestructura:** Despliegue optimizado para la nube (Render.com).
 
 ---
 
-## Arquitectura del Sistema
+## 🏗️ 2. Arquitectura del Sistema
 
-### Estructura de Directorios Actualizada
+### Diagrama de Componentes
 
-```text
-asopadel-old/
-├── asopadel_barinas/      # Configuración central (settings, urls, wsgi)
-├── core/                  # Dashboards, home y lógica compartida
-├── users/                 # Gestión de usuarios (Modelo personalizado con cédula)
-├── competitions/          # Torneos y partidos
-├── facilities/            # Gestión de canchas
-├── blog/                  # Sistema de noticias
-├── static/                # Archivos estáticos fuente (CSS, JS, Imágenes)
-├── templates/             # Plantillas HTML globales (diseño premium)
-├── requirements.txt       # Dependencias de Python
-├── render.yaml            # Configuración de Infraestructura para Render
-├── build.sh               # Script de construcción para despliegue
-├── entrypoint.sh          # Script de inicio para Docker
-├── Dockerfile             # Definición de contenedor de aplicación
-└── pytest.ini             # Configuración del framework de pruebas
+```mermaid
+graph TD
+    User((Usuario/Navegador)) -->|HTTPS| LoadBalancer[Load Balancer / Ingress]
+    LoadBalancer -->|WSGI| Gunicorn[Gunicorn Server]
+    Gunicorn -->|Django App| CoreLogic[Lógica de Negocio]
+    
+    subgraph "Django Applications"
+        CoreLogic --> UsersApp[Users: Autenticación y Roles]
+        CoreLogic --> CompeteApp[Competitions: Torneos y Ranking]
+        CoreLogic --> FacilityApp[Facilities: Canchas y Reservas]
+        CoreLogic --> BlogApp[Blog: Noticias y Media]
+    end
+    
+    CoreLogic -->|Consulta| DB[(PostgreSQL)]
+    CoreLogic -->|Archivos| Media[(Media Storage)]
+    CoreLogic -->|Lectura| Static[(Static Files)]
 ```
 
+### Organización del Código
+
+El proyecto sigue una estructura modular donde cada aplicación encapsula una responsabilidad de dominio:
+
+- **`core/`**: Motor central. Contiene los dashboards dinámicos según el rol, la lógica de la página de inicio y herramientas administrativas globales.
+- **`users/`**: Identidad digital. Implementa un modelo de usuario personalizado basado en la cédula venezolana.
+- **`competitions/`**: Corazón deportivo. Manejo de cuadros de torneos, lógica de equipos (1v1, 2v2) y recálculo de ranking ELO.
+- **`facilities/`**: Operativa física. Control de disponibilidad de canchas en tiempo real y sistema de reservas.
+- **`blog/`**: Canal de comunicación. Noticiero con gestión avanzada de imágenes y puntos focales.
+
 ---
 
-## Modelos de Datos
+## 🗄️ 3. Modelos de Datos y Escenarios de Uso
 
-### Diagrama de Entidad-Relación
+### Esquema Relacional Principal
 
-A continuación se presenta el esquema visual de la base de datos:
+A continuación se detalla la estructura visual de las entidades más críticas:
 
 ```mermaid
 erDiagram
-    USUARIO ||--o{ RESERVACANCHA : realiza
+    USUARIO ||--o{ RESERVA : realiza
     USUARIO ||--o{ PARTIDO : arbitra
-    USUARIO ||--o{ TORNEO : gestiona
-    USUARIO ||--o{ TESTADISTICA : tiene
-    USUARIO }|--o{ PARTIDO : participa_equipo1
-    USUARIO }|--o{ PARTIDO : participa_equipo2
-    USUARIO }|--o{ TORNEO : se_inscribe
-
-    CANCHA ||--o{ RESERVACANCHA : contiene
+    USUARIO }|--o{ PARTIDO : participa
+    TORNEO ||--o{ PARTIDO : contiene
     CANCHA ||--o{ PARTIDO : hospeda
-
-    TORNEO ||--o{ PARTIDO : organiza
-    CATEGORIA ||--o{ TORNEO : define
-    CATEGORIA ||--o{ TESTADISTICA : agrupa
-
-    USUARIO ||--o{ NOTICIA : escribe
+    CANCHA ||--o{ RESERVA : asignada
 
     USUARIO {
         string cedula PK
         string email UK
-        string first_name
-        string last_name
         bool es_admin_aso
         bool es_arbitro
         bool es_jugador
-        integer ranking
-    }
-
-    CANCHA {
-        string nombre
-        string estado
-        decimal precio_hora
-        time horario_apertura
-        time horario_cierre
-    }
-
-    RESERVACANCHA {
-        date fecha
-        time hora_inicio
-        time hora_fin
-        string estado
-    }
-
-    TORNEO {
-        string nombre
-        date fecha_inicio
-        date fecha_fin
-        bool cancelado
+        int ranking
     }
 
     PARTIDO {
@@ -114,117 +77,65 @@ erDiagram
         time hora
         string marcador
         string estado
-        integer ediciones_resultado
-    }
-
-    NOTICIA {
-        string titulo
-        text cuerpo
-        date fecha_publicacion
     }
 ```
 
-### Detalle de Modelos por Aplicación
-
-#### 1. Usuarios (`users.Usuario`)
-
-Utiliza la **Cédula** como identificador único principal (`USERNAME_FIELD`).
-
-- **Roles:** Flags booleanos `es_admin_aso`, `es_arbitro`, `es_jugador`.
-- **Exclusividad de Roles:** Historial gestionado mediante `rol_previo_admin` para preservar integridad al cambiar permisos.
-- **Ranking:** Puntuación entera para el sistema de clasificación competitiva.
-
-#### 2. Competiciones (`competitions`)
-
-- **Torneo:** Entidad principal para eventos. Agrupa jugadores inscritos y gestiona la vigencia temporal.
-- **Partido:**
-  - **Equipos:** Soporte para Padel (1v1 o 2v2) mediante campos `equipo1` y `equipo2` (ManyToMany).
-  - **Control:** Seguimiento de `ediciones_resultado` para auditoría de árbitros.
-- **EstadisticaJugador:** Acumula victorias, derrotas y partidos jugados por jugador y categoría.
-
-#### 3. Instalaciones (`facilities`)
-
-- **Cancha:** Gestiona disponibilidad dinámica. El método `get_estado_actual` calcula el estado real cruzando datos de `ReservaCancha` y `Partido`.
-- **ReservaCancha:** Permite a los jugadores reservar espacios independientes de los torneos oficiales.
-
-#### 4. Blog (`blog`)
-
-- **Noticia:** Sistema de información con soporte para imágenes con punto focal ajustable (`imagen_pos_x`, `imagen_pos_y`) para garantizar encuadres precisos en el frontend.
+### Lógica de Disponibilidad Dinámica
+Una característica clave es el método `get_estado_actual` en el modelo `Cancha`, que determina si una instalación está ocupada cruzando datos de:
+1. **Mantenimiento manual**: Marcado por administradores.
+2. **Reservas Pendientes/Confirmadas**: Del modelo `ReservaCancha`.
+3. **Partidos Programados**: Del modelo `Partido` (asumiendo una ventana de 2 horas por encuentro).
 
 ---
 
-## Roles y Permisos
+## 🔒 4. Seguridad y Cumplimiento
 
-1. **Jugador:** Acceso a perfil premium (con edición rápida y recorte de foto), inscripción en torneos y visualización de rankings.
-2. **Árbitro:** Capacidad para cargar resultados de partidos asignados. Limitado a **máximo 2 ediciones** por resultado para evitar manipulación de datos.
-3. **Administrador:** Gestión total de contenidos (noticias, canchas, torneos) y partidos (creación, edición y cancelación condicional).
-4. **Superusuario:** Único rol capaz de gestionar roles de cualquier usuario (Admin, Árbitro, Jugador) a través de un panel unificado con preservación de historial.
+El sistema está blindado mediante múltiples capas de seguridad configuradas en `settings.py`:
 
----
-
-## Seguridad del Sistema
-
-El sistema implementa capas críticas de seguridad:
-
-- **Gestión de Secretos:** Integración total con variables de entorno (`.env`).
-- **Rate Limiting:** Protección contra fuerza bruta en Login (5 intentos/min por IP) usando `django-ratelimit`.
-- **Validación de Archivos:** Las imágenes subidas se limitan a 5MB y formatos específicos, con procesamiento mediante `Pillow`.
-- **Headers HTTP:** `X-Frame-Options: DENY`, `SecurityMiddleware` de Django activo.
-- **Sesiones:** Expiración tras 1 hora de inactividad.
+- **Protección de Datos:**
+    - `SESSION_COOKIE_HTTPONLY` y `CSRF_COOKIE_HTTPONLY` activos para mitigar ataques XSS.
+    - `SESSION_COOKIE_AGE` limitado a 1 hora de inactividad.
+- **Integridad de Cabeceras:**
+    - `X-Frame-Options: DENY` contra clickjacking.
+    - `SECURE_CONTENT_TYPE_NOSNIFF` activo.
+- **Control de Acceso:** Middlewares estrictos de autenticación que redirigen a los usuarios a sus paneles específicos (`dashboard_by_role`) basándose en permisos.
 
 ---
 
-## Calidad y Testing
+## 🎨 5. Diseño y Experiencia de Usuario (UX/UI)
 
-### Framework de Pruebas
-
-Se utiliza **pytest** para la ejecución de pruebas, aunque se mantiene compatibilidad con `manage.py test`.
-
-**Ejecución:**
-
-```bash
-# Local con pytest
-pytest
-
-# En Docker
-docker compose exec web pytest
-```
+### Sistema de Diseño Premium
+- **Modo Oscuro Integrado**: Soporte nativo para temas claro/oscuro con detección automática del sistema.
+- **Micro-interacciones**: Transiciones suaves, botones `hover-lift` y tarjetas interactivas.
+- **Navegación Inteligente**: Implementación de `Smart Back` que detecta el historial de navegación para evitar "bucles" de retroceso infinitos.
+- **Diseño Responsivo**: Adaptación total a dispositivos móviles mediante Bootstrap 5.3 + Custom CSS optimizado.
 
 ---
 
-## Configuración y Despliegue
+## 🛠️ 6. Herramientas Administrativas Avanzadas
 
-### Despliegue en Render (Recomendado)
+### Gestión de Ranking (Sistema ELO Adaptado)
+El proyecto incluye comandos de gestión (`recalculate_stats`) que permiten recalcular el ranking de todos los jugadores basándose en el historial de partidos finalizados, asignando puntos por victoria y penalizaciones por derrota.
 
-El proyecto incluye un archivo `render.yaml` que define la arquitectura en la nube:
+### Promoción de Roles
+Único en su clase, el sistema permite que el Superusuario promueva o degrade usuarios entre roles (Jugador -> Administrador) **preservando el historial original**. Al degradar a un admin, el sistema consulta el campo `rol_previo_admin` para devolver al usuario a su estado anterior (Árbitro o Jugador).
 
-1. **Base de Datos:** PostgreSQL gestionado.
-2. **Servicio Web:**
-   - **Comando de Build:** `./build.sh` (instala, migra y colecta estáticos).
-   - **Comando de Start:** `gunicorn asopadel_barinas.wsgi:application`.
+---
 
-### Desarrollo con Docker
+## 🚀 7. Guía de Despliegue y Mantenimiento
 
-El entorno local usa Docker Compose para replicar la base de datos PostgreSQL:
+### Producción (Render.com)
+1. El archivo `render.yaml` orquestra el despliegue automático.
+2. `build.sh` realiza la instalación de dependencias, ejecución de migraciones y recolección de estáticos.
+3. Se utiliza `dj-database-url` para una conexión segura a la DB en la nube.
 
+### Desarrollo Local
 ```bash
 docker compose up --build
 ```
-
-- **Persistent Data:** Los datos de la DB se guardan en el volumen `postgres_data`.
-- **Media/Static:** Volúmenes compartidos para manejar archivos subidos.
+Los logs del sistema se almacenan localmente en la carpeta `logs/security.log` para auditoría inmediata de accesos fallidos.
 
 ---
 
-## Guías de Desarrollo
-
-### Flujo de Trabajo (Git Flow)
-
-1. Ramas: `feature/` o `bugfix/`.
-2. Commits: Seguir convención de **Conventional Commits** (`feat:`, `fix:`, `docs:`, `test:`).
-3. **Mantenimiento:** Evitar subir archivos temporales, logs o carpetas `__pycache__` (gestionado por `.gitignore`).
-
----
-
-**Última actualización:** Enero 2026
-**Mantenido por:** Equipo ASOPADEL
+**Versión:** 2.1 (Actualizado Enero 2026)  
+**Estado:** Producción Optimizada
