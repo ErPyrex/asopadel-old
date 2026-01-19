@@ -1,93 +1,115 @@
 {% load static %}
 <!-- Modal Crear Noticia (Shared) -->
-<div class="modal fade" id="createNoticiaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-            <!-- Header con Gradiente Sutil -->
-            <div class="modal-header bg-primary py-3 border-0">
-                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
-                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                        <i class="ti ti-plus fs-5"></i>
-                    </div>
-                    Nueva Noticia
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade"
+     id="createNoticiaModal"
+     tabindex="-1"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <!-- Header con Gradiente Sutil -->
+      <div class="modal-header bg-primary py-3 border-0">
+        <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+          <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+               style="width: 32px;
+                      height: 32px">
+            <i class="ti ti-plus fs-5"></i>
+          </div>
+          Nueva Noticia
+        </h5>
+        <button type="button"
+                class="btn-close btn-close-white"
+                data-bs-dismiss="modal"
+                aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 p-md-5 bg-card">
+        <form action="{% url 'core:admin_create_noticia' %}"
+              method="POST"
+              enctype="multipart/form-data"
+              id="noticiaFormModal">
+          {% csrf_token %}
+          <!-- Campo Título -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título de la Noticia</label>
+            <div class="input-group modern-input-group">
+              <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
+              <input type="text"
+                     name="titulo"
+                     class="form-control border-0 py-2 bg-transparent"
+                     placeholder="Escriba un título impactante..."
+                     required>
             </div>
-            
-            <div class="modal-body p-4 p-md-5 bg-card">
-                <form action="{% url 'core:admin_create_noticia' %}" method="POST" enctype="multipart/form-data" id="noticiaFormModal">
-                    {% csrf_token %}
-                    
-                    <!-- Campo Título -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título de la Noticia</label>
-                        <div class="input-group modern-input-group">
-                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
-                            <input type="text" name="titulo" class="form-control border-0 py-2 bg-transparent" placeholder="Escriba un título impactante..." required>
-                        </div>
-                    </div>
-                    
-                    <!-- Campo Contenido -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
-                        <div class="input-group modern-input-group align-items-start pt-1">
-                            <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
-                            <textarea name="cuerpo" class="form-control border-0 py-2 bg-transparent" rows="5" placeholder="Cuente los detalles de la noticia..." required></textarea>
-                        </div>
-                    </div>
-                    
-                    <!-- Zona de Imagen / Cropper -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de Portada</label>
-                        <input type="hidden" id="news-pos-x-modal" name="imagen_pos_x" value="50">
-                        <input type="hidden" id="news-pos-y-modal" name="imagen_pos_y" value="50">
-                        
-                        <div class="image-crop-container">
-                            <!-- Zona de Drop -->
-                            <div id="news-drop-zone-modal" class="news-drop-zone-modern" onclick="document.getElementById('news-file-input-modal').click()">
-                                <input type="file" id="news-file-input-modal" name="imagen" accept="image/*" class="d-none">
-                                <div class="upload-placeholder text-center p-5">
-                                    <div class="upload-icon-wrapper mb-3">
-                                        <i class="ti ti-cloud-upload fs-1 text-primary"></i>
-                                    </div>
-                                    <h6 class="fw-bold mb-1">Cargar Imagen</h6>
-                                    <p class="text-muted small mb-0">Arrastre aquí o haga clic para seleccionar</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Zona de Recorte -->
-                            <div id="news-crop-zone-modal" class="news-crop-zone-modern d-none">
-                                <div class="crop-header d-flex justify-content-between align-items-center mb-3">
-                                    <span class="small text-muted fw-medium"><i class="ti ti-hand-grab me-2"></i>Arrastra para ajustar el encuadre</span>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold" onclick="resetNewsImageModal()">
-                                        <i class="ti ti-refresh me-1"></i>Cambiar
-                                    </button>
-                                </div>
-                                <div class="news-crop-viewport-modern shadow-sm">
-                                    <div class="news-crop-frame" id="news-crop-frame-modal">
-                                        <img id="news-preview-modal" src="" alt="Vista previa" draggable="false">
-                                    </div>
-                                </div>
-                                <div class="text-center mt-3">
-                                    <span class="badge bg-light text-muted fw-normal rounded-pill px-3 py-2 border">Vista previa de la posición focal</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Botones de Acción -->
-                    <div class="d-grid gap-3 mt-5">
-                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
-                            <i class="ti ti-check-double me-2"></i>Publicar Noticia
-                        </button>
-                        <button type="button" class="btn btn-link text-muted fw-bold text-decoration-none shadow-none" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                </form>
+          </div>
+          <!-- Campo Contenido -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+            <div class="input-group modern-input-group align-items-start pt-1">
+              <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+              <textarea name="cuerpo"
+                        class="form-control border-0 py-2 bg-transparent"
+                        rows="5"
+                        placeholder="Cuente los detalles de la noticia..."
+                        required></textarea>
             </div>
-        </div>
+          </div>
+          <!-- Zona de Imagen / Cropper -->
+          <div class="mb-4">
+            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de Portada</label>
+            <input type="hidden" id="news-pos-x-modal" name="imagen_pos_x" value="50">
+            <input type="hidden" id="news-pos-y-modal" name="imagen_pos_y" value="50">
+            <div class="image-crop-container">
+              <!-- Zona de Drop -->
+              <div id="news-drop-zone-modal"
+                   class="news-drop-zone-modern"
+                   onclick="document.getElementById('news-file-input-modal').click()">
+                <input type="file"
+                       id="news-file-input-modal"
+                       name="imagen"
+                       accept="image/*"
+                       class="d-none">
+                <div class="upload-placeholder text-center p-5">
+                  <div class="upload-icon-wrapper mb-3">
+                    <i class="ti ti-cloud-upload fs-1 text-primary"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1">Cargar Imagen</h6>
+                  <p class="text-muted small mb-0">Arrastre aquí o haga clic para seleccionar</p>
+                </div>
+              </div>
+              <!-- Zona de Recorte -->
+              <div id="news-crop-zone-modal" class="news-crop-zone-modern d-none">
+                <div class="crop-header d-flex justify-content-between align-items-center mb-3">
+                  <span class="small text-muted fw-medium"><i class="ti ti-hand-grab me-2"></i>Arrastra para ajustar el encuadre</span>
+                  <button type="button"
+                          class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold"
+                          onclick="resetNewsImageModal()">
+                    <i class="ti ti-refresh me-1"></i>Cambiar
+                  </button>
+                </div>
+                <div class="news-crop-viewport-modern shadow-sm">
+                  <div class="news-crop-frame" id="news-crop-frame-modal">
+                    <img id="news-preview-modal" src="" alt="Vista previa" draggable="false">
+                  </div>
+                </div>
+                <div class="text-center mt-3">
+                  <span class="badge bg-light text-muted fw-normal rounded-pill px-3 py-2 border">Vista previa de la posición focal</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Botones de Acción -->
+          <div class="d-grid gap-3 mt-5">
+            <button type="submit"
+                    class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+              <i class="ti ti-check-double me-2"></i>Publicar Noticia
+            </button>
+            <button type="button"
+                    class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                    data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
-
 <style>
 /* Colores y Estilos del Modal */
 .bg-card { background: #ffffff; }
@@ -185,7 +207,6 @@
 .hover-lift { transition: transform 0.2s ease; }
 .hover-lift:hover { transform: translateY(-3px); }
 </style>
-
 <script>
 (function() {
     const dropZone = document.getElementById('news-drop-zone-modal');

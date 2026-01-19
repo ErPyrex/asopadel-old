@@ -1,36 +1,36 @@
 {% extends 'base.html' %}
 {% block title %}Cancelar Reserva{% endblock %}
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card border-danger shadow-lg">
-                    <div class="card-header bg-danger text-white">
-                        <h4 class="mb-0">
-                            <i class="bi bi-exclamation-triangle"></i> Cancelar Reserva
-                        </h4>
-                    </div>
-                    <div class="card-body p-4 text-center">
-                        <p class="lead">¿Estás seguro que deseas cancelar tu reserva?</p>
-                        <div class="card my-4 bg-light">
-                            <div class="card-body">
-                                <h5 class="text-primary">{{ reserva.cancha.nombre }}</h5>
-                                <p class="mb-1 fs-5">
-                                    <strong>{{ reserva.fecha|date:"l d F, Y" }}</strong>
-                                </p>
-                                <p class="mb-0">{{ reserva.hora_inicio|time:"H:i" }} a {{ reserva.hora_fin|time:"H:i" }}</p>
-                            </div>
-                        </div>
-                        <form method="POST">
-                            {% csrf_token %}
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-danger btn-lg">Sí, Confirmar Cancelación</button>
-                                <a href="{% url 'core:player_reservations' %}" class="btn btn-secondary">No, Volver</a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card border-danger shadow-lg">
+          <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">
+              <i class="bi bi-exclamation-triangle"></i> Cancelar Reserva
+            </h4>
+          </div>
+          <div class="card-body p-4 text-center">
+            <p class="lead">¿Estás seguro que deseas cancelar tu reserva?</p>
+            <div class="card my-4 bg-light">
+              <div class="card-body">
+                <h5 class="text-primary">{{ reserva.cancha.nombre }}</h5>
+                <p class="mb-1 fs-5">
+                  <strong>{{ reserva.fecha|date:"l d F, Y" }}</strong>
+                </p>
+                <p class="mb-0">{{ reserva.hora_inicio|time:"H:i" }} a {{ reserva.hora_fin|time:"H:i" }}</p>
+              </div>
             </div>
+            <form method="POST">
+              {% csrf_token %}
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger btn-lg">Sí, Confirmar Cancelación</button>
+                <a href="{% url 'core:player_reservations' %}" class="btn btn-secondary">No, Volver</a>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 {% endblock %}

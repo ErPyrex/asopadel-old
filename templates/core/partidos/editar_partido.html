@@ -1,33 +1,33 @@
 {% extends 'base.html' %}
 {% block title %}Editar Partido{% endblock %}
 {% block content %}
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow-lg">
-                    <div class="card-body p-5">
-                        <h2 class="card-title text-center mb-4">Editar Partido</h2>
-                        <!-- Información del partido actual -->
-                        <div class="alert alert-info mb-4">
-                            <strong>Partido:</strong> {{ partido.torneo.nombre|default:"Amistoso / Casual" }}
-                            <br>
-                            <strong>Fecha actual:</strong> {{ partido.fecha }} {{ partido.hora }}
-                            <br>
-                            <strong>Estado:</strong> {{ partido.get_estado_display }}
-                        </div>
-                        <form method="POST">
-                            {% csrf_token %}
-                            {{ form.as_p }}
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                                <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">Cancelar</a>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow-lg">
+          <div class="card-body p-5">
+            <h2 class="card-title text-center mb-4">Editar Partido</h2>
+            <!-- Información del partido actual -->
+            <div class="alert alert-info mb-4">
+              <strong>Partido:</strong> {{ partido.torneo.nombre|default:"Amistoso / Casual" }}
+              <br>
+              <strong>Fecha actual:</strong> {{ partido.fecha }} {{ partido.hora }}
+              <br>
+              <strong>Estado:</strong> {{ partido.get_estado_display }}
             </div>
+            <form method="POST">
+              {% csrf_token %}
+              {{ form.as_p }}
+              <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">Cancelar</a>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -1,120 +1,118 @@
 {% extends 'base.html' %}
 {% block title %}Jugadores registrados{% endblock %}
 {% block content %}
-    <div class="container">
-        <h2 class="text-center mb-4">Jugadores Registrados</h2>
-        <div class="d-flex justify-content-between mb-4">
-            <form method="get" class="d-flex">
-                <input type="text"
-                       name="q"
-                       placeholder="Buscar por nombre..."
-                       value="{{ query }}"
-                       class="form-control me-2">
-                <button type="submit" class="btn btn-primary">Buscar</button>
-            </form>
-        </div>
-        <div class="card shadow-lg">
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Cédula</th>
-                                <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Categoría</th>
-                                <th>Ranking</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for jugador in jugadores %}
-                                <tr>
-                                    <td>{{ jugador.cedula }}</td>
-                                    <td>{{ jugador.first_name }} {{ jugador.last_name }}</td>
-                                    <td>{{ jugador.email }}</td>
-                                    <td>{{ jugador.telefono }}</td>
-                                    <td>
-                                        <form method="POST"
-                                              action="{% url 'core:admin_update_player_category' jugador.id %}"
-                                              class="d-flex align-items-center">
-                                            {% csrf_token %}
-                                            <select name="categoria"
-                                                    class="form-select form-select-sm me-2"
-                                                    onchange="this.form.submit()">
-                                                <option value="" {% if not jugador.categoria_jugador %}selected{% endif %}>
-                                                    Sin
-                                                    categoría
-                                                </option>
-                                                {# FIXED - FORMATTER SAFE #}
-                                                {% for codigo, nombre in categorias %}
-                                                    {% if jugador.categoria_jugador == codigo %}
-                                                        <option value="{{ codigo }}" selected>{{ nombre }}</option>
-                                                    {% else %}
-                                                        <option value="{{ codigo }}">{{ nombre }}</option>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </select>
-                                        </form>
-                                    </td>
-                                    <td>{{ jugador.ranking }}</td>
-                                    <td>
-                                        <a href="{% url 'core:admin_edit_player' jugador.id %}"
-                                           class="btn btn-warning btn-sm">Editar</a>
-                                        <button type="button"
-                                                class="btn btn-danger btn-sm"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deletePlayerModal"
-                                                data-player-name="{{ jugador.first_name }} {{ jugador.last_name }}"
-                                                data-delete-url="{% url 'core:admin_delete_player' jugador.id %}">
-                                            Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% empty %}
-                                <tr>
-                                    <td colspan="6" class="text-center">No hay jugadores registrados.</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <h2 class="text-center mb-4">Jugadores Registrados</h2>
+    <div class="d-flex justify-content-between mb-4">
+      <form method="get" class="d-flex">
+        <input type="text"
+               name="q"
+               placeholder="Buscar por nombre..."
+               value="{{ query }}"
+               class="form-control me-2">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </form>
     </div>
-    <!-- Modal de Confirmación de Eliminación -->
-    <div class="modal fade"
-         id="deletePlayerModal"
-         tabindex="-1"
-         aria-labelledby="deletePlayerModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deletePlayerModalLabel">Confirmar Eliminación</h5>
-                    <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                            aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        ¿Estás seguro de que deseas eliminar al jugador <strong id="modalPlayerName"></strong>?
-                    </p>
-                    <p class="text-muted small">Esta acción es permanente y no se puede deshacer.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form id="deletePlayerForm" method="POST" action="">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Eliminar Jugador</button>
+    <div class="card shadow-lg">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Cédula</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Categoría</th>
+                <th>Ranking</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for jugador in jugadores %}
+                <tr>
+                  <td>{{ jugador.cedula }}</td>
+                  <td>{{ jugador.first_name }} {{ jugador.last_name }}</td>
+                  <td>{{ jugador.email }}</td>
+                  <td>{{ jugador.telefono }}</td>
+                  <td>
+                    <form method="POST"
+                          action="{% url 'core:admin_update_player_category' jugador.id %}"
+                          class="d-flex align-items-center">
+                      {% csrf_token %}
+                      <select name="categoria"
+                              class="form-select form-select-sm me-2"
+                              onchange="this.form.submit()">
+                        <option value="" {% if not jugador.categoria_jugador %}selected{% endif %}>
+                          Sin
+                          categoría
+                        </option>
+                        {# FIXED - FORMATTER SAFE #}
+                        {% for codigo, nombre in categorias %}
+                          {% if jugador.categoria_jugador == codigo %}
+                            <option value="{{ codigo }}" selected>{{ nombre }}</option>
+                          {% else %}
+                            <option value="{{ codigo }}">{{ nombre }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
                     </form>
-                </div>
-            </div>
+                  </td>
+                  <td>{{ jugador.ranking }}</td>
+                  <td>
+                    <a href="{% url 'core:admin_edit_player' jugador.id %}"
+                       class="btn btn-warning btn-sm">Editar</a>
+                    <button type="button"
+                            class="btn btn-danger btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deletePlayerModal"
+                            data-player-name="{{ jugador.first_name }} {{ jugador.last_name }}"
+                            data-delete-url="{% url 'core:admin_delete_player' jugador.id %}">Eliminar</button>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center">No hay jugadores registrados.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-    <script>
+  </div>
+  <!-- Modal de Confirmación de Eliminación -->
+  <div class="modal fade"
+       id="deletePlayerModal"
+       tabindex="-1"
+       aria-labelledby="deletePlayerModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="deletePlayerModalLabel">Confirmar Eliminación</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            ¿Estás seguro de que deseas eliminar al jugador <strong id="modalPlayerName"></strong>?
+          </p>
+          <p class="text-muted small">Esta acción es permanente y no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <form id="deletePlayerForm" method="POST" action="">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Eliminar Jugador</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
     const deletePlayerModal = document.getElementById('deletePlayerModal')
     if (deletePlayerModal) {
         deletePlayerModal.addEventListener('show.bs.modal', event => {
@@ -132,5 +130,5 @@
             modalForm.action = deleteUrl
         })
     }
-    </script>
+  </script>
 {% endblock %}

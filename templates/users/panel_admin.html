@@ -1,226 +1,226 @@
 {% extends 'base.html' %}
 {% block title %}Panel de Administrador | ASOPADEL{% endblock %}
 {% block content %}
-    <div class="container-fluid py-2">
-        <div class="row g-4">
-            <!-- Sidebar -->
-            <nav id="sidebar"
-                 class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-white card-static shadow-sm rounded-4 p-3 h-100">
-                <div class="position-sticky">
-                    <div class="px-3 mb-4 mt-2 text-center">
-                        <h6 class="text-uppercase small fw-bold text-muted mb-0">Panel Administrativo</h6>
-                    </div>
-                    <ul class="nav flex-column gap-1 p-0 list-unstyled">
-                        <li class="nav-item">
-                            <a class="nav-link active rounded-3"
-                               href="{% url 'core:admin_dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-3"
-                               href="{% url 'core:admin_noticias_list' %}">Noticias</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-3" href="{% url 'core:admin_canchas_list' %}">Canchas</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-3" href="{% url 'core:admin_torneos_list' %}">Torneos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-3"
-                               href="{% url 'core:admin_partidos_list' %}">Partidos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-3" href="{% url 'core:admin_player_list' %}">Jugadores</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link rounded-3"
-                               href="{% url 'core:admin_arbitros_list' %}">Árbitros</a>
-                        </li>
-                        {% if user.is_superuser %}
-                            <li class="nav-item">
-                                <a class="nav-link rounded-3" href="{% url 'users:admin_management' %}">Gestión de Admins</a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </nav>
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4 pt-2">
-                    <h1 class="h3 fw-bold mb-0">Panel de Control</h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <span class="badge bg-white text-muted border p-2 rounded-3 shadow-sm fw-normal">
-                            <i class="bi bi-calendar me-1"></i> {% now "d F, Y" %}
-                        </span>
-                    </div>
-                </div>
-                <!-- Metrics -->
-                <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-3">
-                        <div class="card card-static metric-card primary shadow-sm border-0 h-100">
-                            <div class="card-body p-3 p-lg-4">
-                                <p class="metric-label">Jugadores</p>
-                                <h2 class="metric-value" data-target="{{ total_jugadores }}">{{ total_jugadores }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card card-static metric-card success shadow-sm border-0 h-100">
-                            <div class="card-body p-3 p-lg-4">
-                                <p class="metric-label">Árbitros</p>
-                                <h2 class="metric-value" data-target="{{ total_arbitros }}">{{ total_arbitros }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card card-static metric-card info shadow-sm border-0 h-100">
-                            <div class="card-body p-3 p-lg-4">
-                                <p class="metric-label">Canchas</p>
-                                <h2 class="metric-value" data-target="{{ total_canchas }}">{{ total_canchas }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="card card-static metric-card warning shadow-sm border-0 h-100">
-                            <div class="card-body p-3 p-lg-4">
-                                <p class="metric-label">Torneos</p>
-                                <h2 class="metric-value" data-target="{{ total_torneos }}">{{ total_torneos }}</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Management Rows -->
-                <div class="row g-4">
-                    <!-- Noticias -->
-                    <div class="col-lg-12">
-                        <div class="card card-static shadow-sm border-0">
-                            <div class="card-body p-4">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <div class="d-flex align-items-center mb-2">
-                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                                                <i class="bi bi-newspaper fs-5 text-primary"></i>
-                                            </div>
-                                            <h5 class="fw-bold mb-0">Noticias y comunicados</h5>
-                                        </div>
-                                        <p class="text-muted small mb-0">
-                                            Administra avisos y novedades para la comunidad de
-                                            ASOPADEL Barinas.
-                                        </p>
-                                    </div>
-                                    <div class="col-md-4 mt-3 mt-md-0 d-flex gap-2">
-                                        <a href="{% url 'core:admin_noticias_list' %}"
-                                           class="btn btn-primary btn-sm flex-fill">Ver todo</a>
-                                        <button class="btn btn-success btn-sm flex-fill fw-bold"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#createNoticiaModal">Nueva noticia</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Torneos y Partidos -->
-                    <div class="col-md-6">
-                        <div class="card card-static shadow-sm border-0 h-100">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center justify-content-between mb-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-secondary bg-opacity-10 p-2 rounded-3 me-3">
-                                            <i class="bi bi-trophy fs-5 text-secondary"></i>
-                                        </div>
-                                        <h5 class="fw-bold mb-0">Torneos</h5>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <a href="{% url 'core:admin_torneos_list' %}"
-                                           class="btn btn-outline-primary btn-sm">Lista</a>
-                                        <a href="{% url 'core:admin_create_tournament' %}"
-                                           class="btn btn-success btn-sm">Crear</a>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
-                                    <span class="small fw-bold text-muted">Total registrados</span>
-                                    <span class="badge bg-secondary rounded-pill">{{ total_torneos }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card card-static shadow-sm border-0 h-100">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-3">
-                                            <i class="bi bi-grid-3x3-gap fs-5 text-warning"></i>
-                                        </div>
-                                        <h5 class="fw-bold mb-0">Partidos</h5>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <a href="{% url 'core:admin_partidos_list' %}"
-                                           class="btn btn-outline-primary btn-sm">Ver</a>
-                                        <a href="{% url 'core:admin_create_match' %}"
-                                           class="btn btn-success btn-sm">Nuevo</a>
-                                    </div>
-                                </div>
-                                <a href="{% url 'core:admin_pending_results_list' %}"
-                                   class="btn btn-warning w-100 text-white btn-sm fw-bold">
-                                    <i class="bi bi-check2-square me-2"></i>Cargar Resultados Pendientes
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Árbitros, Canchas, Jugadores en una fila compacta -->
-                    <div class="col-md-4">
-                        <div class="card card-static shadow-sm border-0">
-                            <div class="card-body p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h6 class="fw-bold mb-0">
-                                        <i class="bi bi-person-badge me-2 text-success"></i>Árbitros
-                                    </h6>
-                                    <a href="{% url 'core:admin_arbitros_list' %}"
-                                       class="text-primary small text-decoration-none">Ver</a>
-                                </div>
-                                <a href="{% url 'core:admin_create_arbitro' %}"
-                                   class="btn btn-success btn-sm w-100">Nuevo
-                                árbitro</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card card-static shadow-sm border-0">
-                            <div class="card-body p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h6 class="fw-bold mb-0">
-                                        <i class="bi bi-calendar-check me-2 text-info"></i>Canchas
-                                    </h6>
-                                    <a href="{% url 'core:admin_canchas_list' %}"
-                                       class="text-primary small text-decoration-none">Ver</a>
-                                </div>
-                                <button class="btn btn-success btn-sm w-100 fw-bold"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#createCourtModal">Registrar cancha</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card card-static shadow-sm border-0">
-                            <div class="card-body p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-3">
-                                    <h6 class="fw-bold mb-0">
-                                        <i class="bi bi-people me-2 text-dark"></i>Jugadores
-                                    </h6>
-                                    <a href="{% url 'core:admin_player_list' %}"
-                                       class="text-primary small text-decoration-none">Ver</a>
-                                </div>
-                                <a href="{% url 'core:admin_create_player' %}"
-                                   class="btn btn-success btn-sm w-100">Registrar jugador</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+  <div class="container-fluid py-2">
+    <div class="row g-4">
+      <!-- Sidebar -->
+      <nav id="sidebar"
+           class="col-md-3 col-lg-2 d-md-block sidebar collapse bg-white card-static shadow-sm rounded-4 p-3 h-100">
+        <div class="position-sticky">
+          <div class="px-3 mb-4 mt-2 text-center">
+            <h6 class="text-uppercase small fw-bold text-muted mb-0">Panel Administrativo</h6>
+          </div>
+          <ul class="nav flex-column gap-1 p-0 list-unstyled">
+            <li class="nav-item">
+              <a class="nav-link active rounded-3"
+                 href="{% url 'core:admin_dashboard' %}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link rounded-3"
+                 href="{% url 'core:admin_noticias_list' %}">Noticias</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link rounded-3" href="{% url 'core:admin_canchas_list' %}">Canchas</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link rounded-3" href="{% url 'core:admin_torneos_list' %}">Torneos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link rounded-3"
+                 href="{% url 'core:admin_partidos_list' %}">Partidos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link rounded-3" href="{% url 'core:admin_player_list' %}">Jugadores</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link rounded-3"
+                 href="{% url 'core:admin_arbitros_list' %}">Árbitros</a>
+            </li>
+            {% if user.is_superuser %}
+              <li class="nav-item">
+                <a class="nav-link rounded-3" href="{% url 'users:admin_management' %}">Gestión de Admins</a>
+              </li>
+            {% endif %}
+          </ul>
         </div>
+      </nav>
+      <!-- Main Content -->
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4 pt-2">
+          <h1 class="h3 fw-bold mb-0">Panel de Control</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <span class="badge bg-white text-muted border p-2 rounded-3 shadow-sm fw-normal">
+              <i class="bi bi-calendar me-1"></i> {% now "d F, Y" %}
+            </span>
+          </div>
+        </div>
+        <!-- Metrics -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="card card-static metric-card primary shadow-sm border-0 h-100">
+              <div class="card-body p-3 p-lg-4">
+                <p class="metric-label">Jugadores</p>
+                <h2 class="metric-value" data-target="{{ total_jugadores }}">{{ total_jugadores }}</h2>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card card-static metric-card success shadow-sm border-0 h-100">
+              <div class="card-body p-3 p-lg-4">
+                <p class="metric-label">Árbitros</p>
+                <h2 class="metric-value" data-target="{{ total_arbitros }}">{{ total_arbitros }}</h2>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card card-static metric-card info shadow-sm border-0 h-100">
+              <div class="card-body p-3 p-lg-4">
+                <p class="metric-label">Canchas</p>
+                <h2 class="metric-value" data-target="{{ total_canchas }}">{{ total_canchas }}</h2>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card card-static metric-card warning shadow-sm border-0 h-100">
+              <div class="card-body p-3 p-lg-4">
+                <p class="metric-label">Torneos</p>
+                <h2 class="metric-value" data-target="{{ total_torneos }}">{{ total_torneos }}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Management Rows -->
+        <div class="row g-4">
+          <!-- Noticias -->
+          <div class="col-lg-12">
+            <div class="card card-static shadow-sm border-0">
+              <div class="card-body p-4">
+                <div class="row align-items-center">
+                  <div class="col-md-8">
+                    <div class="d-flex align-items-center mb-2">
+                      <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                        <i class="bi bi-newspaper fs-5 text-primary"></i>
+                      </div>
+                      <h5 class="fw-bold mb-0">Noticias y comunicados</h5>
+                    </div>
+                    <p class="text-muted small mb-0">
+                      Administra avisos y novedades para la comunidad de
+                      ASOPADEL Barinas.
+                    </p>
+                  </div>
+                  <div class="col-md-4 mt-3 mt-md-0 d-flex gap-2">
+                    <a href="{% url 'core:admin_noticias_list' %}"
+                       class="btn btn-primary btn-sm flex-fill">Ver todo</a>
+                    <button class="btn btn-success btn-sm flex-fill fw-bold"
+                            data-bs-toggle="modal"
+                            data-bs-target="#createNoticiaModal">Nueva noticia</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Torneos y Partidos -->
+          <div class="col-md-6">
+            <div class="card card-static shadow-sm border-0 h-100">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-secondary bg-opacity-10 p-2 rounded-3 me-3">
+                      <i class="bi bi-trophy fs-5 text-secondary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Torneos</h5>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'core:admin_torneos_list' %}"
+                       class="btn btn-outline-primary btn-sm">Lista</a>
+                    <a href="{% url 'core:admin_create_tournament' %}"
+                       class="btn btn-success btn-sm">Crear</a>
+                  </div>
+                </div>
+                <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+                  <span class="small fw-bold text-muted">Total registrados</span>
+                  <span class="badge bg-secondary rounded-pill">{{ total_torneos }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card card-static shadow-sm border-0 h-100">
+              <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-3">
+                      <i class="bi bi-grid-3x3-gap fs-5 text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Partidos</h5>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'core:admin_partidos_list' %}"
+                       class="btn btn-outline-primary btn-sm">Ver</a>
+                    <a href="{% url 'core:admin_create_match' %}"
+                       class="btn btn-success btn-sm">Nuevo</a>
+                  </div>
+                </div>
+                <a href="{% url 'core:admin_pending_results_list' %}"
+                   class="btn btn-warning w-100 text-white btn-sm fw-bold">
+                  <i class="bi bi-check2-square me-2"></i>Cargar Resultados Pendientes
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- Árbitros, Canchas, Jugadores en una fila compacta -->
+          <div class="col-md-4">
+            <div class="card card-static shadow-sm border-0">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h6 class="fw-bold mb-0">
+                    <i class="bi bi-person-badge me-2 text-success"></i>Árbitros
+                  </h6>
+                  <a href="{% url 'core:admin_arbitros_list' %}"
+                     class="text-primary small text-decoration-none">Ver</a>
+                </div>
+                <a href="{% url 'core:admin_create_arbitro' %}"
+                   class="btn btn-success btn-sm w-100">Nuevo
+                árbitro</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-static shadow-sm border-0">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h6 class="fw-bold mb-0">
+                    <i class="bi bi-calendar-check me-2 text-info"></i>Canchas
+                  </h6>
+                  <a href="{% url 'core:admin_canchas_list' %}"
+                     class="text-primary small text-decoration-none">Ver</a>
+                </div>
+                <button class="btn btn-success btn-sm w-100 fw-bold"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createCourtModal">Registrar cancha</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-static shadow-sm border-0">
+              <div class="card-body p-3">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h6 class="fw-bold mb-0">
+                    <i class="bi bi-people me-2 text-dark"></i>Jugadores
+                  </h6>
+                  <a href="{% url 'core:admin_player_list' %}"
+                     class="text-primary small text-decoration-none">Ver</a>
+                </div>
+                <a href="{% url 'core:admin_create_player' %}"
+                   class="btn btn-success btn-sm w-100">Registrar jugador</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-    <style>
+  </div>
+  <style>
     #sidebar .nav-link {
         font-weight: 500;
         color: var(--color-text);
@@ -252,7 +252,7 @@
     .dark-mode #sidebar .nav-link:hover {
         background-color: #1E293B;
     }
-    </style>
-    {% include 'core/noticias/modals/modal_crear.html' with form=noticia_form %}
-    {% include 'core/canchas/modals/modal_crear.html' %}
+  </style>
+  {% include 'core/noticias/modals/modal_crear.html' with form=noticia_form %}
+  {% include 'core/canchas/modals/modal_crear.html' %}
 {% endblock %}

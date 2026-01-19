@@ -1,23 +1,23 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es" data-bs-theme="auto">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>
-            {% block title %}ASOPADEL BARINAS{% endblock %}
-        </title>
-        <!-- Favicon -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-              rel="stylesheet">
-        <!-- Fonts & Icons -->
-        <link rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
-        <link rel="stylesheet"
-              href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
-        <!-- Script anti-flash: Ejecuta antes de renderizar para aplicar el tema instantáneamente -->
-        <script>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      {% block title %}ASOPADEL BARINAS{% endblock %}
+    </title>
+    <!-- Favicon -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Script anti-flash: Ejecuta antes de renderizar para aplicar el tema instantáneamente -->
+    <script>
         (function () {
             const storedTheme = localStorage.getItem("theme");
             const getPreferredTheme = () => {
@@ -31,193 +31,193 @@
                 document.documentElement.classList.add("dark-mode");
             }
         })();
-        </script>
-    </head>
-    <body>
-        <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
-            <symbol id="circle-half" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z" />
-            </symbol>
-            <symbol id="moon-stars-fill" viewBox="0 0 16 16">
-            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z" />
-            <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z" />
-            </symbol>
-            <symbol id="sun-fill" viewBox="0 0 16 16">
-            <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
-            </symbol>
-        </svg>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid px-lg-5">
-                {% block back_url %}
-                    {% url 'core:home' as home_url %}
-                    {% if request.path != home_url and request.path != '/' %}
-                        <button class="btn-back-custom"
-                                onclick="handleSmartBack('{{ home_url }}')"
-                                aria-label="Volver">
-                            <i class="ti ti-chevron-left"></i>
-                        </button>
-                    {% endif %}
-                {% endblock %}
-                <a class="navbar-brand fw-bolder fs-4" href="{% url 'core:home' %}">
-                    <span class="text-primary">ASOPADEL</span> BARINAS
-                </a>
-                <button class="navbar-toggler border-0 shadow-none"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#navbarNav"
-                        aria-controls="navbarNav"
-                        aria-expanded="false"
-                        aria-label="Toggle navigation">
-                    <i class="ti ti-menu-2 fs-2"></i>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4">
-                        <li class="nav-item">
-                            <a class="nav-link px-3 {% if request.path == '/' or request.path == home_url %}active{% endif %}"
-                               href="{% url 'core:home' %}">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link px-3 {% if '/noticias/' in request.path %}active{% endif %}"
-                               href="{% url 'core:public_noticias_list' %}">Noticias</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link px-3 {% if '/ranking/' in request.path %}active{% endif %}"
-                               href="{% url 'core:ranking' %}">Ranking</a>
-                        </li>
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link px-3 {% if '/dashboard/' in request.path or '/admin-dashboard/' in request.path %}active{% endif %}"
-                                   href="{% url 'core:dashboard_by_role' %}">Panel</a>
-                            </li>
-                        {% else %}
-                            <li class="nav-item">
-                                <a class="nav-link px-3 btn-login-nav" href="{% url 'users:login' %}">Iniciar sesión</a>
-                            </li>
-                        {% endif %}
-                        {% if user.is_authenticated %}
-                            <li class="nav-item dropdown ms-lg-3">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
-                                   href="#"
-                                   id="userDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-                                    <i class="ti ti-user-circle fs-4"></i>
-                                    <span class="d-none d-sm-inline">{{ user.first_name|default:user.username }}</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
-                                    aria-labelledby="userDropdown">
-                                    <li class="px-3 py-2 border-bottom mb-2 d-sm-none">
-                                        <p class="small fw-bold mb-0">{{ user.username }}</p>
-                                        <p class="text-muted mb-0" style="font-size: 10px;">
-                                            {{
-                                            user.get_role_display|default:"Usuario" }}
-                                        </p>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item py-2" href="{% url 'users:perfil' %}">
-                                            <i class="ti ti-user-circle me-2"></i>Mi Perfil
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item py-2"
-                                           href="{% url 'core:player_reservations' %}">
-                                            <i class="ti ti-ball-tennis me-2"></i>Mis Reservas
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <form method="POST" action="{% url 'users:logout' %}" class="px-2">
-                                            {% csrf_token %}
-                                            <button type="submit"
-                                                    class="btn btn-outline-danger btn-sm w-100 border-0 text-start">
-                                                <i class="ti ti-logout me-2"></i>Cerrar Sesión
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        {% endif %}
-                        <li class="nav-item dropdown ms-lg-2">
-                            <button class="btn btn-link nav-link py-1 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
-                                    id="bd-theme"
-                                    type="button"
-                                    aria-expanded="false"
-                                    data-bs-toggle="dropdown"
-                                    data-bs-display="static">
-                                <svg class="bi my-1 theme-icon-active"
-                                     width="16"
-                                     height="16"
-                                     fill="currentColor">
-                                    <use href="#circle-half"></use>
-                                </svg>
-                                <span class="d-lg-none ms-2">Cambiar Tema</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end px-1"
-                                aria-labelledby="bd-theme">
-                                <li>
-                                    <button type="button"
-                                            class="dropdown-item d-flex align-items-center"
-                                            data-bs-theme-value="light">
-                                        <svg class="bi me-2 opacity-50 theme-icon"
-                                             width="16"
-                                             height="16"
-                                             fill="currentColor">
-                                            <use href="#sun-fill"></use>
-                                        </svg>
-                                        Claro
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button"
-                                            class="dropdown-item d-flex align-items-center"
-                                            data-bs-theme-value="dark">
-                                        <svg class="bi me-2 opacity-50 theme-icon"
-                                             width="16"
-                                             height="16"
-                                             fill="currentColor">
-                                            <use href="#moon-stars-fill"></use>
-                                        </svg>
-                                        Oscuro
-                                    </button>
-                                </li>
-                                <li>
-                                    <button type="button"
-                                            class="dropdown-item d-flex align-items-center active"
-                                            data-bs-theme-value="auto">
-                                        <svg class="bi me-2 opacity-50 theme-icon"
-                                             width="16"
-                                             height="16"
-                                             fill="currentColor">
-                                            <use href="#circle-half"></use>
-                                        </svg>
-                                        Sistema
-                                    </button>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <main class="container my-5">
-            {% if messages %}
-                <div class="messages">
-                    {% for message in messages %}<div class="alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}
-                </div>
+    </script>
+  </head>
+  <body>
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <symbol id="circle-half" viewBox="0 0 16 16">
+      <path d="M8 15A7 7 0 1 0 8 1v14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z" />
+      </symbol>
+      <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+      <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z" />
+      <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.734 1.734 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.734 1.734 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.734 1.734 0 0 0 1.097-1.097l.387-1.162zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L13.863.1z" />
+      </symbol>
+      <symbol id="sun-fill" viewBox="0 0 16 16">
+      <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
+      </symbol>
+    </svg>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid px-lg-5">
+        {% block back_url %}
+          {% url 'core:home' as home_url %}
+          {% if request.path != home_url and request.path != '/' %}
+            <button class="btn-back-custom"
+                    onclick="handleSmartBack('{{ home_url }}')"
+                    aria-label="Volver">
+              <i class="ti ti-chevron-left"></i>
+            </button>
+          {% endif %}
+        {% endblock %}
+        <a class="navbar-brand fw-bolder fs-4" href="{% url 'core:home' %}">
+          <span class="text-primary">ASOPADEL</span> BARINAS
+        </a>
+        <button class="navbar-toggler border-0 shadow-none"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+          <i class="ti ti-menu-2 fs-2"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto align-items-center gap-2 gap-lg-4">
+            <li class="nav-item">
+              <a class="nav-link px-3 {% if request.path == '/' or request.path == home_url %}active{% endif %}"
+                 href="{% url 'core:home' %}">Inicio</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-3 {% if '/noticias/' in request.path %}active{% endif %}"
+                 href="{% url 'core:public_noticias_list' %}">Noticias</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link px-3 {% if '/ranking/' in request.path %}active{% endif %}"
+                 href="{% url 'core:ranking' %}">Ranking</a>
+            </li>
+            {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link px-3 {% if '/dashboard/' in request.path or '/admin-dashboard/' in request.path %}active{% endif %}"
+                   href="{% url 'core:dashboard_by_role' %}">Panel</a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link px-3 btn-login-nav" href="{% url 'users:login' %}">Iniciar sesión</a>
+              </li>
             {% endif %}
-            {% block content %}{% endblock %}
-        </main>
-        <footer class="footer">
-            <div class="container">
-                <p>&copy; 2026 ASOPADEL BARINAS. Todos los derechos reservados.</p>
-            </div>
-        </footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="{% static 'js/main.js' %}"></script>
-        <script>
+            {% if user.is_authenticated %}
+              <li class="nav-item dropdown ms-lg-3">
+                <a class="nav-link dropdown-toggle d-flex align-items-center gap-2"
+                   href="#"
+                   id="userDropdown"
+                   role="button"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                  <i class="ti ti-user-circle fs-4"></i>
+                  <span class="d-none d-sm-inline">{{ user.first_name|default:user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0"
+                    aria-labelledby="userDropdown">
+                  <li class="px-3 py-2 border-bottom mb-2 d-sm-none">
+                    <p class="small fw-bold mb-0">{{ user.username }}</p>
+                    <p class="text-muted mb-0" style="font-size: 10px;">
+                      {{
+                      user.get_role_display|default:"Usuario" }}
+                    </p>
+                  </li>
+                  <li>
+                    <a class="dropdown-item py-2" href="{% url 'users:perfil' %}">
+                      <i class="ti ti-user-circle me-2"></i>Mi Perfil
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item py-2"
+                       href="{% url 'core:player_reservations' %}">
+                      <i class="ti ti-ball-tennis me-2"></i>Mis Reservas
+                    </a>
+                  </li>
+                  <li>
+                    <hr class="dropdown-divider">
+                  </li>
+                  <li>
+                    <form method="POST" action="{% url 'users:logout' %}" class="px-2">
+                      {% csrf_token %}
+                      <button type="submit"
+                              class="btn btn-outline-danger btn-sm w-100 border-0 text-start">
+                        <i class="ti ti-logout me-2"></i>Cerrar Sesión
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+            {% endif %}
+            <li class="nav-item dropdown ms-lg-2">
+              <button class="btn btn-link nav-link py-1 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
+                      id="bd-theme"
+                      type="button"
+                      aria-expanded="false"
+                      data-bs-toggle="dropdown"
+                      data-bs-display="static">
+                <svg class="bi my-1 theme-icon-active"
+                     width="16"
+                     height="16"
+                     fill="currentColor">
+                  <use href="#circle-half"></use>
+                </svg>
+                <span class="d-lg-none ms-2">Cambiar Tema</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end px-1"
+                  aria-labelledby="bd-theme">
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center"
+                          data-bs-theme-value="light">
+                    <svg class="bi me-2 opacity-50 theme-icon"
+                         width="16"
+                         height="16"
+                         fill="currentColor">
+                      <use href="#sun-fill"></use>
+                    </svg>
+                    Claro
+                  </button>
+                </li>
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center"
+                          data-bs-theme-value="dark">
+                    <svg class="bi me-2 opacity-50 theme-icon"
+                         width="16"
+                         height="16"
+                         fill="currentColor">
+                      <use href="#moon-stars-fill"></use>
+                    </svg>
+                    Oscuro
+                  </button>
+                </li>
+                <li>
+                  <button type="button"
+                          class="dropdown-item d-flex align-items-center active"
+                          data-bs-theme-value="auto">
+                    <svg class="bi me-2 opacity-50 theme-icon"
+                         width="16"
+                         height="16"
+                         fill="currentColor">
+                      <use href="#circle-half"></use>
+                    </svg>
+                    Sistema
+                  </button>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main class="container my-5">
+      {% if messages %}
+        <div class="messages">
+          {% for message in messages %}<div class="alert alert-{{ message.tags }}">{{ message }}</div>{% endfor %}
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+      <div class="container">
+        <p>&copy; 2026 ASOPADEL BARINAS. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script>
         function handleSmartBack(fallbackUrl) {
             const currentPath = window.location.pathname;
             const referrer = document.referrer;
@@ -240,6 +240,6 @@
                 window.location.href = fallbackUrl;
             }
         }
-        </script>
-    </body>
+    </script>
+  </body>
 </html>

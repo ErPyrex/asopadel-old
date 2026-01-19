@@ -1,412 +1,441 @@
 {% extends 'base.html' %}
 {% block title %}ASOPADEL BARINAS{% endblock %}
 {% block content %}
-    <div class="container-fluid px-lg-5 py-4">
-        <div class="row g-5">
-            <!-- Columna Principal (8): Partidos y Canchas -->
-            <div class="col-lg-8">
-                <!-- Sección Partidos -->
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-                    <div class="home-section-header mb-0">
-                        <div class="icon-holder"
-                             style="background: rgba(16, 185, 129, 0.1);
-                                    color: #10B981">
-                            <i class="ti ti-calendar-stats fs-3"></i>
-                        </div>
-                        <h2 class="section-title-modern">Últimos Partidos</h2>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button class="tag-filter-modern active" onclick="filterMatches('all', this)">Todos</button>
-                        <button class="tag-filter-modern" onclick="filterMatches('finalizado', this)">Resultados</button>
-                        <button class="tag-filter-modern"
-                                onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
-                    </div>
-                </div>
-                <div class="match-list mb-5">
-                    {% if partidos %}
-                        {% for partido in partidos %}
-                            <div class="match-card-modern mb-3" data-status="{{ partido.estado }}">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
-                                        <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }}
-                                    </span>
-                                    <span class="badge {% if partido.estado == 'finalizado' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% else %}text-primary{% endif %} px-3 py-2 rounded-pill small">
-                                        {{ partido.get_estado_display }}
-                                    </span>
-                                </div>
-                                <div class="row align-items-center g-0">
-                                    <div class="col-5 text-end pe-4">
-                                        <div class="fw-bold h5 mb-0 text-truncate">
-                                            {% for j in partido.equipo1.all %}
-                                                {{ j.first_name }}
-                                                {% if not forloop.last %},{% endif %}
-                                            {% empty
-                                                %}Equipo 1
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    <div class="col-2 text-center">
-                                        {% if partido.estado == 'finalizado' %}
-                                            <div class="h3 fw-bold mb-0 text-primary">{{ partido.marcador|default:"0-0" }}</div>
-                                        {% else %}
-                                            <div class="small fw-bold px-3 py-1 border rounded-pill bg-light text-muted">VS</div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-5 ps-4">
-                                        <div class="fw-bold h5 mb-0 text-truncate">
-                                            {% for j in partido.equipo2.all %}
-                                                {{ j.first_name }}
-                                                {% if not forloop.last %},{% endif %}
-                                            {% empty
-                                                %}Equipo 2
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        <div id="no-matches-filtered"
-                             class="card border-0 p-5 text-center rounded-4 d-none"
-                             style="background: var(--color-light)">
-                            <i class="ti ti-search fs-1 text-muted mb-2"></i>
-                            <p class="text-muted mb-0">No se encontraron partidos en esta categoría.</p>
-                        </div>
-                    {% else %}
-                        <div class="card border-0 p-5 text-center rounded-4"
-                             style="background: var(--color-light)">
-                            <i class="ti ti-mood-empty fs-1 text-muted mb-2"></i>
-                            <p class="text-muted mb-0">No hay partidos programados próximamente.</p>
-                        </div>
-                    {% endif %}
-                </div>
-                <!-- Sección Canchas -->
-                <div class="home-section-header mb-4">
-                    <div class="icon-holder"
-                         style="background: rgba(14, 165, 233, 0.1);
-                                color: #0EA5E9">
-                        <i class="ti ti-ball-tennis fs-3"></i>
-                    </div>
-                    <h2 class="section-title-modern">Estado de Canchas</h2>
-                </div>
-                <div class="row g-4 mb-5">
-                    {% for cancha in canchas|slice:":4" %}
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm h-100 ranking-card">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div>
-                                            <h6 class="fw-bold mb-1">{{ cancha.nombre }}</h6>
-                                            <small class="text-muted"><i class="ti ti-map-pin me-1"></i>{{ cancha.ubicacion }}</small>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} shadow-sm"></span>
-                                            <small class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold">
-                                                {{ cancha.get_estado_display }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                    <div class="col-12">
-                        <a href="{% url 'core:public_canchas_list' %}"
-                           class="btn btn-outline-primary w-100 py-3 fw-bold rounded-4">
-                            Consultar Disponibilidad Completa <i class="ti ti-search ms-1"></i>
-                        </a>
-                    </div>
-                </div>
-                <!-- Sección Última Noticia (Ancha) -->
-                {% if noticias %}
-                    {% with noticia=noticias|first %}
-                        <div class="home-section-header mb-4">
-                            <div class="icon-holder"
-                                 style="background: rgba(99, 102, 241, 0.1);
-                                        color: #6366F1">
-                                <i class="ti ti-news fs-3"></i>
-                            </div>
-                            <h2 class="section-title-modern">Última Noticia</h2>
-                        </div>
-                        <button class="btn p-0 border-0 text-start w-100"
-                                data-bs-toggle="modal"
-                                data-bs-target="#noticiaHomeModal{{ noticia.id }}">
-                            <div class="card border-0 shadow-lg ranking-card card-noticia-home-wide overflow-hidden mb-5">
-                                <div class="row g-0">
-                                    {% if noticia.imagen %}
-                                        <div class="col-md-4">
-                                            <img src="{{ noticia.imagen.url }}" class="img-fluid h-100" alt="{{ noticia.titulo }}" style="object-fit: cover; object-position: {{ noticia.imagen_position }}; min-height: 200px">
-                                        </div>
-                                    {% endif %}
-                                    <div class="{% if noticia.imagen %}col-md-8{% else %}col-12{% endif %} p-4 p-md-5 d-flex flex-column justify-content-center">
-                                        <div class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 mb-3 align-self-start">
-                                            NUEVO
-                                        </div>
-                                        <h3 class="h2 fw-bold mb-3 text-heading">{{ noticia.titulo }}</h3>
-                                        <p class="text-muted fs-5 mb-4">{{ noticia.cuerpo|truncatewords:20 }}</p>
-                                        <div class="text-primary fw-bold">
-                                            Continuar leyendo <i class="ti ti-arrow-right ms-1"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </button>
-                        <!-- Modal Detalle Noticia Home -->
-                        <div class="modal fade"
-                             id="noticiaHomeModal{{ noticia.id }}"
-                             tabindex="-1"
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                                    <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
-                                        <button type="button"
-                                                class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body p-0">
-                                        {% if noticia.imagen %}
-                                            <div class="modal-hero-wrapper-home">
-                                                <img src="{{ noticia.imagen.url }}" class="w-100" alt="{{ noticia.titulo }}" style="height: 400px; object-fit: cover; object-position: {{ noticia.imagen_position }}">
-                                            </div>
-                                        {% endif %}
-                                        <div class="p-4 p-md-5">
-                                            <div class="d-flex align-items-center gap-3 mb-4 text-muted small">
-                                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
-                                                    <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
-                                                </span>
-                                                <span>•</span>
-                                                <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{ noticia.autor.get_full_name|default:noticia.autor.username }}</span>
-                                            </div>
-                                            <h2 class="display-6 fw-bold mb-4">{{ noticia.titulo }}</h2>
-                                            <div class="noticia-cuerpo-home fs-5 lh-lg text-secondary">{{ noticia.cuerpo|linebreaks }}</div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer bg-light border-0 p-4">
-                                        <button type="button"
-                                                class="btn btn-secondary rounded-pill px-4"
-                                                data-bs-dismiss="modal">Cerrar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endwith %}
-                {% endif %}
+  <div class="container-fluid px-lg-5 py-4">
+    <div class="row g-5">
+      <!-- Columna Principal (8): Partidos y Canchas -->
+      <div class="col-lg-8">
+        <!-- Sección Partidos -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <div class="home-section-header mb-0">
+            <div class="icon-holder"
+                 style="background: rgba(16, 185, 129, 0.1);
+                        color: #10B981">
+              <i class="ti ti-calendar-stats fs-3"></i>
             </div>
-            <!-- Columna Lateral (4): Torneos y Ranking -->
-            <div class="col-lg-4">
-                <!-- Sección Torneos -->
-                <a href="{% url 'core:public_torneos_list' %}" class="text-decoration-none">
-                    <div class="home-section-header mb-4 hover-lift">
-                        <div class="icon-holder">
-                            <i class="ti ti-trophy fs-3"></i>
-                        </div>
-                        <h2 class="section-title-modern">Torneos <i class="ti ti-chevron-right fs-4 ms-1 opacity-50"></i></h2>
-                    </div>
-                </a>
-                {% if torneos %}
-                    {% for torneo in torneos %}
-                        <div class="card mb-3 border-0 shadow-sm ranking-card card-tournament-home overflow-hidden">
-                            <div class="card-body p-4">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="fw-bold mb-0 text-white">{{ torneo.nombre }}</h5>
-                                    {% if torneo.cancelado %}
-                                        <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 small px-2 py-1">
-                                            <i class="ti ti-ban me-1"></i>Cancelado
-                                        </span>
-                                    {% endif %}
-                                </div>
-                                <p class="text-muted small mb-4 opacity-75">{{ torneo.descripcion|truncatechars:100 }}</p>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center gap-2 bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-3 small fw-bold border border-primary border-opacity-10">
-                                        <i class="ti ti-calendar-event fs-5"></i>
-                                        {{ torneo.fecha_inicio|date:"d M" }}
-                                    </div>
-                                    <button type="button" 
-                                            class="btn btn-primary d-flex align-items-center gap-2 rounded-pill px-4 fw-bold shadow-sm hover-lift"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#torneoPublicModal{{ torneo.id }}">
-                                        VER <i class="ti ti-arrow-right fs-5"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Modal Detalle Torneo Público -->
-                        <div class="modal fade" id="torneoPublicModal{{ torneo.id }}" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                                    <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
-                                        <button type="button" class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75 shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body p-0">
-                                        <!-- Hero del Torneo -->
-                                        <div class="p-4 p-md-5 bg-primary text-white position-relative overflow-hidden">
-                                            <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-dark opacity-50"></div>
-                                            <div class="position-relative z-1">
-                                                <div class="d-flex flex-wrap gap-2 mb-3">
-                                                    {% if torneo.cancelado %}
-                                                        <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold shadow-sm">
-                                                            <i class="ti ti-ban me-1"></i>TORNEO CANCELADO
-                                                        </span>
-                                                    {% elif torneo.activo %}
-                                                        <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">
-                                                            <i class="ti ti-circle-check-filled me-1"></i>TORNEO ACTIVO
-                                                        </span>
-                                                    {% else %}
-                                                        <span class="badge bg-secondary rounded-pill px-3 py-2 fw-bold shadow-sm">
-                                                            <i class="ti ti-history me-1"></i>FINALIZADO
-                                                        </span>
-                                                    {% endif %}
-                                                    <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2 fw-bold border border-white border-opacity-25 shadow-sm">
-                                                        <i class="ti ti-category me-1"></i>{{ torneo.categoria|default:"Libre" }}
-                                                    </span>
-                                                </div>
-                                                <h2 class="display-5 fw-bold mb-2">{{ torneo.nombre }}</h2>
-                                                <div class="d-flex align-items-center gap-4 text-white opacity-75">
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="ti ti-calendar fs-4"></i>
-                                                        <span class="fw-bold">{{ torneo.fecha_inicio|date:"d M, Y" }}</span>
-                                                    </div>
-                                                    <div class="d-flex align-items-center gap-2">
-                                                        <i class="ti ti-calendar-check fs-4"></i>
-                                                        <span class="fw-bold">{{ torneo.fecha_fin|date:"d M, Y" }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="p-4 p-md-5 bg-card">
-                                            <div class="row g-5">
-                                                <!-- Descripción y Premios -->
-                                                <div class="col-12">
-                                                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-primary">
-                                                        <i class="ti ti-align-left fs-4"></i> Descripción
-                                                    </h5>
-                                                    <p class="text-muted fs-5 mb-5 lh-lg">{{ torneo.descripcion|linebreaks }}</p>
-
-                                                    {% if torneo.premios %}
-                                                        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-warning">
-                                                            <i class="ti ti-gift fs-4"></i> Premios
-                                                        </h5>
-                                                        <div class="p-4 bg-warning bg-opacity-5 rounded-4 border border-warning border-opacity-10 mb-5">
-                                                            <div class="text-muted fs-5 lh-lg">{{ torneo.premios|linebreaks }}</div>
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-
-                                                <!-- Jugadores Inscritos -->
-                                                <div class="col-md-6">
-                                                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-info">
-                                                        <i class="ti ti-users fs-4"></i> Jugadores ({{ torneo.jugadores_inscritos.count }})
-                                                    </h5>
-                                                    <div class="player-list-scroll pe-2" style="max-height: 300px; overflow-y: auto;">
-                                                        {% for jugador in torneo.jugadores_inscritos.all %}
-                                                            <div class="d-flex align-items-center gap-3 p-3 mb-2 bg-light rounded-4 border border-light transition-hover">
-                                                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                                    <i class="ti ti-user fs-5"></i>
-                                                                </div>
-                                                                <div class="fw-bold">{{ jugador.get_full_name }}</div>
-                                                            </div>
-                                                        {% empty %}
-                                                            <div class="text-center py-4 text-muted border rounded-4 border-dashed">
-                                                                <i class="ti ti-user-plus fs-1 d-block mb-2 opacity-50"></i>
-                                                                Aún no hay inscritos
-                                                            </div>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-
-                                                <!-- Partidos -->
-                                                <div class="col-md-6">
-                                                    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-success">
-                                                        <i class="ti ti-ball-tennis fs-4"></i> Partidos
-                                                    </h5>
-                                                    <div class="match-list-scroll pe-2" style="max-height: 300px; overflow-y: auto;">
-                                                        {% for partido in torneo.partidos.all %}
-                                                            <div class="p-3 mb-2 bg-light rounded-4 border border-light transition-hover">
-                                                                <div class="d-flex justify-content-between small text-muted mb-2">
-                                                                    <span><i class="ti ti-calendar-event me-1"></i>{{ partido.fecha|date:"d M" }}</span>
-                                                                    <span><i class="ti ti-clock me-1"></i>{{ partido.hora|time:"H:i" }}</span>
-                                                                </div>
-                                                                <div class="d-flex justify-content-between align-items-center font-monospace">
-                                                                    <div class="flex-grow-1 text-truncate pe-2 fw-bold small">
-                                                                        {% for j in partido.equipo1.all %}{{ j.first_name }}{% if not forloop.last %},{% endif %}{% endfor %}
-                                                                    </div>
-                                                                    <div class="badge bg-primary px-3 rounded-pill">{{ partido.marcador|default:"vs" }}</div>
-                                                                    <div class="flex-grow-1 text-truncate ps-2 text-end fw-bold small">
-                                                                        {% for j in partido.equipo2.all %}{{ j.first_name }}{% if not forloop.last %},{% endif %}{% endfor %}
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        {% empty %}
-                                                            <div class="text-center py-4 text-muted border rounded-4 border-dashed">
-                                                                <i class="ti ti-calendar fs-1 d-block mb-2 opacity-50"></i>
-                                                                No hay partidos asignados
-                                                            </div>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer bg-light border-0 p-4">
-                                        <button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm" data-bs-dismiss="modal">Cerrar</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="card border-0 p-5 text-center rounded-4 mb-4 ranking-card" style="background: rgba(255,255,255,0.03)">
-                        <i class="ti ti-trophy-off fs-display-1 text-muted opacity-10 mb-3"></i>
-                        <p class="text-muted fs-5 mb-0">No hay torneos activos actualmente.</p>
-                        <small class="text-muted opacity-50">¡Vuelve pronto para nuevas competencias!</small>
-                    </div>
-                {% endif %}
-                <!-- Sección Ranking -->
-                <div class="home-section-header mb-4 mt-5">
-                    <div class="icon-holder"
-                         style="background: rgba(245, 158, 11, 0.1);
-                                color: #F59E0B">
-                        <i class="ti ti-star fs-3"></i>
-                    </div>
-                    <h2 class="section-title-modern">Top Ranking</h2>
-                </div>
-                <div class="card border-0 shadow-sm ranking-card overflow-hidden">
-                    <div class="card-body p-0">
-                        {% if ranking %}
-                            {% for jugador in ranking %}
-                                <div class="ranking-item-mini">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
-                                        <div>
-                                            <div class="fw-bold">{{ jugador.get_full_name }}</div>
-                                            <small class="text-muted text-uppercase" style="font-size:10px">
-                                                {{ jugador.get_categoria_jugador_display|default:"LIBRE" }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
-                                    pts</span>
-                                </div>
-                            {% endfor %}
-                            <div class="p-4">
-                                <a href="{% url 'core:ranking' %}"
-                                   class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
-                                    Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
-                                </a>
-                            </div>
-                        {% else %}
-                            <div class="p-5 text-center">
-                                <p class="text-muted small mb-0">No hay registros aún.</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            <h2 class="section-title-modern">Últimos Partidos</h2>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="tag-filter-modern active" onclick="filterMatches('all', this)">Todos</button>
+            <button class="tag-filter-modern" onclick="filterMatches('finalizado', this)">Resultados</button>
+            <button class="tag-filter-modern"
+                    onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
+          </div>
         </div>
+        <div class="match-list mb-5">
+          {% if partidos %}
+            {% for partido in partidos %}
+              <div class="match-card-modern mb-3" data-status="{{ partido.estado }}">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
+                    <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }}
+                  </span>
+                  <span class="badge {% if partido.estado == 'finalizado' %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 {% if partido.estado == 'finalizado' %}text-success{% else %}text-primary{% endif %} px-3 py-2 rounded-pill small">
+                    {{ partido.get_estado_display }}
+                  </span>
+                </div>
+                <div class="row align-items-center g-0">
+                  <div class="col-5 text-end pe-4">
+                    <div class="fw-bold h5 mb-0 text-truncate">
+                      {% for j in partido.equipo1.all %}
+                        {{ j.first_name }}
+                        {% if not forloop.last %},{% endif %}
+                      {% empty
+                        %}Equipo 1
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div class="col-2 text-center">
+                    {% if partido.estado == 'finalizado' %}
+                      <div class="h3 fw-bold mb-0 text-primary">{{ partido.marcador|default:"0-0" }}</div>
+                    {% else %}
+                      <div class="small fw-bold px-3 py-1 border rounded-pill bg-light text-muted">VS</div>
+                    {% endif %}
+                  </div>
+                  <div class="col-5 ps-4">
+                    <div class="fw-bold h5 mb-0 text-truncate">
+                      {% for j in partido.equipo2.all %}
+                        {{ j.first_name }}
+                        {% if not forloop.last %},{% endif %}
+                      {% empty
+                        %}Equipo 2
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            <div id="no-matches-filtered"
+                 class="card border-0 p-5 text-center rounded-4 d-none"
+                 style="background: var(--color-light)">
+              <i class="ti ti-search fs-1 text-muted mb-2"></i>
+              <p class="text-muted mb-0">No se encontraron partidos en esta categoría.</p>
+            </div>
+          {% else %}
+            <div class="card border-0 p-5 text-center rounded-4"
+                 style="background: var(--color-light)">
+              <i class="ti ti-mood-empty fs-1 text-muted mb-2"></i>
+              <p class="text-muted mb-0">No hay partidos programados próximamente.</p>
+            </div>
+          {% endif %}
+        </div>
+        <!-- Sección Canchas -->
+        <div class="home-section-header mb-4">
+          <div class="icon-holder"
+               style="background: rgba(14, 165, 233, 0.1);
+                      color: #0EA5E9">
+            <i class="ti ti-ball-tennis fs-3"></i>
+          </div>
+          <h2 class="section-title-modern">Estado de Canchas</h2>
+        </div>
+        <div class="row g-4 mb-5">
+          {% for cancha in canchas|slice:":4" %}
+            <div class="col-md-6">
+              <div class="card border-0 shadow-sm h-100 ranking-card">
+                <div class="card-body p-4">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                      <h6 class="fw-bold mb-1">{{ cancha.nombre }}</h6>
+                      <small class="text-muted"><i class="ti ti-map-pin me-1"></i>{{ cancha.ubicacion }}</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} shadow-sm"></span>
+                      <small class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                        {{ cancha.get_estado_display }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+          <div class="col-12">
+            <a href="{% url 'core:public_canchas_list' %}"
+               class="btn btn-outline-primary w-100 py-3 fw-bold rounded-4">
+              Consultar Disponibilidad Completa <i class="ti ti-search ms-1"></i>
+            </a>
+          </div>
+        </div>
+        <!-- Sección Última Noticia (Ancha) -->
+        {% if noticias %}
+          {% with noticia=noticias|first %}
+            <div class="home-section-header mb-4">
+              <div class="icon-holder"
+                   style="background: rgba(99, 102, 241, 0.1);
+                          color: #6366F1">
+                <i class="ti ti-news fs-3"></i>
+              </div>
+              <h2 class="section-title-modern">Última Noticia</h2>
+            </div>
+            <button class="btn p-0 border-0 text-start w-100"
+                    data-bs-toggle="modal"
+                    data-bs-target="#noticiaHomeModal{{ noticia.id }}">
+              <div class="card border-0 shadow-lg ranking-card card-noticia-home-wide overflow-hidden mb-5">
+                <div class="row g-0">
+                  {% if noticia.imagen %}
+                    <div class="col-md-4">
+                      <img src="{{ noticia.imagen.url }}"
+                           class="img-fluid h-100"
+                           alt="{{ noticia.titulo }}"
+                           style="object-fit: cover;
+                                  object-position: {{ noticia.imagen_position }};
+                                  min-height: 200px">
+                    </div>
+                  {% endif %}
+                  <div class="{% if noticia.imagen %}col-md-8{% else %}col-12{% endif %} p-4 p-md-5 d-flex flex-column justify-content-center">
+                    <div class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 mb-3 align-self-start">
+                      NUEVO
+                    </div>
+                    <h3 class="h2 fw-bold mb-3 text-heading">{{ noticia.titulo }}</h3>
+                    <p class="text-muted fs-5 mb-4">{{ noticia.cuerpo|truncatewords:20 }}</p>
+                    <div class="text-primary fw-bold">
+                      Continuar leyendo <i class="ti ti-arrow-right ms-1"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </button>
+            <!-- Modal Detalle Noticia Home -->
+            <div class="modal fade"
+                 id="noticiaHomeModal{{ noticia.id }}"
+                 tabindex="-1"
+                 aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                  <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
+                    <button type="button"
+                            class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body p-0">
+                    {% if noticia.imagen %}
+                      <div class="modal-hero-wrapper-home">
+                        <img src="{{ noticia.imagen.url }}"
+                             class="w-100"
+                             alt="{{ noticia.titulo }}"
+                             style="height: 400px;
+                                    object-fit: cover;
+                                    object-position: {{ noticia.imagen_position }}">
+                      </div>
+                    {% endif %}
+                    <div class="p-4 p-md-5">
+                      <div class="d-flex align-items-center gap-3 mb-4 text-muted small">
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                          <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
+                        </span>
+                        <span>•</span>
+                        <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{ noticia.autor.get_full_name|default:noticia.autor.username }}</span>
+                      </div>
+                      <h2 class="display-6 fw-bold mb-4">{{ noticia.titulo }}</h2>
+                      <div class="noticia-cuerpo-home fs-5 lh-lg text-secondary">{{ noticia.cuerpo|linebreaks }}</div>
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-light border-0 p-4">
+                    <button type="button"
+                            class="btn btn-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endwith %}
+        {% endif %}
+      </div>
+      <!-- Columna Lateral (4): Torneos y Ranking -->
+      <div class="col-lg-4">
+        <!-- Sección Torneos -->
+        <a href="{% url 'core:public_torneos_list' %}"
+           class="text-decoration-none">
+          <div class="home-section-header mb-4 hover-lift">
+            <div class="icon-holder">
+              <i class="ti ti-trophy fs-3"></i>
+            </div>
+            <h2 class="section-title-modern">
+              Torneos <i class="ti ti-chevron-right fs-4 ms-1 opacity-50"></i>
+            </h2>
+          </div>
+        </a>
+        {% if torneos %}
+          {% for torneo in torneos %}
+            <div class="card mb-3 border-0 shadow-sm ranking-card card-tournament-home overflow-hidden">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h5 class="fw-bold mb-0 text-white">{{ torneo.nombre }}</h5>
+                  {% if torneo.cancelado %}
+                    <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 small px-2 py-1">
+                      <i class="ti ti-ban me-1"></i>Cancelado
+                    </span>
+                  {% endif %}
+                </div>
+                <p class="text-muted small mb-4 opacity-75">{{ torneo.descripcion|truncatechars:100 }}</p>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-2 bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-3 small fw-bold border border-primary border-opacity-10">
+                    <i class="ti ti-calendar-event fs-5"></i>
+                    {{ torneo.fecha_inicio|date:"d M" }}
+                  </div>
+                  <button type="button"
+                          class="btn btn-primary d-flex align-items-center gap-2 rounded-pill px-4 fw-bold shadow-sm hover-lift"
+                          data-bs-toggle="modal"
+                          data-bs-target="#torneoPublicModal{{ torneo.id }}">
+                    VER <i class="ti ti-arrow-right fs-5"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Modal Detalle Torneo Público -->
+            <div class="modal fade"
+                 id="torneoPublicModal{{ torneo.id }}"
+                 tabindex="-1"
+                 aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                  <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
+                    <button type="button"
+                            class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75 shadow-none"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body p-0">
+                    <!-- Hero del Torneo -->
+                    <div class="p-4 p-md-5 bg-primary text-white position-relative overflow-hidden">
+                      <div class="position-absolute top-0 start-0 w-100 h-100 bg-gradient-dark opacity-50"></div>
+                      <div class="position-relative z-1">
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                          {% if torneo.cancelado %}
+                            <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold shadow-sm">
+                              <i class="ti ti-ban me-1"></i>TORNEO CANCELADO
+                            </span>
+                          {% elif torneo.activo %}
+                            <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">
+                              <i class="ti ti-circle-check-filled me-1"></i>TORNEO ACTIVO
+                            </span>
+                          {% else %}
+                            <span class="badge bg-secondary rounded-pill px-3 py-2 fw-bold shadow-sm">
+                              <i class="ti ti-history me-1"></i>FINALIZADO
+                            </span>
+                          {% endif %}
+                          <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2 fw-bold border border-white border-opacity-25 shadow-sm">
+                            <i class="ti ti-category me-1"></i>{{ torneo.categoria|default:"Libre" }}
+                          </span>
+                        </div>
+                        <h2 class="display-5 fw-bold mb-2">{{ torneo.nombre }}</h2>
+                        <div class="d-flex align-items-center gap-4 text-white opacity-75">
+                          <div class="d-flex align-items-center gap-2">
+                            <i class="ti ti-calendar fs-4"></i>
+                            <span class="fw-bold">{{ torneo.fecha_inicio|date:"d M, Y" }}</span>
+                          </div>
+                          <div class="d-flex align-items-center gap-2">
+                            <i class="ti ti-calendar-check fs-4"></i>
+                            <span class="fw-bold">{{ torneo.fecha_fin|date:"d M, Y" }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="p-4 p-md-5 bg-card">
+                      <div class="row g-5">
+                        <!-- Descripción y Premios -->
+                        <div class="col-12">
+                          <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-primary">
+                            <i class="ti ti-align-left fs-4"></i> Descripción
+                          </h5>
+                          <p class="text-muted fs-5 mb-5 lh-lg">{{ torneo.descripcion|linebreaks }}</p>
+                          {% if torneo.premios %}
+                            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-warning">
+                              <i class="ti ti-gift fs-4"></i> Premios
+                            </h5>
+                            <div class="p-4 bg-warning bg-opacity-5 rounded-4 border border-warning border-opacity-10 mb-5">
+                              <div class="text-muted fs-5 lh-lg">{{ torneo.premios|linebreaks }}</div>
+                            </div>
+                          {% endif %}
+                        </div>
+                        <!-- Jugadores Inscritos -->
+                        <div class="col-md-6">
+                          <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-info">
+                            <i class="ti ti-users fs-4"></i> Jugadores ({{ torneo.jugadores_inscritos.count }})
+                          </h5>
+                          <div class="player-list-scroll pe-2"
+                               style="max-height: 300px;
+                                      overflow-y: auto">
+                            {% for jugador in torneo.jugadores_inscritos.all %}
+                              <div class="d-flex align-items-center gap-3 p-3 mb-2 bg-light rounded-4 border border-light transition-hover">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                     style="width: 40px;
+                                            height: 40px">
+                                  <i class="ti ti-user fs-5"></i>
+                                </div>
+                                <div class="fw-bold">{{ jugador.get_full_name }}</div>
+                              </div>
+                            {% empty %}
+                              <div class="text-center py-4 text-muted border rounded-4 border-dashed">
+                                <i class="ti ti-user-plus fs-1 d-block mb-2 opacity-50"></i>
+                                Aún no hay inscritos
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                        <!-- Partidos -->
+                        <div class="col-md-6">
+                          <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-success">
+                            <i class="ti ti-ball-tennis fs-4"></i> Partidos
+                          </h5>
+                          <div class="match-list-scroll pe-2"
+                               style="max-height: 300px;
+                                      overflow-y: auto">
+                            {% for partido in torneo.partidos.all %}
+                              <div class="p-3 mb-2 bg-light rounded-4 border border-light transition-hover">
+                                <div class="d-flex justify-content-between small text-muted mb-2">
+                                  <span><i class="ti ti-calendar-event me-1"></i>{{ partido.fecha|date:"d M" }}</span>
+                                  <span><i class="ti ti-clock me-1"></i>{{ partido.hora|time:"H:i" }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center font-monospace">
+                                  <div class="flex-grow-1 text-truncate pe-2 fw-bold small">
+                                    {% for j in partido.equipo1.all %}
+                                      {{ j.first_name }}
+                                      {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                  </div>
+                                  <div class="badge bg-primary px-3 rounded-pill">{{ partido.marcador|default:"vs" }}</div>
+                                  <div class="flex-grow-1 text-truncate ps-2 text-end fw-bold small">
+                                    {% for j in partido.equipo2.all %}
+                                      {{ j.first_name }}
+                                      {% if not forloop.last %},{% endif %}
+                                    {% endfor %}
+                                  </div>
+                                </div>
+                              </div>
+                            {% empty %}
+                              <div class="text-center py-4 text-muted border rounded-4 border-dashed">
+                                <i class="ti ti-calendar fs-1 d-block mb-2 opacity-50"></i>
+                                No hay partidos asignados
+                              </div>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer bg-light border-0 p-4">
+                    <button type="button"
+                            class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm"
+                            data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="card border-0 p-5 text-center rounded-4 mb-4 ranking-card"
+               style="background: rgba(255,255,255,0.03)">
+            <i class="ti ti-trophy-off fs-display-1 text-muted opacity-10 mb-3"></i>
+            <p class="text-muted fs-5 mb-0">No hay torneos activos actualmente.</p>
+            <small class="text-muted opacity-50">¡Vuelve pronto para nuevas competencias!</small>
+          </div>
+        {% endif %}
+        <!-- Sección Ranking -->
+        <div class="home-section-header mb-4 mt-5">
+          <div class="icon-holder"
+               style="background: rgba(245, 158, 11, 0.1);
+                      color: #F59E0B">
+            <i class="ti ti-star fs-3"></i>
+          </div>
+          <h2 class="section-title-modern">Top Ranking</h2>
+        </div>
+        <div class="card border-0 shadow-sm ranking-card overflow-hidden">
+          <div class="card-body p-0">
+            {% if ranking %}
+              {% for jugador in ranking %}
+                <div class="ranking-item-mini">
+                  <div class="d-flex align-items-center">
+                    <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
+                    <div>
+                      <div class="fw-bold">{{ jugador.get_full_name }}</div>
+                      <small class="text-muted text-uppercase" style="font-size:10px">
+                        {{ jugador.get_categoria_jugador_display|default:"LIBRE" }}
+                      </small>
+                    </div>
+                  </div>
+                  <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
+                  pts</span>
+                </div>
+              {% endfor %}
+              <div class="p-4">
+                <a href="{% url 'core:ranking' %}"
+                   class="btn btn-primary w-100 py-3 fw-bold rounded-pill">
+                  Ranking Completo <i class="ti ti-arrow-right ms-1"></i>
+                </a>
+              </div>
+            {% else %}
+              <div class="p-5 text-center">
+                <p class="text-muted small mb-0">No hay registros aún.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
-    <script>
+  </div>
+  <script>
   function filterMatches(filter, btn) {
     const isActive = btn.classList.contains('active');
     if (isActive && filter !== 'all') {
@@ -433,8 +462,8 @@
     const noResults = document.getElementById('no-matches-filtered');
     if (noResults) visibleCount === 0 ? noResults.classList.remove('d-none') : noResults.classList.add('d-none');
   }
-    </script>
-    <style>
+  </script>
+  <style>
   .card-noticia-home-wide {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--color-border) !important;
@@ -500,5 +529,5 @@
   }
 
   .bg-card { background: var(--bg-card); }
-    </style>
+  </style>
 {% endblock %}

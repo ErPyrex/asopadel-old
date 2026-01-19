@@ -529,7 +529,7 @@ class PartidoResultForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        equipo_ganador = cleaned_data.get("equipo_ganador")
+        cleaned_data.get("equipo_ganador")
 
         if self.instance and self.instance.pk:
             equipo1_jugadores = list(self.instance.equipo1.all())

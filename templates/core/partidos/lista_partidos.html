@@ -1,222 +1,220 @@
 {% extends 'base.html' %}
 {% block title %}Gestión de Partidos{% endblock %}
 {% block content %}
-    <div class="container mt-4">
-        <h2 class="mb-4">🗓️ Gestión de Partidos</h2>
-        <!-- Filtros -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="torneo" class="form-label">Filtrar por Torneo</label>
-                        <select name="torneo" id="torneo" class="form-select">
-                            <option value="">Todos los torneos</option>
-                            {% for torneo in torneos %}
-                                <option value="{{ torneo.id }}" {% if torneo.selected %}selected{% endif %}>{{ torneo.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="estado" class="form-label">Filtrar por Estado</label>
-                        <select name="estado" id="estado" class="form-select">
-                            <option value="">Todos los estados</option>
-                            {% for estado_opcion in estados %}
-                                <option value="{{ estado_opcion.value }}"
-                                        {% if estado_opcion.selected %}selected{% endif %}>
-                                    {{ estado_opcion.label }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">Filtrar</button>
-                        <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">Limpiar</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <!-- Botón crear nuevo -->
-        <div class="mb-3">
-            <a href="{% url 'core:admin_create_match' %}" class="btn btn-success">
-                <i class="bi bi-plus-circle"></i> Crear Nuevo Partido
-            </a>
-        </div>
-        <!-- Tabla de partidos -->
-        {% if partidos %}
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Torneo</th>
-                            <th>Cancha</th>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Jugadores</th>
-                            <th>Árbitro</th>
-                            <th>Estado</th>
-                            <th>Marcador</th>
-                            <th class="text-center">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for partido in partidos %}
-                            <tr>
-                                <td>{{ partido.torneo.nombre|default:"Amistoso / Casual" }}</td>
-                                <td>{{ partido.cancha.nombre|default:"-" }}</td>
-                                <td>{{ partido.fecha }}</td>
-                                <td>{{ partido.hora }}</td>
-                                <td>
-                                    {% if partido.equipo1.exists or partido.equipo2.exists %}
-                                        <small class="d-block text-primary fw-bold">E1:</small>
-                                        {% for j in partido.equipo1.all %}
-                                            <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
-                                        {% endfor %}
-                                        <small class="d-block text-danger fw-bold mt-1">E2:</small>
-                                        {% for j in partido.equipo2.all %}
-                                            <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
-                                        {% endfor %}
-                                    {% else %}
-                                        <span class="text-muted">Sin jugadores</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ partido.arbitro.get_full_name|default:"-" }}</td>
-                                <td>
-                                    {% if partido.estado == 'pendiente' %}
-                                        <span class="badge bg-warning text-dark">Pendiente</span>
-                                    {% elif partido.estado == 'confirmado' %}
-                                        <span class="badge bg-info">Confirmado</span>
-                                    {% elif partido.estado == 'finalizado' %}
-                                        <span class="badge bg-success">Finalizado</span>
-                                    {% elif partido.estado == 'cancelado' %}
-                                        <span class="badge bg-danger">Cancelado</span>
-                                    {% endif %}
-                                </td>
-                                <td>{{ partido.marcador|default:"-" }}</td>
-                                <td class="text-center">
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{% url 'core:admin_match_detail' partido.id %}"
-                                           class="btn btn-outline-primary btn-sm"
-                                           title="Ver detalles">
-                                            <i class="bi bi-eye"></i> Ver
-                                        </a>
-                                        <a href="{% url 'core:admin_edit_match' partido.id %}"
-                                           class="btn btn-outline-warning btn-sm"
-                                           title="Editar">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </a>
-                                        <button type="button"
-                                                class="btn btn-outline-danger btn-sm"
-                                                title="Eliminar"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#deleteModal{{ partido.id }}"
-                                                data-partido-id="{{ partido.id }}">
-                                            <i class="bi bi-trash"></i> Eliminar
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Modal de confirmación para este partido -->
-                            <div class="modal fade"
-                                 id="deleteModal{{ partido.id }}"
-                                 tabindex="-1"
-                                 aria-labelledby="deleteModalLabel{{ partido.id }}"
-                                 aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-danger">
-                                        <div class="modal-header bg-danger text-white">
-                                            <h5 class="modal-title" id="deleteModalLabel{{ partido.id }}">
-                                                <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Eliminación
-                                            </h5>
-                                            <button type="button"
-                                                    class="btn-close btn-close-white"
-                                                    data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="alert alert-warning">
-                                                <strong>¿Estás seguro de eliminar este partido?</strong>
-                                                <p class="mb-0 mt-2">Esta acción no se puede deshacer.</p>
-                                            </div>
-                                            <div class="card bg-light">
-                                                <div class="card-body">
-                                                    <h6 class="card-title fw-bold">{{ partido.torneo.nombre|default:"Partido Amistoso / Casual" }}</h6>
-                                                    <p class="mb-1">
-                                                        <strong>Cancha:</strong> {{ partido.cancha.nombre|default:"No asignada" }}
-                                                    </p>
-                                                    <p class="mb-1">
-                                                        <strong>Fecha:</strong> {{ partido.fecha }} a las {{ partido.hora }}
-                                                    </p>
-                                                    <p class="mb-1">
-                                                        <strong>Jugadores:</strong>
-                                                    </p>
-                                                    <div class="ms-3">
-                                                        {% if partido.equipo1.exists or partido.equipo2.exists %}
-                                                            <small class="d-block text-primary fw-bold">Equipo 1:</small>
-                                                            <ul class="list-unstyled ms-2 mb-2">
-                                                                {% for j in partido.equipo1.all %}<li>{{ j.get_full_name }}</li>{% endfor %}
-                                                            </ul>
-                                                            <small class="d-block text-danger fw-bold">Equipo 2:</small>
-                                                            <ul class="list-unstyled ms-2">
-                                                                {% for j in partido.equipo2.all %}<li>{{ j.get_full_name }}</li>{% endfor %}
-                                                            </ul>
-                                                        {% else %}
-                                                            <span class="text-muted">Sin jugadores</span>
-                                                        {% endif %}
-                                                    </div>
-                                                    <p class="mb-1">
-                                                        <strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No asignado" }}
-                                                    </p>
-                                                    <p class="mb-0">
-                                                        <strong>Estado:</strong>
-                                                        {% if partido.estado == 'pendiente' %}
-                                                            <span class="badge bg-warning text-dark">Pendiente</span>
-                                                        {% elif partido.estado == 'confirmado' %}
-                                                            <span class="badge bg-info">Confirmado</span>
-                                                        {% elif partido.estado == 'finalizado' %}
-                                                            <span class="badge bg-success">Finalizado</span>
-                                                        {% elif partido.estado == 'cancelado' %}
-                                                            <span class="badge bg-danger">Cancelado</span>
-                                                        {% endif %}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {% if partido.estado == 'finalizado' %}
-                                                <div class="alert alert-danger mt-3 mb-0">
-                                                    <strong><i class="bi bi-exclamation-triangle-fill me-1"></i>Advertencia:</strong>
-                                                    Este partido está finalizado. Las estadísticas y puntos de ranking ya fueron
-                                                    actualizados y
-                                                    <strong>NO se revertirán automáticamente</strong> al eliminar el partido.
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                                            <form method="POST"
-                                                  action="{% url 'core:admin_delete_match' partido.id %}"
-                                                  class="d-inline">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-danger">
-                                                    <i class="bi bi-trash-fill me-1"></i>Confirmar Eliminación
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                <h4>No hay partidos registrados</h4>
-                <p>No se encontraron partidos con los filtros seleccionados.</p>
-                <a href="{% url 'core:admin_create_match' %}" class="btn btn-primary">Crear Primer Partido</a>
-            </div>
-        {% endif %}
-        <!-- Botón volver -->
-        <div class="mt-4">
-            <a href="{% url 'core:admin_dashboard' %}" class="btn btn-secondary">Volver al Panel</a>
-        </div>
+  <div class="container mt-4">
+    <h2 class="mb-4">🗓️ Gestión de Partidos</h2>
+    <!-- Filtros -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <form method="GET" class="row g-3">
+          <div class="col-md-4">
+            <label for="torneo" class="form-label">Filtrar por Torneo</label>
+            <select name="torneo" id="torneo" class="form-select">
+              <option value="">Todos los torneos</option>
+              {% for torneo in torneos %}
+                <option value="{{ torneo.id }}" {% if torneo.selected %}selected{% endif %}>{{ torneo.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="estado" class="form-label">Filtrar por Estado</label>
+            <select name="estado" id="estado" class="form-select">
+              <option value="">Todos los estados</option>
+              {% for estado_opcion in estados %}
+                <option value="{{ estado_opcion.value }}"
+                        {% if estado_opcion.selected %}selected{% endif %}>{{ estado_opcion.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+            <a href="{% url 'core:admin_partidos_list' %}" class="btn btn-secondary">Limpiar</a>
+          </div>
+        </form>
+      </div>
     </div>
+    <!-- Botón crear nuevo -->
+    <div class="mb-3">
+      <a href="{% url 'core:admin_create_match' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Crear Nuevo Partido
+      </a>
+    </div>
+    <!-- Tabla de partidos -->
+    {% if partidos %}
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Torneo</th>
+              <th>Cancha</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Jugadores</th>
+              <th>Árbitro</th>
+              <th>Estado</th>
+              <th>Marcador</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for partido in partidos %}
+              <tr>
+                <td>{{ partido.torneo.nombre|default:"Amistoso / Casual" }}</td>
+                <td>{{ partido.cancha.nombre|default:"-" }}</td>
+                <td>{{ partido.fecha }}</td>
+                <td>{{ partido.hora }}</td>
+                <td>
+                  {% if partido.equipo1.exists or partido.equipo2.exists %}
+                    <small class="d-block text-primary fw-bold">E1:</small>
+                    {% for j in partido.equipo1.all %}
+                      <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
+                    {% endfor %}
+                    <small class="d-block text-danger fw-bold mt-1">E2:</small>
+                    {% for j in partido.equipo2.all %}
+                      <span class="badge bg-light text-dark border">{{ j.get_full_name }}</span>
+                    {% endfor %}
+                  {% else %}
+                    <span class="text-muted">Sin jugadores</span>
+                  {% endif %}
+                </td>
+                <td>{{ partido.arbitro.get_full_name|default:"-" }}</td>
+                <td>
+                  {% if partido.estado == 'pendiente' %}
+                    <span class="badge bg-warning text-dark">Pendiente</span>
+                  {% elif partido.estado == 'confirmado' %}
+                    <span class="badge bg-info">Confirmado</span>
+                  {% elif partido.estado == 'finalizado' %}
+                    <span class="badge bg-success">Finalizado</span>
+                  {% elif partido.estado == 'cancelado' %}
+                    <span class="badge bg-danger">Cancelado</span>
+                  {% endif %}
+                </td>
+                <td>{{ partido.marcador|default:"-" }}</td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <a href="{% url 'core:admin_match_detail' partido.id %}"
+                       class="btn btn-outline-primary btn-sm"
+                       title="Ver detalles">
+                      <i class="bi bi-eye"></i> Ver
+                    </a>
+                    <a href="{% url 'core:admin_edit_match' partido.id %}"
+                       class="btn btn-outline-warning btn-sm"
+                       title="Editar">
+                      <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <button type="button"
+                            class="btn btn-outline-danger btn-sm"
+                            title="Eliminar"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal{{ partido.id }}"
+                            data-partido-id="{{ partido.id }}">
+                      <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Modal de confirmación para este partido -->
+              <div class="modal fade"
+                   id="deleteModal{{ partido.id }}"
+                   tabindex="-1"
+                   aria-labelledby="deleteModalLabel{{ partido.id }}"
+                   aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content border-danger">
+                    <div class="modal-header bg-danger text-white">
+                      <h5 class="modal-title" id="deleteModalLabel{{ partido.id }}">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Eliminación
+                      </h5>
+                      <button type="button"
+                              class="btn-close btn-close-white"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="alert alert-warning">
+                        <strong>¿Estás seguro de eliminar este partido?</strong>
+                        <p class="mb-0 mt-2">Esta acción no se puede deshacer.</p>
+                      </div>
+                      <div class="card bg-light">
+                        <div class="card-body">
+                          <h6 class="card-title fw-bold">{{ partido.torneo.nombre|default:"Partido Amistoso / Casual" }}</h6>
+                          <p class="mb-1">
+                            <strong>Cancha:</strong> {{ partido.cancha.nombre|default:"No asignada" }}
+                          </p>
+                          <p class="mb-1">
+                            <strong>Fecha:</strong> {{ partido.fecha }} a las {{ partido.hora }}
+                          </p>
+                          <p class="mb-1">
+                            <strong>Jugadores:</strong>
+                          </p>
+                          <div class="ms-3">
+                            {% if partido.equipo1.exists or partido.equipo2.exists %}
+                              <small class="d-block text-primary fw-bold">Equipo 1:</small>
+                              <ul class="list-unstyled ms-2 mb-2">
+                                {% for j in partido.equipo1.all %}<li>{{ j.get_full_name }}</li>{% endfor %}
+                              </ul>
+                              <small class="d-block text-danger fw-bold">Equipo 2:</small>
+                              <ul class="list-unstyled ms-2">
+                                {% for j in partido.equipo2.all %}<li>{{ j.get_full_name }}</li>{% endfor %}
+                              </ul>
+                            {% else %}
+                              <span class="text-muted">Sin jugadores</span>
+                            {% endif %}
+                          </div>
+                          <p class="mb-1">
+                            <strong>Árbitro:</strong> {{ partido.arbitro.get_full_name|default:"No asignado" }}
+                          </p>
+                          <p class="mb-0">
+                            <strong>Estado:</strong>
+                            {% if partido.estado == 'pendiente' %}
+                              <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% elif partido.estado == 'confirmado' %}
+                              <span class="badge bg-info">Confirmado</span>
+                            {% elif partido.estado == 'finalizado' %}
+                              <span class="badge bg-success">Finalizado</span>
+                            {% elif partido.estado == 'cancelado' %}
+                              <span class="badge bg-danger">Cancelado</span>
+                            {% endif %}
+                          </p>
+                        </div>
+                      </div>
+                      {% if partido.estado == 'finalizado' %}
+                        <div class="alert alert-danger mt-3 mb-0">
+                          <strong><i class="bi bi-exclamation-triangle-fill me-1"></i>Advertencia:</strong>
+                          Este partido está finalizado. Las estadísticas y puntos de ranking ya fueron
+                          actualizados y
+                          <strong>NO se revertirán automáticamente</strong> al eliminar el partido.
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                      <form method="POST"
+                            action="{% url 'core:admin_delete_match' partido.id %}"
+                            class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                          <i class="bi bi-trash-fill me-1"></i>Confirmar Eliminación
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="alert alert-info">
+        <h4>No hay partidos registrados</h4>
+        <p>No se encontraron partidos con los filtros seleccionados.</p>
+        <a href="{% url 'core:admin_create_match' %}" class="btn btn-primary">Crear Primer Partido</a>
+      </div>
+    {% endif %}
+    <!-- Botón volver -->
+    <div class="mt-4">
+      <a href="{% url 'core:admin_dashboard' %}" class="btn btn-secondary">Volver al Panel</a>
+    </div>
+  </div>
 {% endblock %}

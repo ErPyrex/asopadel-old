@@ -235,7 +235,7 @@ class AdminManagementViewTestCase(TestCase):
         )
 
         demote_url = reverse("users:demote_from_admin", args=[another_super.id])
-        response = self.client.post(demote_url)
+        self.client.post(demote_url)
 
         # Superuser should still be superuser
         another_super.refresh_from_db()
