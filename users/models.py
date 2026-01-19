@@ -83,6 +83,20 @@ class Usuario(AbstractUser):
     es_arbitro = models.BooleanField(default=False)
     es_jugador = models.BooleanField(default=False)
 
+    # Rol anterior antes de ser promovido a admin (para restaurar al degradar)
+    rol_previo_admin = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        choices=[
+            ("jugador", "Jugador"),
+            ("arbitro", "Árbitro"),
+            ("ambos", "Jugador y Árbitro"),
+            ("ninguno", "Sin rol previo"),
+        ],
+        help_text="Rol que tenía el usuario antes de ser promovido a admin",
+    )
+
     # Datos adicionales
     telefono = models.CharField(max_length=20, blank=True, null=True)
     categoria_jugador = models.CharField(

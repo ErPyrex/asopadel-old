@@ -35,4 +35,9 @@ urlpatterns = [
         admin_management.demote_from_admin,
         name="demote_from_admin",
     ),
+    path(
+        "admin-management/change-role/<int:user_id>/",
+        admin_management.change_user_role,
+        name="change_user_role",
+    ),
 ]
