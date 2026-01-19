@@ -10,6 +10,7 @@ urlpatterns = [
         "", views.home, name="home"
     ),  # ✅ vista completa con noticias, torneos, ranking y canchas
     path("torneos/", views.public_tournament_list, name="public_torneos_list"),
+    path("partidos/", views.public_match_list, name="public_match_list"),
     path("canchas/", views.public_court_list, name="public_canchas_list"),
     path(
         "canchas/<int:cancha_id>/",
@@ -62,6 +63,17 @@ urlpatterns = [
         "admin-gestion/canchas/<int:cancha_id>/eliminar/",
         views.admin_delete_court,
         name="admin_delete_court",
+    ),
+    # 🗓️ Reservas (Admin)
+    path(
+        "admin-gestion/reservas/<int:reserva_id>/editar/",
+        views.admin_edit_reservation,
+        name="admin_edit_reservation",
+    ),
+    path(
+        "admin-gestion/reservas/<int:reserva_id>/cancelar/",
+        views.admin_cancel_reservation,
+        name="admin_cancel_reservation",
     ),
     # 🎾 Jugadores (Admin)
     path("admin-gestion/jugadores/", views.admin_player_list, name="admin_player_list"),

@@ -139,6 +139,10 @@ def admin_dashboard(request):
     total_arbitros = Usuario.objects.filter(es_arbitro=True).count()
     total_canchas = Cancha.objects.count()
     total_torneos = Torneo.objects.count()
+    
+    # Últimas 2 canchas actualizadas (ordenadas por updated_at desc)
+    ultimas_canchas = Cancha.objects.all()[:2]
+    
     return render(
         request,
         "users/panel_admin.html",
@@ -147,6 +151,7 @@ def admin_dashboard(request):
             "total_arbitros": total_arbitros,
             "total_canchas": total_canchas,
             "total_torneos": total_torneos,
+            "ultimas_canchas": ultimas_canchas,
             "form": CanchaForm(prefix="court"),
             "noticia_form": NoticiaForm(prefix="news"),
         },
@@ -241,8 +246,20 @@ def admin_delete_tournament(request, torneo_id):
 def admin_court_list(request):
     canchas = Cancha.objects.all()
     form = CanchaForm(prefix="court")
+    todas_reservas = ReservaCancha.objects.all().select_related("cancha", "jugador").order_by("-fecha", "-hora_inicio")
+    
+    # Formulario para editar reservas en el modal
+    reserva_form = ReservaCanchaForm()
+    
     return render(
-        request, "core/canchas/lista_canchas.html", {"canchas": canchas, "form": form}
+        request, 
+        "core/canchas/lista_canchas.html", 
+        {
+            "canchas": canchas, 
+            "form": form,
+            "todas_reservas": todas_reservas,
+            "reserva_form": reserva_form
+        }
     )
 
 
@@ -262,32 +279,18 @@ def admin_create_court(request):
 def admin_edit_court(request, cancha_id):
     cancha = get_object_or_404(Cancha, id=cancha_id)
     if request.method == "POST":
-        # Manejar datos del modal o del formulario
-        cancha.nombre = request.POST.get("nombre", cancha.nombre)
-        cancha.estado = request.POST.get("estado", cancha.estado)
-        cancha.ubicacion = request.POST.get("ubicacion", cancha.ubicacion)
-        cancha.descripcion = request.POST.get("descripcion", cancha.descripcion)
-
-        # Precio
-        precio = request.POST.get("precio_hora")
-        if precio:
-            cancha.precio_hora = float(precio)
-
-        # Horarios
-        apertura = request.POST.get("horario_apertura")
-        cierre = request.POST.get("horario_cierre")
-        if apertura:
-            cancha.horario_apertura = apertura
-        if cierre:
-            cancha.horario_cierre = cierre
-
-        # Imagen
-        if request.FILES.get("imagen"):
-            cancha.imagen = request.FILES.get("imagen")
-
-        cancha.save()
-        messages.success(request, "Cancha actualizada exitosamente.")
-        return redirect("core:admin_canchas_list")
+        form = CanchaForm(request.POST, request.FILES, instance=cancha)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cancha actualizada exitosamente.")
+            return redirect("core:admin_canchas_list")
+        else:
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            return redirect("core:admin_canchas_list")
 
     form = CanchaForm(instance=cancha)
     return render(
@@ -306,6 +309,35 @@ def admin_delete_court(request, cancha_id):
     return render(
         request, "core/canchas/confirmar_eliminar_cancha.html", {"cancha": cancha}
     )
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_edit_reservation(request, reserva_id):
+    reserva = get_object_or_404(ReservaCancha, id=reserva_id)
+    if request.method == "POST":
+        form = ReservaCanchaForm(request.POST, instance=reserva)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Reserva de {reserva.jugador.get_full_name()} actualizada.")
+        else:
+            for error in form.non_field_errors():
+                messages.error(request, error)
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    return redirect("core:admin_canchas_list")
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_cancel_reservation(request, reserva_id):
+    reserva = get_object_or_404(ReservaCancha, id=reserva_id)
+    if request.method == "POST":
+        reserva.estado = "cancelada"
+        reserva.save()
+        messages.success(request, f"Reserva de {reserva.jugador.get_full_name()} cancelada.")
+    return redirect("core:admin_canchas_list")
 
 
 # ====================================================================================
@@ -340,11 +372,48 @@ def admin_create_player(request):
 @user_passes_test(is_admin)
 def admin_edit_player(request, jugador_id):
     jugador = get_object_or_404(Usuario, id=jugador_id, es_jugador=True)
-    form = JugadorForm(request.POST or None, request.FILES or None, instance=jugador)
-    if form.is_valid():
-        form.save()
+    
+    if request.method == "POST":
+        # Actualización parcial - solo actualiza campos proporcionados
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
+        telefono = request.POST.get("telefono")
+        categoria = request.POST.get("categoria_jugador")
+        ranking = request.POST.get("ranking")
+        
+        # Solo actualizar si el campo tiene valor
+        if first_name:
+            jugador.first_name = first_name
+        if last_name:
+            jugador.last_name = last_name
+        if email:
+            jugador.email = email
+        if telefono is not None:
+            jugador.telefono = telefono
+        if categoria is not None:
+            jugador.categoria_jugador = categoria if categoria else None
+        if ranking:
+            try:
+                jugador.ranking = int(ranking)
+            except ValueError:
+                pass
+        
+        # Cambio de contraseña (solo superusuarios)
+        new_password = request.POST.get("new_password")
+        if new_password and request.user.is_superuser:
+            if len(new_password) >= 8:
+                jugador.set_password(new_password)
+                messages.info(request, "La contraseña del jugador ha sido actualizada.")
+            else:
+                messages.warning(request, "La contraseña debe tener al menos 8 caracteres.")
+        
+        jugador.save()
         messages.success(request, "Jugador actualizado exitosamente.")
         return redirect("core:admin_player_list")
+    
+    # GET request - mostrar formulario tradicional
+    form = JugadorForm(instance=jugador)
     return render(
         request, "core/jugadores/crear_jugador.html", {"form": form, "jugador": jugador}
     )
@@ -353,6 +422,11 @@ def admin_edit_player(request, jugador_id):
 @login_required
 @user_passes_test(is_admin)
 def admin_delete_player(request, jugador_id):
+    # Solo superusuarios pueden eliminar jugadores
+    if not request.user.is_superuser:
+        messages.error(request, "No tienes permisos para eliminar jugadores.")
+        return redirect("core:admin_player_list")
+    
     jugador = get_object_or_404(Usuario, id=jugador_id, es_jugador=True)
     if request.method == "POST":
         jugador.delete()
@@ -1065,16 +1139,32 @@ def admin_delete_noticia(request, noticia_id):
 
 
 def home(request):
-    noticias = Noticia.objects.order_by("-fecha_publicacion", "-id")[
-        :1
-    ]  # la más reciente
-    canchas = Cancha.objects.all()
-    torneos = Torneo.objects.order_by("-fecha_inicio")[
-        :5
-    ]  # opcional si quieres mostrar torneos
+    noticias = Noticia.objects.order_by("-fecha_publicacion", "-id")[:1]  # la más reciente
+    canchas = Cancha.objects.all()[:2]  # Las 2 últimas actualizadas
 
-    # Obtener Top 10 del ranking
-    ranking = Usuario.objects.filter(es_jugador=True).order_by("-ranking")[:10]
+    # Lógica de torneo principal: Prioridad a torneos en progreso (activo y no cancelado)
+    today = timezone.now().date()
+    torneo_principal = (
+        Torneo.objects.filter(cancelado=False, fecha_inicio__lte=today, fecha_fin__gte=today)
+        .order_by("-fecha_inicio")
+        .first()
+    )
+
+    if not torneo_principal:
+        # Si no hay en progreso, el último registrado
+        torneo_principal = Torneo.objects.order_by("-id").first()
+
+    # Obtener Top 5 del ranking
+    ranking = Usuario.objects.filter(es_jugador=True).order_by("-ranking")[:5]
+
+    proximo_partido_torneo = None
+    if torneo_principal:
+        proximo_partido_torneo = (
+            torneo_principal.partidos.filter(fecha__gte=today)
+            .exclude(estado__in=["finalizado", "cancelado"])
+            .order_by("fecha", "hora")
+            .first()
+        )
 
     # Obtener últimos partidos
     partidos = (
@@ -1087,8 +1177,24 @@ def home(request):
     context = {
         "noticias": noticias,
         "canchas": canchas,
-        "torneos": torneos,
+        "torneo_principal": torneo_principal,
+        "proximo_partido_torneo": proximo_partido_torneo,
         "ranking": ranking,
         "partidos": partidos,
     }
     return render(request, "home.html", context)
+
+
+def public_match_list(request):
+    """Lista pública de todos los partidos registrados"""
+    partidos = (
+        Partido.objects.all()
+        .select_related("torneo", "cancha")
+        .prefetch_related("equipo1", "equipo2")
+        .order_by("-fecha", "-hora")
+    )
+
+    context = {
+        "partidos": partidos,
+    }
+    return render(request, "core/torneos/public_match_list.html", context)
