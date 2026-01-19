@@ -53,21 +53,103 @@ asopadel-old/
 
 ## Modelos de Datos
 
-### Usuario Personalizado (`users.Usuario`)
+### Diagrama de Entidad-Relación
+
+A continuación se presenta el esquema visual de la base de datos:
+
+```mermaid
+erDiagram
+    USUARIO ||--o{ RESERVACANCHA : realiza
+    USUARIO ||--o{ PARTIDO : arbitra
+    USUARIO ||--o{ TORNEO : gestiona
+    USUARIO ||--o{ TESTADISTICA : tiene
+    USUARIO }|--o{ PARTIDO : participa_equipo1
+    USUARIO }|--o{ PARTIDO : participa_equipo2
+    USUARIO }|--o{ TORNEO : se_inscribe
+
+    CANCHA ||--o{ RESERVACANCHA : contiene
+    CANCHA ||--o{ PARTIDO : hospeda
+
+    TORNEO ||--o{ PARTIDO : organiza
+    CATEGORIA ||--o{ TORNEO : define
+    CATEGORIA ||--o{ TESTADISTICA : agrupa
+
+    USUARIO ||--o{ NOTICIA : escribe
+
+    USUARIO {
+        string cedula PK
+        string email UK
+        string first_name
+        string last_name
+        bool es_admin_aso
+        bool es_arbitro
+        bool es_jugador
+        integer ranking
+    }
+
+    CANCHA {
+        string nombre
+        string estado
+        decimal precio_hora
+        time horario_apertura
+        time horario_cierre
+    }
+
+    RESERVACANCHA {
+        date fecha
+        time hora_inicio
+        time hora_fin
+        string estado
+    }
+
+    TORNEO {
+        string nombre
+        date fecha_inicio
+        date fecha_fin
+        bool cancelado
+    }
+
+    PARTIDO {
+        date fecha
+        time hora
+        string marcador
+        string estado
+        integer ediciones_resultado
+    }
+
+    NOTICIA {
+        string titulo
+        text cuerpo
+        date fecha_publicacion
+    }
+```
+
+### Detalle de Modelos por Aplicación
+
+#### 1. Usuarios (`users.Usuario`)
 
 Utiliza la **Cédula** como identificador único principal (`USERNAME_FIELD`).
 
 - **Roles:** Flags booleanos `es_admin_aso`, `es_arbitro`, `es_jugador`.
-- **Exclusividad de Roles:** Un Administrador NO puede tener roles de jugador ni árbitro simultáneamente.
-- **Historial de Roles:** Campo `rol_previo_admin` para restaurar roles automáticamente al revocar privilegios de administrador.
-- **Campos clave:** `cedula`, `telefono`, `foto` (con cropping integrado), `categoria_jugador`.
+- **Exclusividad de Roles:** Historial gestionado mediante `rol_previo_admin` para preservar integridad al cambiar permisos.
+- **Ranking:** Puntuación entera para el sistema de clasificación competitiva.
 
-### Competiciones (`competitions.Torneo`, `competitions.Partido`)
+#### 2. Competiciones (`competitions`)
 
-- **Torneo:** Gestiona estados (`programado`, `en_curso`, `finalizado`).
-- **Partido:** 
-  - Vincula dos equipos (jugadores), un árbitro y el resultado.
-  - **Control de Cambios:** Campo `ediciones_resultado` para limitar la corrección de errores por parte de árbitros.
+- **Torneo:** Entidad principal para eventos. Agrupa jugadores inscritos y gestiona la vigencia temporal.
+- **Partido:**
+  - **Equipos:** Soporte para Padel (1v1 o 2v2) mediante campos `equipo1` y `equipo2` (ManyToMany).
+  - **Control:** Seguimiento de `ediciones_resultado` para auditoría de árbitros.
+- **EstadisticaJugador:** Acumula victorias, derrotas y partidos jugados por jugador y categoría.
+
+#### 3. Instalaciones (`facilities`)
+
+- **Cancha:** Gestiona disponibilidad dinámica. El método `get_estado_actual` calcula el estado real cruzando datos de `ReservaCancha` y `Partido`.
+- **ReservaCancha:** Permite a los jugadores reservar espacios independientes de los torneos oficiales.
+
+#### 4. Blog (`blog`)
+
+- **Noticia:** Sistema de información con soporte para imágenes con punto focal ajustable (`imagen_pos_x`, `imagen_pos_y`) para garantizar encuadres precisos en el frontend.
 
 ---
 
