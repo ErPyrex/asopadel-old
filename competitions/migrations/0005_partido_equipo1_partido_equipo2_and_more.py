@@ -5,31 +5,47 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('competitions', '0004_partido_ganador'),
+        ("competitions", "0004_partido_ganador"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='partido',
-            name='equipo1',
-            field=models.ManyToManyField(blank=True, related_name='partidos_equipo1', to=settings.AUTH_USER_MODEL, verbose_name='Equipo 1'),
+            model_name="partido",
+            name="equipo1",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="partidos_equipo1",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Equipo 1",
+            ),
         ),
         migrations.AddField(
-            model_name='partido',
-            name='equipo2',
-            field=models.ManyToManyField(blank=True, related_name='partidos_equipo2', to=settings.AUTH_USER_MODEL, verbose_name='Equipo 2'),
+            model_name="partido",
+            name="equipo2",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="partidos_equipo2",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Equipo 2",
+            ),
         ),
         migrations.AddField(
-            model_name='partido',
-            name='equipo_ganador',
-            field=models.PositiveSmallIntegerField(blank=True, choices=[(1, 'Equipo 1'), (2, 'Equipo 2')], null=True, verbose_name='Equipo Ganador'),
+            model_name="partido",
+            name="equipo_ganador",
+            field=models.PositiveSmallIntegerField(
+                blank=True,
+                choices=[(1, "Equipo 1"), (2, "Equipo 2")],
+                null=True,
+                verbose_name="Equipo Ganador",
+            ),
         ),
         migrations.AlterField(
-            model_name='partido',
-            name='jugadores',
-            field=models.ManyToManyField(blank=True, related_name='partidos_jugados', to=settings.AUTH_USER_MODEL),
+            model_name="partido",
+            name="jugadores",
+            field=models.ManyToManyField(
+                blank=True, related_name="partidos_jugados", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

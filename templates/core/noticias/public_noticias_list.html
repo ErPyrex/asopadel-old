@@ -1,59 +1,131 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Noticias - ASOPADEL BARINAS{% endblock %}
-
 {% block content %}
-<div class="container py-4">
+  <div class="container py-4">
     <header class="text-center mb-5">
-        <h1 class="display-4 fw-bold mb-2">Últimas <span class="text-primary">Noticias</span></h1>
-        <p class="text-muted fs-5">Mantente al día con lo último en el mundo del pádel en Barinas</p>
+      <h1 class="display-4 fw-bold mb-2">
+        Últimas <span class="text-primary">Noticias</span>
+      </h1>
+      <p class="text-muted fs-5">Mantente al día con lo último en el mundo del pádel en Barinas</p>
     </header>
-
     <div class="row g-4">
-        {% for noticia in noticias %}
-        <div class="col-md-6 col-lg-4">
+      {% for noticia in noticias %}
+        {% with autor_name=noticia.autor.get_full_name|default:noticia.autor.username %}
+          <div class="col-md-6 col-lg-4">
             <article class="card h-100 border-0 shadow-lg overflow-hidden card-noticia">
-                {% if noticia.imagen %}
+              {% if noticia.imagen %}
                 <div class="noticia-img-wrapper">
-                    <img src="{{ noticia.imagen.url }}" class="card-img-top noticia-img" alt="{{ noticia.titulo }}">
+                  <img src="{{ noticia.imagen.url }}"
+                       class="card-img-top noticia-img"
+                       alt="{{ noticia.titulo }}"
+                       style="object-position: {{ noticia.imagen_position }}">
                 </div>
-                {% else %}
-                <div
-                    class="noticia-img-placeholder d-flex align-items-center justify-content-center bg-light text-muted">
-                    <i class="ti ti-news fs-1"></i>
+              {% else %}
+                <div class="noticia-img-placeholder d-flex align-items-center justify-content-center bg-light text-muted">
+                  <i class="ti ti-news fs-1"></i>
                 </div>
-                {% endif %}
-                <div class="card-body p-4 d-flex flex-column">
-                    <div class="d-flex align-items-center gap-2 mb-2 text-muted small">
-                        <span><i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}</span>
-                        <span>•</span>
-                        <span><i class="ti ti-user me-1"></i>Por {{
-                            noticia.autor.get_full_name|default:noticia.autor.username }}</span>
-                    </div>
-                    <h5 class="card-title fw-bold mb-3">{{ noticia.titulo }}</h5>
-                    <p class="card-text text-muted mb-4">{{ noticia.cuerpo|truncatewords:25 }}</p>
-                    <div class="mt-auto">
-                        <a href="{% url 'core:public_noticia_detail' noticia.id %}"
-                            class="btn btn-primary w-100 rounded-pill">
-                            Leer más <i class="ti ti-arrow-right ms-1"></i>
-                        </a>
-                    </div>
+              {% endif %}
+              <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center gap-2 mb-2 text-muted small">
+                  <span><i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}</span>
+                  <span>•</span>
+                  <span><i class="ti ti-user me-1"></i>Por {{ autor_name }}</span>
                 </div>
+                <h5 class="card-title fw-bold mb-3">{{ noticia.titulo }}</h5>
+                <p class="card-text text-muted mb-4">{{ noticia.cuerpo|truncatewords:25 }}</p>
+                <div class="mt-auto">
+                  <!-- Disparador del Modal -->
+                  <button class="btn btn-primary w-100 rounded-pill shadow-sm"
+                          data-bs-toggle="modal"
+                          data-bs-target="#noticiaModal{{ noticia.id }}">
+                    Leer más <i class="ti ti-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
             </article>
-        </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <div class="p-5 bg-light rounded-4">
-                <i class="ti ti-news-off fs-1 text-muted mb-3 d-block"></i>
-                <h3 class="fw-bold">No hay noticias por el momento</h3>
-                <p class="text-muted">Vuelve pronto para enterarte de lo más reciente.</p>
+          </div>
+          <!-- Modal de Detalle de Noticia -->
+          <div class="modal fade"
+               id="noticiaModal{{ noticia.id }}"
+               tabindex="-1"
+               aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
+                  <button type="button"
+                          class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                  {% if noticia.imagen %}
+                    <div class="modal-hero-wrapper">
+                      <img src="{{ noticia.imagen.url }}"
+                           class="w-100"
+                           alt="{{ noticia.titulo }}"
+                           style="height: 400px;
+                                  object-fit: cover;
+                                  object-position: {{ noticia.imagen_position }}">
+                      <div class="modal-hero-overlay"></div>
+                    </div>
+                  {% endif %}
+                  <div class="p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 text-muted small">
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                        <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
+                      </span>
+                      <span>•</span>
+                      <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{ autor_name }}</span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-4 text-heading">{{ noticia.titulo }}</h2>
+                    <div class="noticia-cuerpo fs-5 lh-lg text-secondary">{{ noticia.cuerpo|linebreaks }}</div>
+                  </div>
+                </div>
+                <div class="modal-footer bg-light border-0 p-4">
+                  <div class="d-flex justify-content-between align-items-center w-100 flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="text-muted fw-bold small">Compartir:</span>
+                      <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                              style="width: 36px;
+                                     height: 36px;
+                                     padding: 0">
+                        <i class="ti ti-brand-x"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                              style="width: 36px;
+                                     height: 36px;
+                                     padding: 0">
+                        <i class="ti ti-brand-facebook"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-secondary rounded-circle"
+                              style="width: 36px;
+                                     height: 36px;
+                                     padding: 0">
+                        <i class="ti ti-brand-whatsapp"></i>
+                      </button>
+                    </div>
+                    <button type="button"
+                            class="btn btn-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+        {% endwith %}
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="p-5 bg-light rounded-4">
+            <i class="ti ti-news-off fs-1 text-muted mb-3 d-block"></i>
+            <h3 class="fw-bold">No hay noticias por el momento</h3>
+            <p class="text-muted">Vuelve pronto para enterarte de lo más reciente.</p>
+          </div>
         </div>
-        {% endfor %}
+      {% endfor %}
     </div>
-</div>
-
-<style>
+  </div>
+  <style>
     .card-noticia {
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
     }
@@ -82,5 +154,30 @@
     .noticia-img-placeholder {
         height: 200px;
     }
-</style>
+
+    .modal-hero-wrapper {
+        position: relative;
+    }
+
+    .modal-hero-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(transparent, rgba(255, 255, 255, 1));
+    }
+
+    [data-bs-theme="dark"] .modal-hero-overlay {
+        background: linear-gradient(transparent, var(--bg-card));
+    }
+
+    [data-bs-theme="dark"] .modal-content {
+        background-color: var(--bg-card);
+    }
+
+    [data-bs-theme="dark"] .modal-footer {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+  </style>
 {% endblock %}

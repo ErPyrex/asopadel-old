@@ -4,17 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('facilities', '0003_cancha_descripcion_cancha_horario_apertura_and_more'),
+        ("facilities", "0003_cancha_descripcion_cancha_horario_apertura_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='cancha',
-            name='tipo',
+            model_name="cancha",
+            name="tipo",
         ),
         migrations.DeleteModel(
-            name='TipoCancha',
+            name="TipoCancha",
         ),
     ]

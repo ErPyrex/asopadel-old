@@ -4,30 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('facilities', '0002_alter_cancha_tipo'),
+        ("facilities", "0002_alter_cancha_tipo"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cancha',
-            name='descripcion',
+            model_name="cancha",
+            name="descripcion",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='cancha',
-            name='horario_apertura',
-            field=models.TimeField(default='08:00'),
+            model_name="cancha",
+            name="horario_apertura",
+            field=models.TimeField(default="08:00"),
         ),
         migrations.AddField(
-            model_name='cancha',
-            name='horario_cierre',
-            field=models.TimeField(default='22:00'),
+            model_name="cancha",
+            name="horario_cierre",
+            field=models.TimeField(default="22:00"),
         ),
         migrations.AddField(
-            model_name='cancha',
-            name='precio_hora',
+            model_name="cancha",
+            name="precio_hora",
             field=models.DecimalField(decimal_places=2, default=0.0, max_digits=10),
         ),
     ]

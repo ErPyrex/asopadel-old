@@ -1,98 +1,221 @@
 {% extends 'base.html' %}
-{% block title %}Reservar Cancha{% endblock %}
-
+{% load static %}
+{% block title %}Reservar Cancha - ASOPADEL{% endblock %}
 {% block content %}
-<!-- FullCalendar CSS -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
-
-<div class="container mt-4">
-    <div class="row">
-        <!-- Columna Izquierda: Formulario -->
-        <div class="col-md-4 mb-4">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">📝 Nueva Reserva</h4>
+  <!-- FullCalendar CSS -->
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css'
+        rel='stylesheet' />
+  <div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+      <!-- Columna Izquierda: Formulario e Info -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+          <div class="card-header bg-primary py-3 border-0">
+            <h5 class="modal-title fw-bold text-white mb-0">
+              <i class="ti ti-calendar-plus me-2"></i>Nueva Reserva
+            </h5>
+          </div>
+          <div class="card-body p-4">
+            {% if cancha %}
+              <div class="alert alert-primary bg-primary bg-opacity-10 border-0 rounded-4 p-3 mb-4">
+                <div class="d-flex align-items-center">
+                  <div class="bg-primary text-white rounded-circle p-2 me-3">
+                    <i class="ti ti-ball-tennis"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted d-block text-uppercase fw-bold tiny">Pista Seleccionada</small>
+                    <span class="fw-bold">{{ cancha.nombre }}</span>
+                  </div>
                 </div>
-                <div class="card-body">
-                    {% if cancha %}
-                    <div class="alert alert-info py-2">
-                        <small>Reservando en:</small><br>
-                        <strong>{{ cancha.nombre }}</strong>
+              </div>
+            {% endif %}
+            <form method="POST" id="reservaForm" class="modern-form">
+              {% csrf_token %}
+              <div class="mb-4">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cancha</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-0"><i class="ti ti-id-badge-2"></i></span>
+                  {{ form.cancha }}
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-0"><i class="ti ti-calendar-event"></i></span>
+                  {{ form.fecha }}
+                </div>
+              </div>
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Inicio</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-0 px-2"><i class="ti ti-clock"></i></span>
+                      {{ form.hora_inicio }}
                     </div>
-                    {% endif %}
-
-                    <form method="POST" id="reservaForm">
-                        {% csrf_token %}
-
-                        <!-- Campo Cancha (Oculto o Select) -->
-                        <div class="mb-3">
-                            <label class="form-label">Cancha</label>
-                            {{ form.cancha }}
-                        </div>
-
-                        <!-- Campo Fecha -->
-                        <div class="mb-3">
-                            <label class="form-label">Fecha</label>
-                            {{ form.fecha }}
-                        </div>
-
-                        <div class="row">
-                            <!-- Hora Inicio -->
-                            <div class="col-6 mb-3">
-                                <label class="form-label">Inicio</label>
-                                {{ form.hora_inicio }}
-                            </div>
-                            <!-- Hora Fin -->
-                            <div class="col-6 mb-3">
-                                <label class="form-label">Fin</label>
-                                {{ form.hora_fin }}
-                            </div>
-                        </div>
-
-                        <div class="d-grid mt-3">
-                            <button type="submit" class="btn btn-success">Reservar Ahora</button>
-                            <a href="{% url 'core:player_reservations' %}" class="btn btn-outline-secondary mt-2">Mis
-                                Reservas</a>
-                        </div>
-                    </form>
+                  </div>
                 </div>
-            </div>
-
-            <div class="card mt-3 shadow-sm border-info">
-                <div class="card-body">
-                    <h6 class="text-info"><i class="bi bi-info-circle"></i> Instrucciones</h6>
-                    <small>
-                        <ol class="ps-3 mb-0">
-                            <li>Selecciona un <strong>espacio vacío</strong> en el calendario.</li>
-                            <li>Verifica la fecha y horas en el formulario.</li>
-                            <li>Haz clic en <strong>Reservar Ahora</strong>.</li>
-                        </ol>
-                        <hr class="my-2">
-                        <span class="badge bg-warning text-dark">Amarillo</span> Pendiente (Otros)<br>
-                        <span class="badge bg-danger">Rojo</span> Ocupado<br>
-                        <span class="badge bg-success">Verde</span> Mi Reserva
-                    </small>
+                <div class="col-6">
+                  <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fin</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light border-0 px-2"><i class="ti ti-clock-pause"></i></span>
+                      {{ form.hora_fin }}
+                    </div>
+                  </div>
                 </div>
-            </div>
+              </div>
+              <div class="d-grid gap-3 mt-2">
+                <button type="submit"
+                        class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm py-3">
+                  <i class="ti ti-circle-check me-2"></i>Confirmar Reserva
+                </button>
+                <a href="{% url 'core:player_reservations' %}"
+                   class="btn btn-light btn-lg rounded-pill fw-bold text-muted py-3">
+                  <i class="ti ti-history me-2"></i>Mis Reservas
+                </a>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <!-- Columna Derecha: Calendario -->
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body p-2">
-                    <div id='calendar'></div>
+        <!-- Card de Instrucciones -->
+        <div class="card border-0 shadow-sm rounded-4 ranking-card">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3 d-flex align-items-center">
+              <i class="ti ti-info-circle text-primary me-2"></i>Instrucciones
+            </h6>
+            <ul class="list-unstyled mb-4 small">
+              <li class="mb-2 d-flex align-items-start">
+                <i class="ti ti-point-filled text-primary mt-1 me-1"></i>
+                <span>Haz clic y arrastra en el <strong>calendario</strong> para marcar tu horario.</span>
+              </li>
+              <li class="mb-2 d-flex align-items-start">
+                <i class="ti ti-point-filled text-primary mt-1 me-1"></i>
+                <span>Las reservas se realizan en bloques de mínimo 1 hora.</span>
+              </li>
+            </ul>
+            <div class="legend-box border-top pt-3">
+              <h6 class="tiny fw-bold text-muted text-uppercase mb-3">Leyenda de Colores</h6>
+              <div class="d-flex flex-column gap-2 mb-0">
+                <div class="d-flex align-items-center">
+                  <span class="legend-indicator" style="background: #F59E0B;"></span>
+                  <small class="ms-2 fw-medium">Pendiente (Otros)</small>
                 </div>
+                <div class="d-flex align-items-center">
+                  <span class="legend-indicator" style="background: #EF4444;"></span>
+                  <small class="ms-2 fw-medium">Bloqueado / Ocupado</small>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="legend-indicator" style="background: #10B981;"></span>
+                  <small class="ms-2 fw-medium">Tu Reserva</small>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+      <!-- Columna Derecha: Calendario Interactivo -->
+      <div class="col-lg-8 col-xl-9">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden calendar-wrapper">
+          <div class="card-body p-2 p-md-4">
+            <div id='calendar'></div>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+  <!-- Estilos para personalización del calendario y diseño -->
+  <style>
+    .legend-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        display: inline-block;
+    }
 
-<!-- FullCalendar JS -->
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script>
+    .calendar-wrapper {
+        min-height: 600px;
+        background: var(--bg-card);
+    }
+
+    /* Estilos Premium para FullCalendar */
+    .fc {
+        font-family: 'Poppins', sans-serif;
+        --fc-border-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .dark-mode .fc {
+        --fc-border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .fc .fc-toolbar-title {
+        font-weight: 700;
+        font-size: 1.5rem;
+        text-transform: capitalize;
+    }
+
+    .fc .fc-button-primary {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 8px 20px;
+        text-transform: capitalize;
+    }
+
+    .fc .fc-button-primary:hover {
+        background-color: var(--color-primary-dark);
+    }
+
+    .fc .fc-button-primary:disabled {
+        opacity: 0.4;
+    }
+
+    .fc-theme-standard td,
+    .fc-theme-standard th {
+        border-color: var(--fc-border-color);
+    }
+
+    .fc .fc-timegrid-slot {
+        height: 3.5em;
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        padding: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .fc-event {
+        border: none;
+        border-radius: 6px;
+        padding: 2px 5px;
+        cursor: pointer;
+    }
+
+    .modern-form .input-group-text {
+        border-radius: 12px 0 0 12px;
+        color: var(--color-primary);
+    }
+
+    .modern-form .form-control,
+    .modern-form .form-select {
+        border-radius: 0 12px 12px 0;
+    }
+
+    @media (max-width: 991.98px) {
+        .calendar-wrapper {
+            min-height: 500px;
+        }
+    }
+  </style>
+  <!-- FullCalendar JS -->
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
-        var canchaSelect = document.getElementById('id_cancha'); // ID por defecto de Django
+        var canchaSelect = document.getElementById('id_cancha');
         var fechaInput = document.getElementById('id_fecha');
         var horaInicioInput = document.getElementById('id_hora_inicio');
         var horaFinInput = document.getElementById('id_hora_fin');
@@ -100,6 +223,19 @@
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'timeGridWeek',
             locale: 'es',
+            allDaySlot: false,
+            slotMinTime: '08:00:00',
+            slotMaxTime: '22:00:00',
+            expandRows: true,
+            height: 'auto',
+            navLinks: true,
+            selectable: true,
+            selectMirror: true,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridWeek,timeGridDay'
+            },
             buttonText: {
                 today: 'Hoy',
                 month: 'Mes',
@@ -107,19 +243,6 @@
                 day: 'Día',
                 list: 'Lista'
             },
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'timeGridWeek,timeGridDay'
-            },
-            slotMinTime: '08:00:00', // Horario apertura
-            slotMaxTime: '22:00:00', // Horario cierre
-            allDaySlot: false,
-            expandRows: true,
-            height: 'auto',
-            navLinks: true, // clic en día va a vista día
-            selectable: true,
-            selectMirror: true,
             eventTimeFormat: {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -130,10 +253,11 @@
             // Cargar eventos (reservas existentes)
             events: function (info, successCallback, failureCallback) {
                 var canchaId = canchaSelect.value;
-                if (!canchaId) return successCallback([]); // Si no hay cancha seleccionada
+                if (!canchaId) {
+                    successCallback([]);
+                    return;
+                }
 
-                // Construir URL dinámicamente usando el patrón definido en urls.py
-                // Usamos un ID dummy '0' para que Django genere la base, y luego lo reemplazamos por el ID real
                 var baseUrl = "{% url 'core:api_court_availability' 0 %}";
                 var url = baseUrl.replace('/0/', '/' + canchaId + '/') +
                     "?start=" + info.startStr +
@@ -145,45 +269,39 @@
                     .catch(error => failureCallback(error));
             },
 
-            slotDuration: '02:00:00', // Slots de 2 horas (cuadros visuales)
-            slotLabelInterval: '02:00', // Etiquetas cada 2 horas
-            snapDuration: '02:00:00', // Forzar selección en bloques de 2h
+            slotDuration: '01:00:00',
+            slotLabelInterval: '01:00',
+            snapDuration: '00:30:00',
 
-            // Al seleccionar un rango vacío en el calendario
             select: function (info) {
                 fechaInput.value = info.startStr.split('T')[0];
 
                 var start = info.start;
                 var end = info.end;
 
-                // Calcular duración seleccionada manualmente
                 var durationHours = (end - start) / (1000 * 60 * 60);
 
-                // Si la selección es pequeña (ej: clic simple de 30 min), forzar 2 horas por defecto
-                // Un partido de pádel dura tipicamente 1.5 - 2 horas
                 if (durationHours <= 0.5) {
-                    end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2 horas
-
-                    // Validar límite de cierre (22:00 según modelo)
+                    end = new Date(start.getTime() + 1.5 * 60 * 60 * 1000);
                     var limitHour = 22;
                     if (end.getHours() > limitHour || (end.getHours() === limitHour && end.getMinutes() > 0)) {
-                        end.setHours(limitHour, 0, 0); // Capar a las 22:00
+                        end.setHours(limitHour, 0, 0);
                     }
                 }
 
                 horaInicioInput.value = start.toTimeString().split(' ')[0].substring(0, 5);
                 horaFinInput.value = end.toTimeString().split(' ')[0].substring(0, 5);
 
-                // Efecto visual (opcional)
-                horaInicioInput.classList.add('bg-light', 'border-success');
-                horaFinInput.classList.add('bg-light', 'border-success');
+                fechaInput.classList.add('is-valid');
+                horaInicioInput.classList.add('is-valid');
+                horaFinInput.classList.add('is-valid');
                 setTimeout(() => {
-                    horaInicioInput.classList.remove('bg-light', 'border-success');
-                    horaFinInput.classList.remove('bg-light', 'border-success');
-                }, 500);
+                    fechaInput.classList.remove('is-valid');
+                    horaInicioInput.classList.remove('is-valid');
+                    horaFinInput.classList.remove('is-valid');
+                }, 1500);
             },
 
-            // Re-renderizar si cambia la ventana
             windowResize: function (view) {
                 calendar.render();
             }
@@ -191,12 +309,11 @@
 
         calendar.render();
 
-        // Recargar calendario cuando cambie el select de cancha
         if (canchaSelect) {
             canchaSelect.addEventListener('change', function () {
                 calendar.refetchEvents();
             });
         }
     });
-</script>
+  </script>
 {% endblock %}

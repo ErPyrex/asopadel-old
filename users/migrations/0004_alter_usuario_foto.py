@@ -6,15 +6,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0003_alter_usuario_managers_remove_usuario_username'),
+        ("users", "0003_alter_usuario_managers_remove_usuario_username"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='usuario',
-            name='foto',
-            field=models.ImageField(blank=True, null=True, upload_to='perfiles/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'webp'], message='Solo se permiten archivos de imagen (jpg, jpeg, png, webp)'), users.models.ValidateImageSize]),
+            model_name="usuario",
+            name="foto",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to="perfiles/",
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["jpg", "jpeg", "png", "webp"],
+                        message="Solo se permiten archivos de imagen (jpg, jpeg, png, webp)",
+                    ),
+                    users.models.ValidateImageSize,
+                ],
+            ),
         ),
     ]

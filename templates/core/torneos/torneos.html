@@ -1,95 +1,1034 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Gestión de Torneos - Administrador{% endblock %}
 {% block content %}
-
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h2 class="fw-bold mb-1"><i class="ti ti-trophy me-2 text-primary"></i>Torneos registrados</h2>
-      <p class="text-muted mb-0">Cada torneo es una historia en juego. Diseña el desafío.</p>
+  <div class="container-fluid px-lg-5 py-4">
+    <!-- Header de la sección -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+      <div>
+        <h1 class="display-5 fw-bold mb-2">
+          Gestión de <span class="text-primary">Torneos</span>
+        </h1>
+        <p class="text-muted fs-5 mb-0">Cada torneo es una historia en juego. Diseña el desafío.</p>
+      </div>
+      <div>
+        <button type="button"
+                class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#createTournamentModal">
+          <i class="ti ti-plus me-2"></i>Nuevo Torneo
+        </button>
+      </div>
     </div>
-    <a href="{% url 'core:admin_create_tournament' %}"
-      class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
-      <i class="ti ti-plus"></i>
-      <span>Nuevo Torneo</span>
-    </a>
-  </div>
-
-  <!-- Filtros Modernos -->
-  <div class="card border-0 shadow-sm mb-4">
-    <div class="card-body">
-      <form method="get" class="row g-3 align-items-end">
-        <div class="col-md-4">
-          <label for="tipo" class="form-label small fw-bold text-muted">Tipo de Torneo</label>
-          <select name="tipo" id="tipo" class="form-select">
-            <option value="">Todos los tipos</option>
-            <option value="individual" {% if tipo_seleccionado == "individual" %}selected{% endif %}>Individual</option>
-            <option value="dobles" {% if tipo_seleccionado == "dobles" %}selected{% endif %}>Dobles</option>
-            <option value="mixto" {% if tipo_seleccionado == "mixto" %}selected{% endif %}>Mixto</option>
-          </select>
+    <!-- Filtros Rápidos -->
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5 bg-dark bg-opacity-10 border border-white border-opacity-10">
+      <div class="card-body p-4">
+        <form method="get" class="row g-4 align-items-end">
+          <div class="col-md-4">
+            <label for="tipo"
+                   class="form-label small fw-bold text-muted text-uppercase mb-2">Tipo de Torneo</label>
+            <div class="input-group border rounded-pill overflow-hidden bg-light">
+              <span class="input-group-text border-0 bg-transparent ps-3"><i class="ti ti-category text-primary"></i></span>
+              <select name="tipo"
+                      id="tipo"
+                      class="form-select border-0 bg-transparent py-2">
+                <option value="">Todos los tipos</option>
+                <option value="individual"
+                        {% if tipo_seleccionado == "individual" %}selected{% endif %}>Individual</option>
+                <option value="dobles"
+                        {% if tipo_seleccionado == "dobles" %}selected{% endif %}>Dobles</option>
+                <option value="mixto"
+                        {% if tipo_seleccionado == "mixto" %}selected{% endif %}>Mixto</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label for="activo"
+                   class="form-label small fw-bold text-muted text-uppercase mb-2">Estado</label>
+            <div class="input-group border rounded-pill overflow-hidden bg-light">
+              <span class="input-group-text border-0 bg-transparent ps-3"><i class="ti ti-activity text-primary"></i></span>
+              <select name="activo"
+                      id="activo"
+                      class="form-select border-0 bg-transparent py-2">
+                <option value="">Todos los estados</option>
+                <option value="1" {% if estado_seleccionado == "1" %}selected{% endif %}>Activos</option>
+                <option value="0" {% if estado_seleccionado == "0" %}selected{% endif %}>Inactivos</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <button type="submit"
+                    class="btn btn-dark btn-lg rounded-pill px-5 fw-bold w-100 shadow-sm transition-all hover-lift">
+              <i class="ti ti-filter me-2"></i>Filtrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Cuadrícula de Torneos -->
+    <div class="row g-4">
+      {% for torneo in torneos %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card transition-hover">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="bg-primary bg-opacity-10 p-2 rounded-3">
+                  <i class="ti ti-trophy fs-2 text-primary"></i>
+                </div>
+                <div class="text-end">
+                  {% if torneo.cancelado %}
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
+                      <i class="ti ti-ban me-1"></i>Cancelado
+                    </span>
+                  {% elif torneo.activo %}
+                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                      <i class="ti ti-circle-check-filled me-1"></i>Activo
+                    </span>
+                  {% else %}
+                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">
+                      <i class="ti ti-circle-x-filled me-1"></i>Inactivo
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+              <h4 class="fw-bold mb-1">{{ torneo.nombre }}</h4>
+              <p class="text-muted small mb-4">
+                <span class="badge bg-light text-dark border rounded-pill">{{ torneo.categoria|default:"Sin Categoría" }}</span>
+              </p>
+              <div class="row g-2 mb-4">
+                <div class="col-6">
+                  <div class="bg-light rounded-3 p-2 text-center">
+                    <span class="d-block text-muted tiny text-uppercase fw-bold">Fecha Inicio</span>
+                    <span class="fw-bold small">{{ torneo.fecha_inicio|date:"d M, Y"|default:torneo.fecha_inicio }}</span>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="bg-light rounded-3 p-2 text-center">
+                    <span class="d-block text-muted tiny text-uppercase fw-bold">Fecha Fin</span>
+                    <span class="fw-bold small">{{ torneo.fecha_fin|date:"d M, Y"|default:torneo.fecha_fin }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="button"
+                        class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-grow-1"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editTournamentModal{{ torneo.id }}"
+                        {% if torneo.cancelado %}disabled title="Torneo cancelado"{% endif %}>
+                  <i class="ti ti-edit me-1"></i>Editar
+                </button>
+                <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold flex-grow-1"
+                        {% if torneo.cancelado %}disabled title="Torneo cancelado"{% endif %}>
+                  <i class="ti ti-users me-1"></i>Inscritos ({{ torneo.jugadores_inscritos.count }})
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-4">
-          <label for="activo" class="form-label small fw-bold text-muted">Estado</label>
-          <select name="activo" id="activo" class="form-select">
-            <option value="">Todos los estados</option>
-            <option value="1" {% if estado_seleccionado == "1" %}selected{% endif %}>Activos</option>
-            <option value="0" {% if estado_seleccionado == "0" %}selected{% endif %}>Inactivos</option>
-          </select>
+        <!-- Modal Editar Torneo {{ torneo.id }} -->
+        <div class="modal fade"
+             id="editTournamentModal{{ torneo.id }}"
+             tabindex="-1"
+             aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div class="modal-header bg-primary py-3 border-0">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                  <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                       style="width: 36px;
+                              height: 36px">
+                    <i class="ti ti-edit fs-5"></i>
+                  </div>
+                  Editar: {{ torneo.nombre }}
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-4 p-md-5 bg-card">
+                <form action="{% url 'core:admin_edit_tournament' torneo.id %}"
+                      method="POST"
+                      class="edit-tournament-form"
+                      data-torneo-id="{{ torneo.id }}">
+                  {% csrf_token %}
+                  <div class="row g-4">
+                    <!-- Nombre -->
+                    <div class="col-12">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre del Torneo</label>
+                      <div class="input-group modern-input-group">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
+                        <input type="text"
+                               name="nombre"
+                               class="form-control border-0 py-2 bg-transparent"
+                               value="{{ torneo.nombre }}"
+                               required>
+                      </div>
+                    </div>
+                    <!-- Fechas -->
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Inicio</label>
+                      <div class="input-group modern-input-group">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-event text-primary"></i></span>
+                        <input type="date"
+                               name="fecha_inicio"
+                               class="form-control border-0 py-2 bg-transparent edit-fecha-inicio"
+                               value="{{ torneo.fecha_inicio|date:'Y-m-d' }}"
+                               data-torneo-id="{{ torneo.id }}"
+                               required>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Fin</label>
+                      <div class="input-group modern-input-group">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-check text-primary"></i></span>
+                        <input type="date"
+                               name="fecha_fin"
+                               class="form-control border-0 py-2 bg-transparent edit-fecha-fin"
+                               value="{{ torneo.fecha_fin|date:'Y-m-d' }}"
+                               data-torneo-id="{{ torneo.id }}"
+                               required>
+                      </div>
+                    </div>
+                    <!-- Categoría y Árbitro -->
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
+                      <div class="input-group modern-input-group">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-tags text-primary"></i></span>
+                        <select name="categoria"
+                                class="form-select border-0 py-2 bg-transparent edit-categoria-select"
+                                data-torneo-id="{{ torneo.id }}"
+                                required>
+                          {% for cat in categorias %}
+                            <option value="{{ cat.id }}"
+                                    {% if torneo.categoria.id == cat.id %}selected{% endif %}>{{ cat.nombre }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro Asignado</label>
+                      <div class="input-group modern-input-group">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-shield text-primary"></i></span>
+                        <select name="arbitro"
+                                class="form-select border-0 py-2 bg-transparent"
+                                required>
+                          {% for arb in arbitros %}
+                            <option value="{{ arb.id }}"
+                                    {% if torneo.arbitro.id == arb.id %}selected{% endif %}>
+                              {{ arb.get_full_name|default:arb.username }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <!-- Descripción -->
+                    <div class="col-12">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
+                      <div class="input-group modern-input-group align-items-start pt-1">
+                        <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                        <textarea name="descripcion"
+                                  class="form-control border-0 py-2 bg-transparent"
+                                  rows="3"
+                                  required>{{ torneo.descripcion }}</textarea>
+                      </div>
+                    </div>
+                    <!-- Premios -->
+                    <div class="col-12">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Premios</label>
+                      <div class="input-group modern-input-group align-items-start pt-1">
+                        <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-gift text-primary"></i></span>
+                        <textarea name="premios"
+                                  class="form-control border-0 py-2 bg-transparent"
+                                  rows="2">{{ torneo.premios|default:'' }}</textarea>
+                      </div>
+                    </div>
+                    <!-- Jugadores Inscritos -->
+                    <div class="col-12">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                        <i class="ti ti-users me-1"></i>Jugadores Inscritos
+                      </label>
+                      <!-- Buscador -->
+                      <div class="input-group modern-input-group mb-3">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-search text-primary"></i></span>
+                        <input type="text"
+                               class="form-control border-0 py-2 bg-transparent edit-player-search"
+                               data-torneo-id="{{ torneo.id }}"
+                               placeholder="Buscar jugador por nombre o cédula...">
+                      </div>
+                      <!-- Resultados -->
+                      <div class="edit-player-search-results mb-3"
+                           data-torneo-id="{{ torneo.id }}"
+                           style="max-height: 150px;
+                                  overflow-y: auto;
+                                  display: none"></div>
+                      <!-- Chips de jugadores seleccionados -->
+                      <div class="player-chips-container bg-light rounded-3 p-3 min-height-80"
+                           id="edit_selected_players_{{ torneo.id }}">
+                        {% for jugador in torneo.jugadores_inscritos.all %}
+                          <span class="player-chip" data-player-id="{{ jugador.id }}">
+                            {{ jugador.first_name }} {{ jugador.last_name }} ({{ jugador.cedula }})
+                            <i class="ti ti-x remove-player-edit"
+                               data-id="{{ jugador.id }}"
+                               data-torneo-id="{{ torneo.id }}"></i>
+                          </span>
+                        {% empty %}
+                          <div class="text-muted small text-center py-2 no-players-msg">
+                            <i class="ti ti-user-plus me-1"></i>Sin jugadores inscritos
+                          </div>
+                        {% endfor %}
+                      </div>
+                      <select name="jugadores_inscritos"
+                              class="edit-jugadores-hidden"
+                              data-torneo-id="{{ torneo.id }}"
+                              multiple
+                              style="display: none">
+                        {% for jugador in torneo.jugadores_inscritos.all %}
+                          <option value="{{ jugador.id }}" selected>{{ jugador.first_name }} {{ jugador.last_name }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Acciones -->
+                  <div class="d-grid gap-3 mt-5">
+                    <button type="submit"
+                            class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                      <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                    </button>
+                    <button type="button"
+                            class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                            data-bs-dismiss="modal">Cerrar</button>
+                    <hr class="my-2 opacity-25">
+                    <button type="button"
+                            class="btn btn-outline-danger rounded-pill fw-bold"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteTournamentModal{{ torneo.id }}"
+                            data-bs-dismiss="modal">
+                      <i class="ti ti-trash me-2"></i>Cancelar Torneo
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="col-md-4">
-          <button type="submit" class="btn btn-dark w-100 d-flex align-items-center justify-content-center gap-2">
-            <i class="ti ti-filter"></i> Filtrar
-          </button>
+        <!-- Modal Confirmación Eliminar Torneo {{ torneo.id }} -->
+        <div class="modal fade"
+             id="deleteTournamentModal{{ torneo.id }}"
+             tabindex="-1"
+             aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div class="modal-header bg-danger py-3 border-0">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                  <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                       style="width: 36px;
+                              height: 36px">
+                    <i class="ti ti-alert-triangle fs-5"></i>
+                  </div>
+                  Cancelar Torneo
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-4 p-md-5 bg-card text-center">
+                <div class="mb-4">
+                  <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center"
+                       style="width: 80px;
+                              height: 80px">
+                    <i class="ti ti-trophy-off fs-1 text-danger"></i>
+                  </div>
+                </div>
+                <h4 class="fw-bold mb-3">¿Estás seguro?</h4>
+                <p class="text-muted mb-4">
+                  Esta acción <strong>marcará el torneo como cancelado</strong>. El torneo seguirá apareciendo en la lista pero no se podrán realizar más ediciones ni inscripciones.
+                </p>
+                <div class="text-start mb-4">
+                  <label class="form-label small text-muted">Para confirmar, escribe el nombre del torneo:</label>
+                  <div class="d-flex align-items-center gap-2 mb-3 p-3 bg-light rounded-3">
+                    <code class="fs-5 text-danger fw-bold flex-grow-1 tournament-name-copy"
+                          data-torneo-id="{{ torneo.id }}"
+                          data-name="{{ torneo.nombre }}"
+                          style="cursor: pointer"
+                          title="Clic para copiar">
+                      {{ torneo.nombre }}
+                    </code>
+                    <i class="ti ti-copy text-muted copy-icon"
+                       data-torneo-id="{{ torneo.id }}"
+                       style="cursor: pointer"
+                       title="Copiar nombre"></i>
+                  </div>
+                  <input type="text"
+                         class="form-control py-3 text-center fw-bold delete-confirm-input"
+                         data-torneo-id="{{ torneo.id }}"
+                         data-expected="{{ torneo.nombre }}"
+                         placeholder="Escribe el nombre del torneo aquí...">
+                </div>
+                <form action="{% url 'core:admin_delete_tournament' torneo.id %}"
+                      method="POST"
+                      class="d-grid gap-2">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="btn btn-danger btn-lg rounded-pill fw-bold py-3 delete-confirm-btn"
+                          data-torneo-id="{{ torneo.id }}"
+                          disabled>
+                    <i class="ti ti-ban me-2"></i>Confirmar Cancelación del Torneo
+                  </button>
+                  <button type="button"
+                          class="btn btn-light btn-lg rounded-pill fw-bold"
+                          data-bs-dismiss="modal">No, mantener torneo</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-      </form>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="mb-4">
+            <i class="ti ti-trophy fs-display-1 text-muted opacity-10"></i>
+          </div>
+          <h3 class="text-muted fw-bold">No hay torneos registrados</h3>
+          <p class="text-muted">Comienza diseñando tu primer torneo competitivo.</p>
+        </div>
+      {% endfor %}
     </div>
   </div>
-
-  <!-- Tabla de torneos Modernizada -->
-  <div class="card border-0 shadow-sm overflow-hidden">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
-          <tr>
-            <th class="ps-4">Nombre</th>
-            <th>Tipo</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
-            <th class="text-center">Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for torneo in torneos %}
-          <tr>
-            <td class="ps-4 fw-bold text-heading">{{ torneo.nombre }}</td>
-            <td>
-              <span class="badge bg-light text-dark border">{{ torneo.tipo|title }}</span>
-            </td>
-            <td><i class="ti ti-calendar-event me-1 text-muted"></i> {{ torneo.fecha_inicio }}</td>
-            <td><i class="ti ti-calendar-check me-1 text-muted"></i> {{ torneo.fecha_fin }}</td>
-            <td class="text-center">
-              {% if torneo.activo %}
-              <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
-                <i class="ti ti-circle-check-filled me-1"></i> Activo
-              </span>
-              {% else %}
-              <span class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 rounded-pill">
-                <i class="ti ti-circle-x-filled me-1"></i> Inactivo
-              </span>
-              {% endif %}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="5" class="text-center py-5">
-              <i class="ti ti-database-off fs-1 text-muted mb-2"></i>
-              <p class="text-muted mb-0">No hay torneos registrados aún.</p>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <!-- Modal Crear Torneo -->
+  <div class="modal fade"
+       id="createTournamentModal"
+       tabindex="-1"
+       aria-labelledby="createTournamentModalLabel"
+       aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <!-- Header Premium -->
+        <div class="modal-header bg-primary py-3 border-0">
+          <h5 class="modal-title fw-bold text-white d-flex align-items-center"
+              id="createTournamentModalLabel">
+            <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                 style="width: 36px;
+                        height: 36px">
+              <i class="ti ti-trophy fs-5"></i>
+            </div>
+            Nuevo Torneo
+          </h5>
+          <button type="button"
+                  class="btn-close btn-close-white"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 p-md-5 bg-card">
+          <form action="{% url 'core:admin_create_tournament' %}"
+                method="POST"
+                id="createTournamentForm">
+            {% csrf_token %}
+            <div class="row g-4">
+              <!-- Nombre -->
+              <div class="col-12">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre del Torneo</label>
+                <div class="input-group modern-input-group">
+                  <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
+                  <input type="text"
+                         name="nombre"
+                         class="form-control border-0 py-2 bg-transparent"
+                         placeholder="Ej: Torneo Apertura 2024"
+                         required>
+                </div>
+              </div>
+              <!-- Fechas con validación -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Inicio</label>
+                <div class="input-group modern-input-group">
+                  <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-event text-primary"></i></span>
+                  <input type="date"
+                         name="fecha_inicio"
+                         id="fecha_inicio"
+                         class="form-control border-0 py-2 bg-transparent"
+                         required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha de Fin</label>
+                <div class="input-group modern-input-group">
+                  <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar-check text-primary"></i></span>
+                  <input type="date"
+                         name="fecha_fin"
+                         id="fecha_fin"
+                         class="form-control border-0 py-2 bg-transparent"
+                         required>
+                </div>
+              </div>
+              <!-- Categoría y Árbitro -->
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
+                <div class="input-group modern-input-group">
+                  <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-tags text-primary"></i></span>
+                  <select name="categoria"
+                          id="categoria_select"
+                          class="form-select border-0 py-2 bg-transparent"
+                          required>
+                    {% for cat in categorias %}<option value="{{ cat.id }}">{{ cat.nombre }}</option>{% endfor %}
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro Asignado</label>
+                <div class="input-group modern-input-group">
+                  <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-shield text-primary"></i></span>
+                  <select name="arbitro"
+                          class="form-select border-0 py-2 bg-transparent"
+                          required>
+                    {% for arb in arbitros %}
+                      <option value="{{ arb.id }}">{{ arb.get_full_name|default:arb.username }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+              <!-- Descripción -->
+              <div class="col-12">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Descripción</label>
+                <div class="input-group modern-input-group align-items-start pt-1">
+                  <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                  <textarea name="descripcion"
+                            class="form-control border-0 py-2 bg-transparent"
+                            rows="3"
+                            placeholder="Explique las reglas, lugar y objetivos del torneo..."
+                            required></textarea>
+                </div>
+              </div>
+              <!-- Premios -->
+              <div class="col-12">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Premios</label>
+                <div class="input-group modern-input-group align-items-start pt-1">
+                  <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-gift text-primary"></i></span>
+                  <textarea name="premios"
+                            class="form-control border-0 py-2 bg-transparent"
+                            rows="2"
+                            placeholder="Indique trofeos, premios en metálico o puntos..."></textarea>
+                </div>
+              </div>
+              <!-- Gestión de Jugadores Inscritos -->
+              <div class="col-12">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-2">
+                  <i class="ti ti-users me-1"></i>Jugadores Inscritos
+                </label>
+                <!-- Buscador de jugadores -->
+                <div class="input-group modern-input-group mb-3">
+                  <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-search text-primary"></i></span>
+                  <input type="text"
+                         id="player_search"
+                         class="form-control border-0 py-2 bg-transparent"
+                         placeholder="Buscar jugador por nombre o cédula...">
+                </div>
+                <!-- Resultados de búsqueda -->
+                <div id="player_search_results"
+                     class="mb-3"
+                     style="max-height: 200px;
+                            overflow-y: auto;
+                            display: none">
+                  <!-- Los resultados se llenan dinámicamente -->
+                </div>
+                <!-- Jugadores seleccionados -->
+                <div class="player-chips-container bg-light rounded-3 p-3 min-height-100"
+                     id="selected_players_container">
+                  <div class="text-muted small text-center py-3" id="no_players_msg">
+                    <i class="ti ti-user-plus me-2"></i>No hay jugadores inscritos. Use el buscador para agregar.
+                  </div>
+                </div>
+                <!-- Campo oculto para enviar los IDs -->
+                <select name="jugadores_inscritos"
+                        id="jugadores_inscritos_hidden"
+                        multiple
+                        style="display: none"></select>
+              </div>
+            </div>
+            <!-- Acciones -->
+            <div class="d-grid gap-3 mt-5">
+              <button type="submit"
+                      class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                <i class="ti ti-device-floppy me-2"></i>Crear Torneo
+              </button>
+              <button type="button"
+                      class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                      data-bs-dismiss="modal">Cancelar</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+  <style>
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    }
+    .hover-lift:hover { transform: translateY(-2px); }
+    .tiny { font-size: 0.65rem; }
+    .fs-display-1 { font-size: 5rem; }
+    .bg-card { background: #ffffff; }
+    [data-bs-theme="dark"] .bg-card { background: #1a1d21; }
+    [data-bs-theme="dark"] .bg-light { background: rgba(255, 255, 255, 0.05) !important; color: #fff !important; }
+    [data-bs-theme="dark"] .text-dark { color: #fff !important; }
 
+    /* Estilos del Modal */
+    .modern-input-group {
+        background: var(--bs-gray-100);
+        border: 1px solid var(--bs-gray-200);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    [data-bs-theme="dark"] .modern-input-group {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .modern-input-group:focus-within {
+        background: #fff !important;
+        border-color: var(--bs-primary) !important;
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.1) !important;
+    }
+    .modern-input-group .form-control, 
+    .modern-input-group .form-select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: inherit !important;
+        padding: 0.75rem 1rem;
+    }
+
+    /* Chips de jugadores */
+    .player-chip {
+        display: inline-flex;
+        align-items: center;
+        background: var(--bs-primary);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        margin: 0.25rem;
+        font-weight: 500;
+    }
+    .player-chip .remove-player {
+        margin-left: 0.5rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .player-chip .remove-player:hover { opacity: 1; }
+
+    /* Resultados de búsqueda */
+    .player-result-item {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border: 1px solid transparent;
+    }
+    .player-result-item:hover {
+        background: rgba(59, 130, 246, 0.1);
+        border-color: var(--bs-primary);
+    }
+    .min-height-80 { min-height: 80px; }
+    .player-chip .remove-player-edit {
+        margin-left: 0.5rem;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .player-chip .remove-player-edit:hover { opacity: 1; }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        // ==========================================
+        // MODAL DE CREACIÓN
+        // ==========================================
+        const fechaInicio = document.getElementById('fecha_inicio');
+        const fechaFin = document.getElementById('fecha_fin');
+        const categoriaSelect = document.getElementById('categoria_select');
+        const playerSearch = document.getElementById('player_search');
+        const searchResults = document.getElementById('player_search_results');
+        const selectedContainer = document.getElementById('selected_players_container');
+        const hiddenSelect = document.getElementById('jugadores_inscritos_hidden');
+        
+        if (fechaInicio) {
+            fechaInicio.setAttribute('min', today);
+            fechaInicio.addEventListener('change', function() {
+                if (this.value) {
+                    const startDate = new Date(this.value);
+                    startDate.setDate(startDate.getDate() + 1);
+                    const minEndDate = startDate.toISOString().split('T')[0];
+                    fechaFin.setAttribute('min', minEndDate);
+                    if (fechaFin.value && fechaFin.value < minEndDate) {
+                        fechaFin.value = minEndDate;
+                    }
+                }
+            });
+            fechaFin.setAttribute('min', today);
+        }
+        
+        // Gestión de jugadores para modal de creación
+        let selectedPlayers = [];
+        let searchTimeout = null;
+        
+        function updateSelectedPlayersUI() {
+            if (!selectedContainer) return;
+            selectedContainer.innerHTML = '';
+            
+            if (selectedPlayers.length === 0) {
+                selectedContainer.innerHTML = `
+                    <div class="text-muted small text-center py-3">
+                        <i class="ti ti-user-plus me-2"></i>No hay jugadores inscritos. Use el buscador para agregar.
+                    </div>
+                `;
+            } else {
+                selectedPlayers.forEach(player => {
+                    const chip = document.createElement('span');
+                    chip.className = 'player-chip';
+                    chip.innerHTML = `
+                        ${player.nombre} (${player.cedula})
+                        <i class="ti ti-x remove-player" data-id="${player.id}"></i>
+                    `;
+                    selectedContainer.appendChild(chip);
+                });
+                
+                document.querySelectorAll('#selected_players_container .remove-player').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const playerId = parseInt(this.dataset.id);
+                        selectedPlayers = selectedPlayers.filter(p => p.id !== playerId);
+                        updateSelectedPlayersUI();
+                        updateHiddenSelect();
+                    });
+                });
+            }
+        }
+        
+        function updateHiddenSelect() {
+            if (!hiddenSelect) return;
+            hiddenSelect.innerHTML = '';
+            selectedPlayers.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player.id;
+                option.selected = true;
+                option.textContent = player.nombre;
+                hiddenSelect.appendChild(option);
+            });
+        }
+        
+        function searchPlayersCreate(query) {
+            if (!categoriaSelect) return;
+            const categoriaId = categoriaSelect.value;
+            fetch(`{% url 'core:api_players_by_category' %}?categoria_id=${categoriaId}&search=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.jugadores && data.jugadores.length > 0) {
+                        searchResults.style.display = 'block';
+                        searchResults.innerHTML = '';
+                        
+                        data.jugadores.forEach(player => {
+                            if (selectedPlayers.find(p => p.id === player.id)) return;
+                            
+                            const item = document.createElement('div');
+                            item.className = 'player-result-item d-flex justify-content-between align-items-center';
+                            item.innerHTML = `
+                                <div>
+                                    <strong>${player.nombre}</strong>
+                                    <span class="text-muted small ms-2">CI: ${player.cedula}</span>
+                                </div>
+                                <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">${player.categoria}</span>
+                            `;
+                            item.addEventListener('click', () => {
+                                selectedPlayers.push(player);
+                                updateSelectedPlayersUI();
+                                updateHiddenSelect();
+                                playerSearch.value = '';
+                                searchResults.style.display = 'none';
+                            });
+                            searchResults.appendChild(item);
+                        });
+                        
+                        if (searchResults.children.length === 0) {
+                            searchResults.innerHTML = '<div class="text-muted small p-3 text-center">Todos los jugadores ya están agregados</div>';
+                        }
+                    } else {
+                        searchResults.style.display = 'block';
+                        searchResults.innerHTML = '<div class="text-muted small p-3 text-center">No se encontraron jugadores con esa categoría</div>';
+                    }
+                })
+                .catch(err => console.error('Error buscando jugadores:', err));
+        }
+        
+        if (playerSearch) {
+            playerSearch.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                const query = this.value.trim();
+                if (query.length >= 2) {
+                    searchTimeout = setTimeout(() => searchPlayersCreate(query), 300);
+                } else {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+        
+        if (categoriaSelect) {
+            categoriaSelect.addEventListener('change', function() {
+                if (playerSearch) playerSearch.value = '';
+                if (searchResults) searchResults.style.display = 'none';
+            });
+        }
+
+        // ==========================================
+        // MODALES DE EDICIÓN
+        // ==========================================
+        
+        // Configurar fechas para modales de edición
+        document.querySelectorAll('.edit-fecha-inicio').forEach(input => {
+            const torneoId = input.dataset.torneoId;
+            const fechaFinEdit = document.querySelector(`.edit-fecha-fin[data-torneo-id="${torneoId}"]`);
+            
+            input.addEventListener('change', function() {
+                if (this.value && fechaFinEdit) {
+                    const startDate = new Date(this.value);
+                    startDate.setDate(startDate.getDate() + 1);
+                    const minEndDate = startDate.toISOString().split('T')[0];
+                    fechaFinEdit.setAttribute('min', minEndDate);
+                    if (fechaFinEdit.value && fechaFinEdit.value < minEndDate) {
+                        fechaFinEdit.value = minEndDate;
+                    }
+                }
+            });
+        });
+        
+        // Gestión de jugadores en modales de edición
+        const editPlayersState = {};
+        
+        // Inicializar estado para cada modal de edición
+        document.querySelectorAll('.edit-jugadores-hidden').forEach(select => {
+            const torneoId = select.dataset.torneoId;
+            editPlayersState[torneoId] = [];
+            
+            // Cargar jugadores existentes
+            select.querySelectorAll('option').forEach(opt => {
+                editPlayersState[torneoId].push({
+                    id: parseInt(opt.value),
+                    nombre: opt.textContent.trim(),
+                    cedula: ''
+                });
+            });
+        });
+        
+        // Función para actualizar UI de jugadores en modal de edición
+        function updateEditPlayersUI(torneoId) {
+            const container = document.getElementById(`edit_selected_players_${torneoId}`);
+            const hiddenSel = document.querySelector(`.edit-jugadores-hidden[data-torneo-id="${torneoId}"]`);
+            
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const players = editPlayersState[torneoId] || [];
+            
+            if (players.length === 0) {
+                container.innerHTML = `
+                    <div class="text-muted small text-center py-2 no-players-msg">
+                        <i class="ti ti-user-plus me-1"></i>Sin jugadores inscritos
+                    </div>
+                `;
+            } else {
+                players.forEach(player => {
+                    const chip = document.createElement('span');
+                    chip.className = 'player-chip';
+                    chip.dataset.playerId = player.id;
+                    chip.innerHTML = `
+                        ${player.nombre} ${player.cedula ? `(${player.cedula})` : ''}
+                        <i class="ti ti-x remove-player-edit" data-id="${player.id}" data-torneo-id="${torneoId}"></i>
+                    `;
+                    container.appendChild(chip);
+                });
+            }
+            
+            // Actualizar select oculto
+            if (hiddenSel) {
+                hiddenSel.innerHTML = '';
+                players.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.selected = true;
+                    opt.textContent = p.nombre;
+                    hiddenSel.appendChild(opt);
+                });
+            }
+            
+            // Rebind remove buttons
+            container.querySelectorAll('.remove-player-edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const playerId = parseInt(this.dataset.id);
+                    const tid = this.dataset.torneoId;
+                    editPlayersState[tid] = editPlayersState[tid].filter(p => p.id !== playerId);
+                    updateEditPlayersUI(tid);
+                });
+            });
+        }
+        
+        // Inicializar bindings de remoción para chips existentes
+        document.querySelectorAll('.remove-player-edit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const playerId = parseInt(this.dataset.id);
+                const torneoId = this.dataset.torneoId;
+                editPlayersState[torneoId] = editPlayersState[torneoId].filter(p => p.id !== playerId);
+                updateEditPlayersUI(torneoId);
+            });
+        });
+        
+        // Búsqueda de jugadores en modales de edición
+        document.querySelectorAll('.edit-player-search').forEach(input => {
+            const torneoId = input.dataset.torneoId;
+            let editSearchTimeout = null;
+            
+            input.addEventListener('input', function() {
+                clearTimeout(editSearchTimeout);
+                const query = this.value.trim();
+                const resultsContainer = document.querySelector(`.edit-player-search-results[data-torneo-id="${torneoId}"]`);
+                const categoriaSelect = document.querySelector(`.edit-categoria-select[data-torneo-id="${torneoId}"]`);
+                
+                if (query.length >= 2) {
+                    editSearchTimeout = setTimeout(() => {
+                        const categoriaId = categoriaSelect ? categoriaSelect.value : '';
+                        fetch(`{% url 'core:api_players_by_category' %}?categoria_id=${categoriaId}&search=${encodeURIComponent(query)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.jugadores && data.jugadores.length > 0) {
+                                    resultsContainer.style.display = 'block';
+                                    resultsContainer.innerHTML = '';
+                                    
+                                    const currentPlayers = editPlayersState[torneoId] || [];
+                                    
+                                    data.jugadores.forEach(player => {
+                                        if (currentPlayers.find(p => p.id === player.id)) return;
+                                        
+                                        const item = document.createElement('div');
+                                        item.className = 'player-result-item d-flex justify-content-between align-items-center';
+                                        item.innerHTML = `
+                                            <div>
+                                                <strong>${player.nombre}</strong>
+                                                <span class="text-muted small ms-2">CI: ${player.cedula}</span>
+                                            </div>
+                                            <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">${player.categoria}</span>
+                                        `;
+                                        item.addEventListener('click', () => {
+                                            if (!editPlayersState[torneoId]) editPlayersState[torneoId] = [];
+                                            editPlayersState[torneoId].push(player);
+                                            updateEditPlayersUI(torneoId);
+                                            input.value = '';
+                                            resultsContainer.style.display = 'none';
+                                        });
+                                        resultsContainer.appendChild(item);
+                                    });
+                                    
+                                    if (resultsContainer.children.length === 0) {
+                                        resultsContainer.innerHTML = '<div class="text-muted small p-3 text-center">Todos los jugadores ya están agregados</div>';
+                                    }
+                                } else {
+                                    resultsContainer.style.display = 'block';
+                                    resultsContainer.innerHTML = '<div class="text-muted small p-3 text-center">No se encontraron jugadores</div>';
+                                }
+                            })
+                            .catch(err => console.error('Error:', err));
+                    }, 300);
+                } else {
+                    resultsContainer.style.display = 'none';
+                }
+            });
+        });
+
+        // Cerrar resultados al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (searchResults && !playerSearch.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+            document.querySelectorAll('.edit-player-search-results').forEach(container => {
+                const input = document.querySelector(`.edit-player-search[data-torneo-id="${container.dataset.torneoId}"]`);
+                if (input && !input.contains(e.target) && !container.contains(e.target)) {
+                    container.style.display = 'none';
+                }
+            });
+        });
+
+        // ==========================================
+        // MODAL DE ELIMINACIÓN - Copiar nombre y validación
+        // ==========================================
+        
+        // Función para copiar nombre al portapapeles
+        function copyTournamentName(torneoId, name) {
+            navigator.clipboard.writeText(name).then(() => {
+                // Feedback visual
+                const copyIcon = document.querySelector(`.copy-icon[data-torneo-id="${torneoId}"]`);
+                if (copyIcon) {
+                    copyIcon.classList.remove('ti-copy');
+                    copyIcon.classList.add('ti-check', 'text-success');
+                    setTimeout(() => {
+                        copyIcon.classList.remove('ti-check', 'text-success');
+                        copyIcon.classList.add('ti-copy', 'text-muted');
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Event listeners para copiar nombre
+        document.querySelectorAll('.tournament-name-copy').forEach(el => {
+            el.addEventListener('click', function() {
+                const torneoId = this.dataset.torneoId;
+                const name = this.dataset.name;
+                copyTournamentName(torneoId, name);
+            });
+        });
+        
+        document.querySelectorAll('.copy-icon').forEach(el => {
+            el.addEventListener('click', function() {
+                const torneoId = this.dataset.torneoId;
+                const nameEl = document.querySelector(`.tournament-name-copy[data-torneo-id="${torneoId}"]`);
+                if (nameEl) {
+                    copyTournamentName(torneoId, nameEl.dataset.name);
+                }
+            });
+        });
+        
+        // Validación del campo de confirmación
+        document.querySelectorAll('.delete-confirm-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const torneoId = this.dataset.torneoId;
+                const expected = this.dataset.expected;
+                const btn = document.querySelector(`.delete-confirm-btn[data-torneo-id="${torneoId}"]`);
+                
+                if (btn) {
+                    if (this.value.trim() === expected) {
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50');
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-50');
+                    }
+                }
+            });
+        });
+
+        // Limpiar campo al cerrar modal
+        document.querySelectorAll('[id^="deleteTournamentModal"]').forEach(modal => {
+            modal.addEventListener('hidden.bs.modal', function() {
+                const torneoId = this.id.replace('deleteTournamentModal', '');
+                const input = this.querySelector('.delete-confirm-input');
+                const btn = this.querySelector('.delete-confirm-btn');
+                if (input) input.value = '';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50');
+                }
+            });
+        });
+    });
+  </script>
 {% endblock %}

@@ -1,28 +1,533 @@
 {% extends 'base.html' %}
-{% block title %}Noticias publicadas{% endblock %}
-
+{% load static %}
+{% block title %}Gestión de Noticias - Administrador{% endblock %}
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">Noticias Publicadas</h2>
-    <div class="text-center mb-4">
-        <a href="{% url 'core:admin_create_noticia' %}" class="btn btn-success">Crear Nueva Noticia</a>
+  <div class="container-fluid px-lg-5 py-4">
+    <!-- Header de la sección -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+      <div>
+        <h1 class="display-5 fw-bold mb-2">
+          Gestión de <span class="text-primary">Noticias</span>
+        </h1>
+        <p class="text-muted fs-5 mb-0">Administra las publicaciones que verán los usuarios.</p>
+      </div>
+      <div>
+        <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#createNoticiaModal">
+          <i class="ti ti-plus me-2"></i>Nueva Noticia
+        </button>
+      </div>
     </div>
-    <div class="row">
-        {% for noticia in noticias %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">{{ noticia.titulo }}</h5>
-                    <p class="card-text">{{ noticia.cuerpo|truncatewords:30 }}</p>
+    <!-- Lista de noticias -->
+    <div class="row g-4">
+      {% for noticia in noticias %}
+        {% with autor_name=noticia.autor.get_full_name|default:noticia.autor.username %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card">
+              {% if noticia.imagen %}
+                <div style="height: 180px; overflow: hidden;">
+                  <img src="{{ noticia.imagen.url }}"
+                       class="w-100 h-100"
+                       style="object-fit: cover;
+                              object-position: {{ noticia.imagen_position }}"
+                       alt="{{ noticia.titulo }}">
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">{{ noticia.fecha_publicacion }} | {{ noticia.autor.get_full_name }}</small>
+              {% else %}
+                <div class="bg-light d-flex align-items-center justify-content-center"
+                     style="height: 180px">
+                  <i class="ti ti-news fs-1 text-muted opacity-25"></i>
                 </div>
+              {% endif %}
+              <div class="card-body p-4 d-flex flex-column">
+                <div class="d-flex align-items-center gap-2 mb-3 text-muted small">
+                  <i class="ti ti-calendar"></i> {{ noticia.fecha_publicacion|date:"d M, Y" }}
+                  <span class="mx-1">•</span>
+                  <i class="ti ti-user"></i> {{ autor_name }}
+                </div>
+                <h5 class="fw-bold mb-3">{{ noticia.titulo }}</h5>
+                <p class="text-muted small mb-4">{{ noticia.cuerpo|truncatewords:20 }}</p>
+                <div class="mt-auto">
+                  <div class="d-flex gap-2 mb-2">
+                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold flex-fill"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editNoticiaModal{{ noticia.id }}">
+                      <i class="ti ti-edit me-1"></i>Editar
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold flex-fill"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteNoticiaModal{{ noticia.id }}">
+                      <i class="ti ti-trash me-1"></i>Eliminar
+                    </button>
+                  </div>
+                  <button class="btn btn-light btn-sm rounded-pill px-3 fw-bold w-100"
+                          data-bs-toggle="modal"
+                          data-bs-target="#previewModal{{ noticia.id }}">
+                    <i class="ti ti-eye me-1"></i>Vista previa
+                  </button>
+                </div>
+              </div>
             </div>
+          </div>
+          <!-- Modal Editar Noticia -->
+          <div class="modal fade"
+               id="editNoticiaModal{{ noticia.id }}"
+               tabindex="-1"
+               aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <!-- Header con Gradiente Sutil -->
+                <div class="modal-header bg-primary py-3 border-0">
+                  <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                         style="width: 32px;
+                                height: 32px">
+                      <i class="ti ti-edit fs-5"></i>
+                    </div>
+                    Editar Noticia
+                  </h5>
+                  <button type="button"
+                          class="btn-close btn-close-white"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 p-md-5 bg-card text-start">
+                  <form action="{% url 'core:admin_edit_noticia' noticia.id %}"
+                        method="POST"
+                        enctype="multipart/form-data"
+                        id="editNoticiaForm{{ noticia.id }}">
+                    {% csrf_token %}
+                    <!-- Campo Título -->
+                    <div class="mb-4">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Título de la Noticia</label>
+                      <div class="input-group modern-input-group">
+                        <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-typography text-primary"></i></span>
+                        <input type="text"
+                               name="titulo"
+                               class="form-control border-0 py-2 bg-transparent"
+                               value="{{ noticia.titulo }}"
+                               placeholder="Título de la noticia"
+                               required>
+                      </div>
+                    </div>
+                    <!-- Campo Contenido -->
+                    <div class="mb-4">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contenido</label>
+                      <div class="input-group modern-input-group align-items-start pt-1">
+                        <span class="input-group-text border-0 ps-3 bg-transparent mt-2"><i class="ti ti-align-left text-primary"></i></span>
+                        <textarea name="cuerpo"
+                                  rows="6"
+                                  class="form-control border-0 py-2 bg-transparent"
+                                  placeholder="Contenido de la noticia"
+                                  required>{{ noticia.cuerpo }}</textarea>
+                      </div>
+                    </div>
+                    <!-- Zona de Imagen / Cropper -->
+                    <div class="mb-4">
+                      <label class="form-label fw-bold text-muted small text-uppercase mb-2">Imagen de Portada</label>
+                      <input type="hidden"
+                             name="imagen_pos_x"
+                             id="edit-pos-x-{{ noticia.id }}"
+                             value="{{ noticia.imagen_pos_x }}">
+                      <input type="hidden"
+                             name="imagen_pos_y"
+                             id="edit-pos-y-{{ noticia.id }}"
+                             value="{{ noticia.imagen_pos_y }}">
+                      <div class="image-crop-edit-container"
+                           id="crop-container-{{ noticia.id }}">
+                        {% if noticia.imagen %}
+                          <!-- Si ya tiene imagen, mostrar el cropper directamente -->
+                          <div class="news-crop-zone-modern">
+                            <div class="crop-header d-flex justify-content-between align-items-center mb-3">
+                              <span class="small text-muted fw-medium"><i class="ti ti-hand-grab me-2"></i>Arrastra para ajustar el encuadre</span>
+                              <label class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold mb-0"
+                                     style="cursor: pointer">
+                                <i class="ti ti-refresh me-1"></i>Cambiar
+                                <input type="file"
+                                       name="imagen"
+                                       id="edit-file-{{ noticia.id }}"
+                                       accept="image/*"
+                                       class="d-none"
+                                       onchange="handleEditImageChange(this, {{ noticia.id }})">
+                              </label>
+                            </div>
+                            <div class="news-crop-viewport-modern shadow-sm"
+                                 id="viewport-{{ noticia.id }}">
+                              <div class="news-crop-frame" id="frame-{{ noticia.id }}">
+                                <img id="edit-preview-{{ noticia.id }}"
+                                     src="{{ noticia.imagen.url }}"
+                                     alt="Vista previa"
+                                     draggable="false">
+                              </div>
+                            </div>
+                            <div class="text-center mt-3">
+                              <span class="badge bg-light text-muted fw-normal rounded-pill px-3 py-2 border">Posición focal actual</span>
+                            </div>
+                          </div>
+                        {% else %}
+                          <!-- Si no tiene imagen, mostrar dropzone -->
+                          <div class="news-drop-zone-modern"
+                               id="dropzone-{{ noticia.id }}"
+                               onclick="document.getElementById('edit-file-{{ noticia.id }}').click()">
+                            <input type="file"
+                                   name="imagen"
+                                   id="edit-file-{{ noticia.id }}"
+                                   accept="image/*"
+                                   class="d-none"
+                                   onchange="handleEditImageChange(this, {{ noticia.id }})">
+                            <div class="upload-placeholder text-center p-5">
+                              <div class="upload-icon-wrapper mb-3">
+                                <i class="ti ti-cloud-upload fs-1 text-primary"></i>
+                              </div>
+                              <h6 class="fw-bold mb-1">Cargar Imagen</h6>
+                              <p class="text-muted small mb-0">Arrastre aquí o haga clic para seleccionar</p>
+                            </div>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                    <!-- Botones de Acción -->
+                    <div class="d-grid gap-3 mt-5">
+                      <button type="submit"
+                              class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
+                        <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                      </button>
+                      <button type="button"
+                              class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                              data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal Vista Previa (Simulando Frontend) -->
+          <div class="modal fade"
+               id="previewModal{{ noticia.id }}"
+               tabindex="-1"
+               aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+              <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
+                  <button type="button"
+                          class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 text-start">
+                  {% if noticia.imagen %}
+                    <div class="position-relative">
+                      <img src="{{ noticia.imagen.url }}"
+                           class="w-100"
+                           alt="{{ noticia.titulo }}"
+                           style="height: 400px;
+                                  object-fit: cover">
+                      <div class="modal-hero-overlay-admin"></div>
+                    </div>
+                  {% endif %}
+                  <div class="p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 text-muted small">
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                        <i class="ti ti-calendar me-1"></i>{{ noticia.fecha_publicacion|date:"d M, Y" }}
+                      </span>
+                      <span>•</span>
+                      <span><i class="ti ti-user-circle fs-5 me-1"></i>Por {{ autor_name }}</span>
+                    </div>
+                    <h2 class="display-6 fw-bold mb-4">{{ noticia.titulo }}</h2>
+                    <div class="fs-5 lh-lg text-secondary">{{ noticia.cuerpo|linebreaks }}</div>
+                  </div>
+                </div>
+                <div class="modal-footer bg-light border-0 p-4">
+                  <button type="button"
+                          class="btn btn-secondary rounded-pill px-4"
+                          data-bs-dismiss="modal">
+                    Cerrar
+                    Vista Previa
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal Eliminar Noticia -->
+          <div class="modal fade"
+               id="deleteNoticiaModal{{ noticia.id }}"
+               tabindex="-1"
+               aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-body p-5 text-center">
+                  <div class="icon-box mb-4 mx-auto d-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle"
+                       style="width: 80px;
+                              height: 80px">
+                    <i class="ti ti-alert-triangle fs-1"></i>
+                  </div>
+                  <h3 class="fw-bold mb-3">¿Eliminar noticia?</h3>
+                  <p class="text-muted mb-4 fs-5">
+                    Esta acción no se puede deshacer. Se eliminará permanentemente
+                    la noticia:
+                    <br>
+                    <strong>"{{ noticia.titulo }}"</strong>
+                  </p>
+                  <form action="{% url 'core:admin_delete_noticia' noticia.id %}"
+                        method="POST">
+                    {% csrf_token %}
+                    <div class="d-grid gap-2">
+                      <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold">
+                        Sí,
+                        eliminar
+                      </button>
+                      <button type="button"
+                              class="btn btn-light btn-lg rounded-pill fw-bold border"
+                              data-bs-dismiss="modal">No, cancelar</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endwith %}
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <div class="p-5 bg-light rounded-5">
+            <i class="ti ti-news-off fs-1 text-muted mb-3 d-block"></i>
+            <h3 class="fw-bold">No hay noticias publicadas</h3>
+            <p class="text-muted">Comienza publicando tu primera noticia para informar a la comunidad.</p>
+            <button class="btn btn-primary rounded-pill px-4 fw-bold mt-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#createNoticiaModal">Crear primera noticia</button>
+          </div>
         </div>
-        {% empty %}
-        <p class="text-center">No hay noticias publicadas aún.</p>
-        {% endfor %}
+      {% endfor %}
     </div>
-</div>
+  </div>
+  {% include 'core/noticias/modals/modal_crear.html' %}
+  <style>
+    /* Estilos Generales y Dark Mode */
+    .bg-card { background: #ffffff; }
+    [data-bs-theme="dark"] .bg-card { background: #1a1d21; }
+
+    /* Modern Input Groups */
+    .modern-input-group {
+        background: var(--bs-gray-100);
+        border: 1px solid var(--bs-gray-200);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    [data-bs-theme="dark"] .modern-input-group {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    .modern-input-group:focus-within {
+        background: #fff;
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.1);
+    }
+    [data-bs-theme="dark"] .modern-input-group:focus-within { background: rgba(255, 255, 255, 0.08); }
+
+    .modern-input-group .form-control:focus { box-shadow: none; border: none; }
+    .modern-input-group .form-control { color: inherit; }
+
+    /* Zona de Carga Modernizada */
+    .news-drop-zone-modern {
+        border: 2px dashed var(--bs-gray-300);
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: var(--bs-gray-100);
+        overflow: hidden;
+    }
+    [data-bs-theme="dark"] .news-drop-zone-modern {
+        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .news-drop-zone-modern:hover, .news-drop-zone-modern.dragover {
+        border-color: var(--bs-primary);
+        background: rgba(59, 130, 246, 0.05);
+        transform: scale(1.01);
+    }
+
+    .upload-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background: #fff;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    [data-bs-theme="dark"] .upload-icon-wrapper { background: rgba(255, 255, 255, 0.1); }
+
+    /* Cropper Modernizado */
+    .news-crop-zone-modern {
+        border: 1px solid var(--bs-gray-200);
+        border-radius: 16px;
+        padding: 16px;
+        background: #fff;
+    }
+    [data-bs-theme="dark"] .news-crop-zone-modern {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .news-crop-viewport-modern {
+        position: relative;
+        width: 100%;
+        height: 220px;
+        overflow: hidden;
+        border-radius: 12px;
+        background: #000;
+    }
+
+    .news-crop-frame {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+    }
+    .news-crop-frame:active { cursor: grabbing; }
+
+    .news-crop-frame img {
+        position: absolute;
+        max-width: none;
+        user-select: none;
+        -webkit-user-drag: none;
+    }
+
+    .hover-lift { transition: transform 0.2s ease; }
+    .hover-lift:hover { transform: translateY(-3px); }
+
+    /* Hero del Preview */
+    .modal-hero-overlay-admin {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(transparent, var(--bs-body-bg));
+    }
+  </style>
+  <script>
+    // ===== LÓGICA DEL CROPPER PARA EDICIÓN DE NOTICIAS =====
+    function handleEditImageChange(input, noticiaId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('edit-preview-' + noticiaId);
+                const dropZone = document.getElementById('dropzone-' + noticiaId);
+                const cropZone = document.getElementById('crop-container-' + noticiaId).querySelector('.news-crop-zone-modern');
+                
+                // Si el dropzone existe (porque no tenía imagen antes), ocultarlo y mostrar cropper
+                if (dropZone) dropZone.classList.add('d-none');
+                
+                // Asegurarse de que el contenedor del cropper sea visible
+                const container = document.getElementById('crop-container-' + noticiaId);
+                if (noticiaId && !document.getElementById('viewport-' + noticiaId)) {
+                    // Si se cargó una imagen nueva donde no había, necesitamos inyectar el HTML del cropper o recargar
+                    // Por simplicidad en este caso, asumimos que el cropper se maneja por la función setup de abajo
+                }
+
+                preview.src = e.target.result;
+                preview.onload = function() {
+                    initCropper(noticiaId);
+                };
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function initCropper(noticiaId) {
+        const frame = document.getElementById('frame-' + noticiaId);
+        const preview = document.getElementById('edit-preview-' + noticiaId);
+        const posXInput = document.getElementById('edit-pos-x-' + noticiaId);
+        const posYInput = document.getElementById('edit-pos-y-' + noticiaId);
+        
+        if (!frame || !preview) return;
+
+        const frameWidth = frame.offsetWidth;
+        const frameHeight = frame.offsetHeight;
+        
+        const imgRatio = preview.naturalWidth / preview.naturalHeight;
+        const frameRatio = frameWidth / frameHeight;
+        
+        let imgWidth, imgHeight;
+        if (imgRatio > frameRatio) {
+            imgHeight = frameHeight;
+            imgWidth = imgHeight * imgRatio;
+        } else {
+            imgWidth = frameWidth;
+            imgHeight = imgWidth / imgRatio;
+        }
+        
+        preview.style.width = imgWidth + 'px';
+        preview.style.height = imgHeight + 'px';
+        
+        const savedPctX = parseInt(posXInput.value) || 50;
+        const savedPctY = parseInt(posYInput.value) || 50;
+        
+        let imgX = -(savedPctX / 100 * imgWidth - frameWidth / 2);
+        let imgY = -(savedPctY / 100 * imgHeight - frameHeight / 2);
+        
+        const minX = frameWidth - imgWidth;
+        const minY = frameHeight - imgHeight;
+        imgX = Math.max(minX, Math.min(0, imgX));
+        imgY = Math.max(minY, Math.min(0, imgY));
+        
+        preview.style.left = imgX + 'px';
+        preview.style.top = imgY + 'px';
+        
+        let isDragging = false;
+        let startX, startY, currentImgX = imgX, currentImgY = imgY;
+
+        frame.onmousedown = function(e) {
+            isDragging = true;
+            startX = e.clientX - currentImgX;
+            startY = e.clientY - currentImgY;
+            e.preventDefault();
+        };
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isDragging) return;
+            
+            let newX = e.clientX - startX;
+            let newY = e.clientY - startY;
+            
+            newX = Math.max(minX, Math.min(0, newX));
+            newY = Math.max(minY, Math.min(0, newY));
+            
+            currentImgX = newX;
+            currentImgY = newY;
+            preview.style.left = newX + 'px';
+            preview.style.top = newY + 'px';
+            
+            const centerX = -newX + frameWidth / 2;
+            const centerY = -newY + frameHeight / 2;
+            posXInput.value = Math.max(0, Math.min(100, Math.round((centerX / imgWidth) * 100)));
+            posYInput.value = Math.max(0, Math.min(100, Math.round((centerY / imgHeight) * 100)));
+        });
+
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+        });
+    }
+
+    // Inicializar croppers cuando se abren los modales
+    document.querySelectorAll('[id^="editNoticiaModal"]').forEach(modal => {
+        modal.addEventListener('shown.bs.modal', function() {
+            const noticiaId = this.id.replace('editNoticiaModal', '');
+            const preview = document.getElementById('edit-preview-' + noticiaId);
+            if (preview && preview.src) {
+                if (preview.complete) {
+                    initCropper(noticiaId);
+                } else {
+                    preview.onload = function() {
+                        initCropper(noticiaId);
+                    };
+                }
+            }
+        });
+    });
+  </script>
 {% endblock %}
