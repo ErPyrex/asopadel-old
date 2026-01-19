@@ -5,7 +5,7 @@ import datetime
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from blog.models import Noticia
-from competitions.models import Torneo, Partido
+from competitions.models import Torneo, Partido, EstadisticaJugador
 from facilities.models import Cancha, ReservaCancha
 from users.models import Usuario
 from .forms import (
@@ -25,6 +25,60 @@ is_admin = IsAdmin
 is_arbitro = IsArbitro
 is_jugador = IsJugador
 is_admin_or_arbitro = IsAdminOrArbitro
+
+
+def update_player_stats(partido):
+    """
+    Actualiza las estadísticas y ranking ELO de los jugadores después de un partido.
+    - Incrementa partidos_jugados para todos los participantes
+    - Incrementa victorias para el equipo ganador
+    - Incrementa derrotas para el equipo perdedor
+    - Actualiza el ranking ELO basado en el resultado
+    """
+    if not partido.equipo_ganador:
+        return  # No hay ganador definido
+
+    # Obtener jugadores de cada equipo
+    equipo1_jugadores = list(partido.equipo1.all())
+    equipo2_jugadores = list(partido.equipo2.all())
+
+    if partido.equipo_ganador == 1:
+        ganadores = equipo1_jugadores
+        perdedores = equipo2_jugadores
+    else:
+        ganadores = equipo2_jugadores
+        perdedores = equipo1_jugadores
+
+    # Puntos ELO base por victoria/derrota
+    elo_base = 25
+
+    # Actualizar estadísticas de ganadores
+    for jugador in ganadores:
+        # Obtener o crear estadística (sin categoría por simplicidad)
+        stat, _ = EstadisticaJugador.objects.get_or_create(
+            jugador=jugador, categoria=None
+        )
+        stat.partidos_jugados += 1
+        stat.victorias += 1
+        stat.save()
+
+        # Actualizar ranking ELO
+        jugador.ranking = (jugador.ranking or 0) + elo_base
+        jugador.save(update_fields=["ranking"])
+
+    # Actualizar estadísticas de perdedores
+    for jugador in perdedores:
+        stat, _ = EstadisticaJugador.objects.get_or_create(
+            jugador=jugador, categoria=None
+        )
+        stat.partidos_jugados += 1
+        stat.derrotas += 1
+        stat.save()
+
+        # Actualizar ranking ELO (reducir, pero no debajo de 0)
+        nuevo_ranking = (jugador.ranking or 0) - (elo_base // 2)
+        jugador.ranking = max(0, nuevo_ranking)
+        jugador.save(update_fields=["ranking"])
 
 
 # 🧭 Redirección por rol
@@ -435,9 +489,25 @@ def arbitro_dashboard(request):
     """
     Dashboard view for referees (arbitros).
     Show assigned tournaments and court status.
+    Include data for create match modal.
     """
     torneos = Torneo.objects.filter(arbitro=request.user)
     canchas = Cancha.objects.all()
+    
+    # Data for create match modal - filter active tournaments (not cancelled, end date >= today)
+    from django.utils import timezone
+    today = timezone.now().date()
+    torneos_modal = Torneo.objects.filter(cancelado=False, fecha_fin__gte=today)
+    arbitros = Usuario.objects.filter(es_arbitro=True)
+    jugadores = Usuario.objects.filter(es_jugador=True).order_by('first_name', 'last_name')
+    
+    # Available time slots
+    horarios = []
+    for hour in range(6, 22):
+        for minute in [0, 30]:
+            time_str = f"{hour:02d}:{minute:02d}"
+            label = f"{hour:02d}:{minute:02d} hs"
+            horarios.append((time_str, label))
 
     return render(
         request,
@@ -445,8 +515,13 @@ def arbitro_dashboard(request):
         {
             "torneos": torneos,
             "canchas": canchas,
+            "torneos_modal": torneos_modal,
+            "arbitros": arbitros,
+            "jugadores": jugadores,
+            "horarios": horarios,
         },
     )
+
 
 
 # ====================================================================================
@@ -616,7 +691,7 @@ def admin_pending_results_list(request):
 def admin_record_result(request, partido_id):
     """
     Vista para cargar el resultado de un partido.
-    Cambia el estado a 'finalizado'.
+    Cambia el estado a 'finalizado' y actualiza estadísticas de jugadores.
     """
     partido = get_object_or_404(Partido, id=partido_id)
 
@@ -626,7 +701,14 @@ def admin_record_result(request, partido_id):
             partido = form.save(commit=False)
             partido.estado = "finalizado"
             partido.save()
-            messages.success(request, "Resultado cargado y partido finalizado.")
+
+            # Actualizar estadísticas y ranking ELO de los jugadores
+            update_player_stats(partido)
+
+            messages.success(
+                request,
+                "Resultado cargado y partido finalizado. Estadísticas actualizadas.",
+            )
             return redirect("core:admin_pending_results_list")
     else:
         form = PartidoResultForm(instance=partido)
