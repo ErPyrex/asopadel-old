@@ -38,6 +38,7 @@ class Torneo(models.Model):
     @property
     def activo(self):
         from django.utils import timezone
+
         if self.cancelado:
             return False
         return self.fecha_fin >= timezone.now().date()
@@ -92,6 +93,12 @@ class Partido(models.Model):
             ("cancelado", "Cancelado"),
         ],
         default="pendiente",
+    )
+    # Contador de ediciones de resultado (árbitros max 2, admins ilimitado)
+    ediciones_resultado = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name="Ediciones de Resultado",
+        help_text="Número de veces que se ha editado el resultado",
     )
 
     def __str__(self):
