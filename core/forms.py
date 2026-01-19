@@ -91,10 +91,10 @@ class TorneoForm(forms.ModelForm):
         # Asegúrate de que solo los usuarios que son árbitros puedan ser seleccionados
         self.fields["arbitro"].queryset = Usuario.objects.filter(es_arbitro=True)
         self.fields["arbitro"].empty_label = None
-        
+
         # Asegurarse de que categoría no tenga guiones
         self.fields["categoria"].empty_label = None
-        
+
         # Asegúrate de que solo los usuarios que son jugadores puedan ser seleccionados
         self.fields["jugadores_inscritos"].queryset = Usuario.objects.filter(
             es_jugador=True
@@ -355,7 +355,7 @@ class PartidoSchedulingForm(forms.ModelForm):
 
         # Restaurar etiqueta por defecto y hacer requerido inicialmente
         self.fields["torneo"].required = False
-        self.fields["torneo"].empty_label = "--------- Seleccione un Torneo ---------"
+        self.fields["torneo"].empty_label = "Seleccione un Torneo"
         self.fields[
             "torneo"
         ].help_text = "Seleccione el torneo al que pertenece el partido."
@@ -363,10 +363,10 @@ class PartidoSchedulingForm(forms.ModelForm):
         # Add empty option for optional players
         self.fields[
             "equipo1_jugador2"
-        ].empty_label = "--------- Sin segundo jugador (individuales) ---------"
+        ].empty_label = "Sin segundo jugador (individuales)"
         self.fields[
             "equipo2_jugador2"
-        ].empty_label = "--------- Sin segundo jugador (individuales) ---------"
+        ].empty_label = "Sin segundo jugador (individuales)"
 
         # Load existing team data when editing
         if self.instance and self.instance.pk:
@@ -1035,10 +1035,13 @@ class JugadorForm(forms.ModelForm):
 
 
 class NoticiaForm(forms.ModelForm):
-    imagen_pos_x = forms.IntegerField(widget=forms.HiddenInput(), initial=50, required=False)
-    imagen_pos_y = forms.IntegerField(widget=forms.HiddenInput(), initial=50, required=False)
+    imagen_pos_x = forms.IntegerField(
+        widget=forms.HiddenInput(), initial=50, required=False
+    )
+    imagen_pos_y = forms.IntegerField(
+        widget=forms.HiddenInput(), initial=50, required=False
+    )
 
     class Meta:
         model = Noticia
         fields = ["titulo", "cuerpo", "imagen", "imagen_pos_x", "imagen_pos_y"]
-

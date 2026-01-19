@@ -137,6 +137,16 @@ urlpatterns = [
         views.admin_delete_match,
         name="admin_delete_match",
     ),
+    path(
+        "admin-gestion/partidos/<int:partido_id>/cancelar/",
+        views.admin_cancel_match,
+        name="admin_cancel_match",
+    ),
+    path(
+        "admin-gestion/partidos/<int:partido_id>/editar-resultado/",
+        views.admin_edit_result,
+        name="admin_edit_result",
+    ),
     # 🧑‍🎾 Reservas (Jugador)
     path(
         "player-reservar-cancha/",

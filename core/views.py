@@ -107,37 +107,38 @@ def admin_dashboard(request):
 def admin_tournament_list(request):
     tipo_seleccionado = request.GET.get("tipo", "")
     estado_seleccionado = request.GET.get("activo", "")
-    
+
     torneos = Torneo.objects.all()
-    
+
     # Nota: El modelo Torneo no tiene campo 'tipo' o 'activo' actualmente.
     # Si se desea filtrar por tipo (que podría ser categoría) o estado:
     if tipo_seleccionado:
         # Asumiendo que 'tipo' se refiere a la categoría para este ejemplo
         torneos = torneos.filter(categoria__nombre__icontains=tipo_seleccionado)
-    
+
     if estado_seleccionado == "1":
         # Activo si la fecha_fin >= hoy
         torneos = torneos.filter(fecha_fin__gte=timezone.now().date())
     elif estado_seleccionado == "0":
         # Inactivo si la fecha_fin < hoy
         torneos = torneos.filter(fecha_fin__lt=timezone.now().date())
-    
+
     # Datos para el modal de creación
     from competitions.models import Categoria
+
     categorias = Categoria.objects.all()
     arbitros = Usuario.objects.filter(es_arbitro=True, is_active=True)
-        
+
     return render(
-        request, 
-        "core/torneos/torneos.html", 
+        request,
+        "core/torneos/torneos.html",
         {
             "torneos": torneos,
             "tipo_seleccionado": tipo_seleccionado,
             "estado_seleccionado": estado_seleccionado,
             "categorias": categorias,
             "arbitros": arbitros,
-        }
+        },
     )
 
 
@@ -212,12 +213,12 @@ def admin_edit_court(request, cancha_id):
         cancha.estado = request.POST.get("estado", cancha.estado)
         cancha.ubicacion = request.POST.get("ubicacion", cancha.ubicacion)
         cancha.descripcion = request.POST.get("descripcion", cancha.descripcion)
-        
+
         # Precio
         precio = request.POST.get("precio_hora")
         if precio:
             cancha.precio_hora = float(precio)
-        
+
         # Horarios
         apertura = request.POST.get("horario_apertura")
         cierre = request.POST.get("horario_cierre")
@@ -225,15 +226,15 @@ def admin_edit_court(request, cancha_id):
             cancha.horario_apertura = apertura
         if cierre:
             cancha.horario_cierre = cierre
-        
+
         # Imagen
         if request.FILES.get("imagen"):
             cancha.imagen = request.FILES.get("imagen")
-        
+
         cancha.save()
         messages.success(request, "Cancha actualizada exitosamente.")
         return redirect("core:admin_canchas_list")
-    
+
     form = CanchaForm(instance=cancha)
     return render(
         request, "core/canchas/crear_cancha.html", {"form": form, "cancha": cancha}
@@ -326,7 +327,7 @@ def admin_update_player_category(request, jugador_id):
             jugador.save()
             messages.success(
                 request,
-                f"Categoría de {jugador.get_full_name} actualizada a {jugador.get_categoria_jugador_display()}.",
+                f"Categoría de {jugador.get_full_name()} actualizada a {jugador.get_categoria_jugador_display()}.",
             )
         else:
             messages.error(request, "Categoría no válida.")
@@ -520,12 +521,39 @@ def admin_match_list(request):
             }
         )
 
+    # Datos para el modal de creación
+    canchas = Cancha.objects.filter(estado="disponible")
+    jugadores = Usuario.objects.filter(es_jugador=True).order_by(
+        "first_name", "last_name"
+    )
+    arbitros = Usuario.objects.filter(es_arbitro=True).order_by(
+        "first_name", "last_name"
+    )
+    torneos_modal = Torneo.objects.all()
+
+    # Horarios disponibles
+    horarios = [
+        ("08:00", "08:00 AM - 10:00 AM"),
+        ("10:00", "10:00 AM - 12:00 PM"),
+        ("12:00", "12:00 PM - 02:00 PM"),
+        ("14:00", "02:00 PM - 04:00 PM"),
+        ("16:00", "04:00 PM - 06:00 PM"),
+        ("18:00", "06:00 PM - 08:00 PM"),
+        ("20:00", "08:00 PM - 10:00 PM"),
+    ]
+
     context = {
         "partidos": partidos,
         "torneos": torneos_list,
         "estados": estados_list,
         "torneo_filtro": torneo_id,
         "estado_filtro": estado,
+        # Datos para el modal
+        "canchas": canchas,
+        "jugadores": jugadores,
+        "arbitros": arbitros,
+        "torneos_modal": torneos_modal,
+        "horarios": horarios,
     }
 
     return render(request, "core/partidos/lista_partidos.html", context)
@@ -626,6 +654,83 @@ def admin_delete_match(request, partido_id):
     }
 
     return render(request, "core/partidos/confirmar_eliminar_partido.html", context)
+
+
+@login_required
+@user_passes_test(is_admin)
+def admin_cancel_match(request, partido_id):
+    """Cancela un partido que no se ha efectuado (solo pendiente/confirmado)"""
+    partido = get_object_or_404(Partido, id=partido_id)
+
+    if request.method == "POST":
+        # Solo se pueden cancelar partidos que no se han jugado
+        if partido.estado in ["pendiente", "confirmado"]:
+            partido.estado = "cancelado"
+            partido.save()
+            messages.success(request, "El partido ha sido cancelado exitosamente.")
+        else:
+            messages.error(
+                request, "No se puede cancelar un partido que ya fue finalizado."
+            )
+        return redirect("core:admin_partidos_list")
+
+    return redirect("core:admin_partidos_list")
+
+
+@login_required
+@user_passes_test(is_admin_or_arbitro)
+def admin_edit_result(request, partido_id):
+    """
+    Edita el resultado de un partido ya finalizado.
+    Árbitros: máximo 2 ediciones por partido.
+    Admins/Superadmin: sin límite.
+    """
+    partido = get_object_or_404(Partido, id=partido_id)
+    user = request.user
+
+    # Verificar límite para árbitros (no admins)
+    is_admin_user = user.is_staff or user.is_superuser
+    max_ediciones_arbitro = 2
+
+    if not is_admin_user and partido.ediciones_resultado >= max_ediciones_arbitro:
+        messages.error(
+            request,
+            f"Has alcanzado el límite de {max_ediciones_arbitro} correcciones para este partido. Contacta a un administrador.",
+        )
+        return redirect("core:admin_partidos_list")
+
+    if request.method == "POST":
+        marcador = request.POST.get("marcador")
+        equipo_ganador = request.POST.get("equipo_ganador")
+
+        if marcador:
+            partido.marcador = marcador
+
+        # Determinar ganador basado en selección
+        if equipo_ganador == "1":
+            partido.equipo_ganador = 1
+        elif equipo_ganador == "2":
+            partido.equipo_ganador = 2
+
+        # Incrementar contador de ediciones (solo si ya estaba finalizado)
+        if partido.estado == "finalizado":
+            partido.ediciones_resultado += 1
+
+        partido.estado = "finalizado"
+        partido.save()
+
+        ediciones_restantes = max_ediciones_arbitro - partido.ediciones_resultado
+        if not is_admin_user and ediciones_restantes > 0:
+            messages.success(
+                request,
+                f"Resultado actualizado. Te quedan {ediciones_restantes} corrección(es) disponible(s).",
+            )
+        else:
+            messages.success(request, "Resultado actualizado exitosamente.")
+
+        return redirect("core:admin_partidos_list")
+
+    return redirect("core:admin_partidos_list")
 
 
 # ====================================================================================
@@ -808,9 +913,17 @@ def admin_create_noticia(request):
         titulo = request.POST.get("news-titulo") or request.POST.get("titulo")
         cuerpo = request.POST.get("news-cuerpo") or request.POST.get("cuerpo")
         imagen = request.FILES.get("news-imagen") or request.FILES.get("imagen")
-        pos_x = request.POST.get("news-imagen_pos_x") or request.POST.get("imagen_pos_x") or 50
-        pos_y = request.POST.get("news-imagen_pos_y") or request.POST.get("imagen_pos_y") or 50
-        
+        pos_x = (
+            request.POST.get("news-imagen_pos_x")
+            or request.POST.get("imagen_pos_x")
+            or 50
+        )
+        pos_y = (
+            request.POST.get("news-imagen_pos_y")
+            or request.POST.get("imagen_pos_y")
+            or 50
+        )
+
         if titulo and cuerpo:
             noticia = Noticia(
                 titulo=titulo,
@@ -818,12 +931,12 @@ def admin_create_noticia(request):
                 imagen=imagen,
                 imagen_pos_x=int(pos_x),
                 imagen_pos_y=int(pos_y),
-                autor=request.user
+                autor=request.user,
             )
             noticia.save()
             messages.success(request, "Noticia publicada exitosamente.")
             return redirect("core:admin_noticias_list")
-    
+
     form = NoticiaForm(prefix="news")
     return render(request, "core/noticias/crear_noticia.html", {"form": form})
 
@@ -835,21 +948,21 @@ def admin_edit_noticia(request, noticia_id):
     if request.method == "POST":
         noticia.titulo = request.POST.get("titulo", noticia.titulo)
         noticia.cuerpo = request.POST.get("cuerpo", noticia.cuerpo)
-        
+
         # Manejar posición de imagen
         if request.POST.get("imagen_pos_x"):
             noticia.imagen_pos_x = int(request.POST.get("imagen_pos_x", 50))
         if request.POST.get("imagen_pos_y"):
             noticia.imagen_pos_y = int(request.POST.get("imagen_pos_y", 50))
-        
+
         # Manejar imagen
         if request.FILES.get("imagen"):
             noticia.imagen = request.FILES.get("imagen")
-        
+
         noticia.save()
         messages.success(request, "Noticia actualizada exitosamente.")
         return redirect("core:admin_noticias_list")
-    
+
     form = NoticiaForm(instance=noticia)
     return render(
         request, "core/noticias/crear_noticia.html", {"form": form, "noticia": noticia}
@@ -870,7 +983,9 @@ def admin_delete_noticia(request, noticia_id):
 
 
 def home(request):
-    noticias = Noticia.objects.order_by("-fecha_publicacion", "-id")[:1]  # la más reciente
+    noticias = Noticia.objects.order_by("-fecha_publicacion", "-id")[
+        :1
+    ]  # la más reciente
     canchas = Cancha.objects.all()
     torneos = Torneo.objects.order_by("-fecha_inicio")[
         :5
