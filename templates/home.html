@@ -20,12 +20,31 @@
                         <button class="tag-filter-modern" onclick="filterMatches('finalizado', this)">Resultados</button>
                         <button class="tag-filter-modern"
                                 onclick="filterMatches('pendiente,confirmado', this)">Próximos</button>
+                        <a href="{% url 'core:public_match_list' %}"
+                           class="btn btn-outline-primary rounded-pill px-4 py-2 small fw-bold shadow-sm d-flex align-items-center gap-2 transition-hover">
+                            Ver todos <i class="ti ti-arrow-narrow-right"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="match-list mb-5">
                     {% if partidos %}
                         {% for partido in partidos %}
-                            <div class="match-card-modern mb-3" data-status="{{ partido.estado }}">
+                            <div class="match-card-modern mb-3"
+                                 data-status="{{ partido.estado }}"
+                                 style="cursor: pointer"
+                                 data-bs-toggle="modal"
+                                 data-bs-target="#matchModal"
+                                 data-match-id="{{ partido.id }}"
+                                 data-match-fecha="{{ partido.fecha|date:'Y-m-d' }}"
+                                 data-match-hora="{{ partido.hora|time:'H:i' }}"
+                                 data-match-estado="{{ partido.estado }}"
+                                 data-match-estado-display="{{ partido.get_estado_display }}"
+                                 data-match-equipo1="{% for j in partido.equipo1.all %}{{ j.first_name }} {{ j.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                 data-match-equipo2="{% for j in partido.equipo2.all %}{{ j.first_name }} {{ j.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                 data-match-cancha="{{ partido.cancha.nombre|default:'Por asignar' }}"
+                                 data-match-ubicacion="{{ partido.cancha.ubicacion|default:'' }}"
+                                 data-match-torneo="{{ partido.torneo.nombre|default:'Partido Amistoso' }}"
+                                 data-match-marcador="{{ partido.marcador|default:'0-0' }}">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <span class="text-muted small fw-bold text-uppercase d-flex align-items-center gap-1">
                                         <i class="ti ti-clock"></i> {{ partido.fecha|date:"d M Y" }}
@@ -89,30 +108,35 @@
                     <h2 class="section-title-modern">Estado de Canchas</h2>
                 </div>
                 <div class="row g-4 mb-5">
-                    {% for cancha in canchas|slice:":4" %}
+                    {% for cancha in canchas %}
                         <div class="col-md-6">
-                            <div class="card border-0 shadow-sm h-100 ranking-card">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div>
-                                            <h6 class="fw-bold mb-1">{{ cancha.nombre }}</h6>
-                                            <small class="text-muted"><i class="ti ti-map-pin me-1"></i>{{ cancha.ubicacion }}</small>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="status-indicator {% if cancha.estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} shadow-sm"></span>
-                                            <small class="{% if cancha.estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold">
-                                                {{ cancha.get_estado_display }}
-                                            </small>
+                            <a href="{% url 'core:public_court_detail' cancha.id %}"
+                               class="text-decoration-none">
+                                <div class="card border-0 shadow-sm h-100 ranking-card hover-lift">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <div>
+                                                <h6 class="fw-bold mb-1 text-heading">{{ cancha.nombre }}</h6>
+                                                <small class="text-muted"><i class="ti ti-map-pin me-1"></i>{{ cancha.ubicacion }}</small>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2">
+                                                {% with estado=cancha.get_estado_actual %}
+                                                    <span class="status-indicator {% if estado == 'disponible' %}bg-success{% else %}bg-danger{% endif %} shadow-sm"></span>
+                                                    <small class="{% if estado == 'disponible' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                                        {{ estado|title }}
+                                                    </small>
+                                                {% endwith %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     {% endfor %}
                     <div class="col-12">
                         <a href="{% url 'core:public_canchas_list' %}"
-                           class="btn btn-outline-primary w-100 py-3 fw-bold rounded-4">
-                            Consultar Disponibilidad Completa <i class="ti ti-search ms-1"></i>
+                           class="btn btn-outline-primary w-100 py-3 fw-bold rounded-4 shadow-sm hover-lift">
+                            Consultar Disponibilidad Completa <i class="ti ti-calendar-search ms-2"></i>
                         </a>
                     </div>
                 </div>
@@ -137,9 +161,9 @@
                                             <img src="{{ noticia.imagen.url }}"
                                                  class="img-fluid h-100"
                                                  alt="{{ noticia.titulo }}"
-                                                 style="object-fit: cover;
-                                                        object-position: {{ noticia.imagen_position }};
-                                                        min-height: 200px">
+                                                 style='object-fit: cover;
+                                                        object-position: {{ noticia.imagen_position|default:"center" }};
+                                                        min-height: 200px'>
                                         </div>
                                     {% endif %}
                                     <div class="{% if noticia.imagen %}col-md-8{% else %}col-12{% endif %} p-4 p-md-5 d-flex flex-column justify-content-center">
@@ -174,9 +198,9 @@
                                                 <img src="{{ noticia.imagen.url }}"
                                                      class="w-100"
                                                      alt="{{ noticia.titulo }}"
-                                                     style="height: 400px;
+                                                     style='height: 400px;
                                                             object-fit: cover;
-                                                            object-position: {{ noticia.imagen_position }}">
+                                                            object-position: {{ noticia.imagen_position|default:"center" }}'>
                                             </div>
                                         {% endif %}
                                         <div class="p-4 p-md-5">
@@ -216,8 +240,8 @@
                         </h2>
                     </div>
                 </a>
-                {% if torneos %}
-                    {% for torneo in torneos %}
+                {% if torneo_principal %}
+                    {% with torneo=torneo_principal %}
                         <div class="card mb-3 border-0 shadow-sm ranking-card card-tournament-home overflow-hidden">
                             <div class="card-body p-4">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
@@ -225,6 +249,10 @@
                                     {% if torneo.cancelado %}
                                         <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 small px-2 py-1">
                                             <i class="ti ti-ban me-1"></i>Cancelado
+                                        </span>
+                                    {% elif torneo.activo %}
+                                        <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 small px-2 py-1">
+                                            <i class="ti ti-circle-check-filled me-1"></i>En Progreso
                                         </span>
                                     {% endif %}
                                 </div>
@@ -249,7 +277,8 @@
                              tabindex="-1"
                              aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                                <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                                     style="background: var(--card-bg, #0f172a)">
                                     <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
                                         <button type="button"
                                                 class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75 shadow-none"
@@ -268,7 +297,7 @@
                                                         </span>
                                                     {% elif torneo.activo %}
                                                         <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">
-                                                            <i class="ti ti-circle-check-filled me-1"></i>TORNEO ACTIVO
+                                                            <i class="ti ti-circle-check-filled me-1"></i>TORNEO EN PROGRESO
                                                         </span>
                                                     {% else %}
                                                         <span class="badge bg-secondary rounded-pill px-3 py-2 fw-bold shadow-sm">
@@ -292,7 +321,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="p-4 p-md-5 bg-card">
+                                        <div class="p-4 p-md-5 bg-card"
+                                             style="background: var(--card-bg, #0f172a)">
                                             <div class="row g-5">
                                                 <!-- Descripción y Premios -->
                                                 <div class="col-12">
@@ -318,45 +348,88 @@
                                                          style="max-height: 300px;
                                                                 overflow-y: auto">
                                                         {% for jugador in torneo.jugadores_inscritos.all %}
-                                                            <div class="d-flex align-items-center gap-3 p-3 mb-2 bg-light rounded-4 border border-light transition-hover">
-                                                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
-                                                                     style="width: 40px;
-                                                                            height: 40px">
-                                                                    <i class="ti ti-user fs-5"></i>
+                                                            <a href="{% url 'core:player_public_profile' jugador.id %}"
+                                                               class="text-decoration-none">
+                                                                <div class="d-flex align-items-center gap-3 p-3 mb-2 bg-light bg-opacity-5 rounded-4 border border-white border-opacity-5 transition-hover">
+                                                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                                                         style="width: 40px;
+                                                                                height: 40px">
+                                                                        <i class="ti ti-user fs-5"></i>
+                                                                    </div>
+                                                                    <div class="fw-bold text-white">{{ jugador.get_full_name }}</div>
                                                                 </div>
-                                                                <div class="fw-bold">{{ jugador.get_full_name }}</div>
-                                                            </div>
+                                                            </a>
                                                         {% empty %}
-                                                            <div class="text-center py-4 text-muted border rounded-4 border-dashed">
+                                                            <div class="text-center py-4 text-muted border rounded-4 border-dashed border-opacity-25">
                                                                 <i class="ti ti-user-plus fs-1 d-block mb-2 opacity-50"></i>
                                                                 Aún no hay inscritos
                                                             </div>
                                                         {% endfor %}
                                                     </div>
                                                 </div>
-                                                <!-- Partidos -->
+                                                <!-- Próximo Partido y Todos los Partidos -->
                                                 <div class="col-md-6">
+                                                    {% if proximo_partido_torneo %}
+                                                        <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-warning">
+                                                            <i class="ti ti-star fs-4"></i> Próximo Partido
+                                                        </h5>
+                                                        <div class="p-3 mb-4 rounded-4 border border-warning border-opacity-25 bg-warning bg-opacity-10">
+                                                            <div class="d-flex justify-content-between small fw-bold text-warning mb-2">
+                                                                <span>{{ proximo_partido_torneo.fecha|date:"d M" }} • {{ proximo_partido_torneo.hora|time:"H:i" }}</span>
+                                                                <span>{{ proximo_partido_torneo.cancha.nombre|default:"Por definir" }}</span>
+                                                            </div>
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="text-white small fw-bold">
+                                                                    {% for j in proximo_partido_torneo.equipo1.all %}
+                                                                        {{ j.first_name }}
+                                                                        {% if not forloop.last %},{% endif %}
+                                                                    {% endfor %}
+                                                                </span>
+                                                                <span class="badge bg-warning text-dark px-2">VS</span>
+                                                                <span class="text-white small fw-bold">
+                                                                    {% for j in proximo_partido_torneo.equipo2.all %}
+                                                                        {{ j.first_name }}
+                                                                        {% if not forloop.last %},{% endif %}
+                                                                    {% endfor %}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
                                                     <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 text-success">
-                                                        <i class="ti ti-ball-tennis fs-4"></i> Partidos
+                                                        <i class="ti ti-ball-tennis fs-4"></i> Todos los Partidos
                                                     </h5>
                                                     <div class="match-list-scroll pe-2"
                                                          style="max-height: 300px;
                                                                 overflow-y: auto">
-                                                        {% for partido in torneo.partidos.all %}
-                                                            <div class="p-3 mb-2 bg-light rounded-4 border border-light transition-hover">
+                                                        {% for partido in torneo.partidos.all|dictsort:"fecha" %}
+                                                            <div class="p-3 mb-2 bg-light bg-opacity-5 rounded-4 border border-white border-opacity-5 transition-hover"
+                                                                 style="cursor: pointer"
+                                                                 data-bs-toggle="modal"
+                                                                 data-bs-target="#matchModal"
+                                                                 data-match-id="{{ partido.id }}"
+                                                                 data-match-fecha="{{ partido.fecha|date:'Y-m-d' }}"
+                                                                 data-match-hora="{{ partido.hora|time:'H:i' }}"
+                                                                 data-match-estado="{{ partido.estado }}"
+                                                                 data-match-estado-display="{{ partido.get_estado_display }}"
+                                                                 data-match-equipo1="{% for j in partido.equipo1.all %}{{ j.first_name }} {{ j.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                                                 data-match-equipo2="{% for j in partido.equipo2.all %}{{ j.first_name }} {{ j.last_name }}{% if not forloop.last %}, {% endif %}{% endfor %}"
+                                                                 data-match-cancha="{{ partido.cancha.nombre|default:'Por asignar' }}"
+                                                                 data-match-ubicacion="{{ partido.cancha.ubicacion|default:'' }}"
+                                                                 data-match-torneo="{{ torneo.nombre }}"
+                                                                 data-match-marcador="{{ partido.marcador|default:'0-0' }}">
                                                                 <div class="d-flex justify-content-between small text-muted mb-2">
                                                                     <span><i class="ti ti-calendar-event me-1"></i>{{ partido.fecha|date:"d M" }}</span>
                                                                     <span><i class="ti ti-clock me-1"></i>{{ partido.hora|time:"H:i" }}</span>
                                                                 </div>
                                                                 <div class="d-flex justify-content-between align-items-center font-monospace">
-                                                                    <div class="flex-grow-1 text-truncate pe-2 fw-bold small">
+                                                                    <div class="flex-grow-1 text-truncate pe-2 fw-bold small text-white">
                                                                         {% for j in partido.equipo1.all %}
                                                                             {{ j.first_name }}
                                                                             {% if not forloop.last %},{% endif %}
                                                                         {% endfor %}
                                                                     </div>
                                                                     <div class="badge bg-primary px-3 rounded-pill">{{ partido.marcador|default:"vs" }}</div>
-                                                                    <div class="flex-grow-1 text-truncate ps-2 text-end fw-bold small">
+                                                                    <div class="flex-grow-1 text-truncate ps-2 text-end fw-bold small text-white">
                                                                         {% for j in partido.equipo2.all %}
                                                                             {{ j.first_name }}
                                                                             {% if not forloop.last %},{% endif %}
@@ -365,7 +438,7 @@
                                                                 </div>
                                                             </div>
                                                         {% empty %}
-                                                            <div class="text-center py-4 text-muted border rounded-4 border-dashed">
+                                                            <div class="text-center py-4 text-muted border rounded-4 border-dashed border-opacity-25">
                                                                 <i class="ti ti-calendar fs-1 d-block mb-2 opacity-50"></i>
                                                                 No hay partidos asignados
                                                             </div>
@@ -375,7 +448,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer bg-light border-0 p-4">
+                                    <div class="modal-footer border-0 p-4"
+                                         style="background: var(--card-bg, #0f172a)">
                                         <button type="button"
                                                 class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm"
                                                 data-bs-dismiss="modal">Cerrar</button>
@@ -383,7 +457,7 @@
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
+                    {% endwith %}
                 {% else %}
                     <div class="card border-0 p-5 text-center rounded-4 mb-4 ranking-card"
                          style="background: rgba(255,255,255,0.03)">
@@ -405,19 +479,22 @@
                     <div class="card-body p-0">
                         {% if ranking %}
                             {% for jugador in ranking %}
-                                <div class="ranking-item-mini">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
-                                        <div>
-                                            <div class="fw-bold">{{ jugador.get_full_name }}</div>
-                                            <small class="text-muted text-uppercase" style="font-size:10px">
-                                                {{ jugador.get_categoria_jugador_display|default:"LIBRE" }}
-                                            </small>
+                                <a href="{% url 'core:player_public_profile' jugador.id %}"
+                                   class="text-decoration-none transition-hover">
+                                    <div class="ranking-item-mini">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rank-badge-mini me-3">{{ forloop.counter }}</div>
+                                            <div>
+                                                <div class="fw-bold text-white">{{ jugador.get_full_name }}</div>
+                                                <small class="text-muted text-uppercase" style="font-size:10px">
+                                                    {{ jugador.get_categoria_jugador_display|default:"LIBRE" }}
+                                                </small>
+                                            </div>
                                         </div>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
+                                        pts</span>
                                     </div>
-                                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 fs-6">{{ jugador.ranking|default:0 }}
-                                    pts</span>
-                                </div>
+                                </a>
                             {% endfor %}
                             <div class="p-4">
                                 <a href="{% url 'core:ranking' %}"
@@ -462,6 +539,149 @@
     const noResults = document.getElementById('no-matches-filtered');
     if (noResults) visibleCount === 0 ? noResults.classList.remove('d-none') : noResults.classList.add('d-none');
   }
+    </script>
+    <!-- Modal Detalles de Partido -->
+    <div class="modal fade" id="matchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+                 style="background: var(--card-bg, #0f172a)">
+                <div class="modal-header border-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <span id="matchModalStatusBadge"
+                          class="badge rounded-pill px-3 py-2 small fw-bold"></span>
+                    <button type="button"
+                            class="btn-close btn-close-white shadow-none"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 pt-2">
+                    <div class="text-center mb-4">
+                        <div id="matchModalTournament"
+                             class="text-primary small fw-bold text-uppercase mb-1"></div>
+                        <div class="d-flex align-items-center justify-content-center gap-2 text-muted small">
+                            <i class="ti ti-calendar"></i> <span id="matchModalDate"></span>
+                            <span class="mx-1">•</span>
+                            <i class="ti ti-clock"></i> <span id="matchModalTime"></span>
+                        </div>
+                    </div>
+                    <div class="row align-items-center g-3 mb-4">
+                        <div class="col-5 text-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                 style="width: 50px;
+                                        height: 50px">
+                                <i class="ti ti-users text-primary fs-3"></i>
+                            </div>
+                            <div id="matchModalEquipo1" class="fw-bold text-heading small"></div>
+                        </div>
+                        <div class="col-2 text-center">
+                            <div id="matchModalScoreContainer">
+                                <span id="matchModalScore" class="h2 fw-bold text-primary mb-0"></span>
+                            </div>
+                            <div id="matchModalVsContainer" class="d-none">
+                                <span class="badge bg-light text-muted rounded-pill px-3 py-1 fw-bold">VS</span>
+                            </div>
+                        </div>
+                        <div class="col-5 text-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                 style="width: 50px;
+                                        height: 50px">
+                                <i class="ti ti-users text-primary fs-3"></i>
+                            </div>
+                            <div id="matchModalEquipo2" class="fw-bold text-heading small"></div>
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-4"
+                         style="background: rgba(255,255,255,0.03);
+                                border: 1px solid rgba(255,255,255,0.05)">
+                        <div class="d-flex align-items-start gap-3 mb-3">
+                            <div class="bg-info bg-opacity-10 p-2 rounded-3">
+                                <i class="ti ti-map-pin text-info fs-5"></i>
+                            </div>
+                            <div>
+                                <div class="text-heading fw-bold small">Ubicación</div>
+                                <div id="matchModalCancha" class="text-muted small"></div>
+                                <div id="matchModalUbicacion" class="text-muted x-small opacity-75"></div>
+                            </div>
+                        </div>
+                        <div id="matchModalInProgressRow" class="d-none">
+                            <div class="d-flex align-items-center gap-2 p-2 rounded-pill bg-success bg-opacity-10 border border-success border-opacity-20 animate-pulse">
+                                <span class="badge bg-success rounded-circle p-1 ms-1"></span>
+                                <span class="text-success small fw-bold">Partido en Progreso</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button"
+                            class="btn btn-secondary w-100 rounded-pill py-2 fw-bold border-0 shadow-sm"
+                            data-bs-dismiss="modal"
+                            style="background: rgba(255,255,255,0.05)">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const matchModal = document.getElementById('matchModal');
+        if (matchModal) {
+            matchModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                
+                // Extract info from data-* attributes
+                const data = button.dataset;
+                
+                // Update modal content
+                document.getElementById('matchModalTournament').textContent = data.matchTorneo;
+                document.getElementById('matchModalDate').textContent = new Date(data.matchFecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                document.getElementById('matchModalTime').textContent = data.matchHora + ' hs';
+                document.getElementById('matchModalEquipo1').textContent = data.matchEquipo1;
+                document.getElementById('matchModalEquipo2').textContent = data.matchEquipo2;
+                document.getElementById('matchModalCancha').textContent = data.matchCancha;
+                document.getElementById('matchModalUbicacion').textContent = data.matchUbicacion;
+                
+                const statusBadge = document.getElementById('matchModalStatusBadge');
+                statusBadge.textContent = data.matchEstadoDisplay;
+                
+                // Reset visibility
+                document.getElementById('matchModalScoreContainer').classList.add('d-none');
+                document.getElementById('matchModalVsContainer').classList.add('d-none');
+                document.getElementById('matchModalInProgressRow').classList.add('d-none');
+                
+                // Status specific logic
+                if (data.matchEstado === 'finalizado') {
+                    statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-success bg-opacity-10 text-success';
+                    document.getElementById('matchModalScoreContainer').classList.remove('d-none');
+                    document.getElementById('matchModalScore').textContent = data.matchMarcador;
+                } else if (data.matchEstado === 'cancelado') {
+                    statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-danger bg-opacity-10 text-danger';
+                    document.getElementById('matchModalVsContainer').classList.remove('d-none');
+                } else {
+                    // Pendiente o Confirmado
+                    statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-primary bg-opacity-10 text-primary';
+                    document.getElementById('matchModalVsContainer').classList.remove('d-none');
+                    
+                    // Check if it's in progress
+                    const matchDate = data.matchFecha;
+                    const matchTimeStr = data.matchHora;
+                    const [hours, minutes] = matchTimeStr.split(':').map(Number);
+                    
+                    const now = new Date();
+                    const todayStr = now.toISOString().split('T')[0];
+                    
+                    if (matchDate === todayStr) {
+                        const matchStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+                        // Assume 1.5 hours duration
+                        const matchEnd = new Date(matchStart.getTime() + 90 * 60000);
+                        
+                        if (now >= matchStart && now <= matchEnd) {
+                            document.getElementById('matchModalInProgressRow').classList.remove('d-none');
+                            statusBadge.textContent = 'En Progreso';
+                            statusBadge.className = 'badge rounded-pill px-3 py-2 small fw-bold bg-warning bg-opacity-10 text-warning';
+                        }
+                    }
+                }
+            });
+        }
+    });
     </script>
     <style>
   .card-noticia-home-wide {
@@ -529,5 +749,69 @@
   }
 
   .bg-card { background: var(--bg-card); }
+
+  /* Modern Section Titles */
+  .section-title-modern {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-heading);
+      margin-bottom: 0;
+      letter-spacing: -0.5px;
+  }
+
+  .home-section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+  }
+
+  .icon-holder {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      font-size: 1.25rem;
+      flex-shrink: 0;
+  }
+
+  /* Match Card Modern */
+  .match-card-modern {
+      background: var(--bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+  }
+
+  .match-card-modern:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary);
+  }
+
+  .match-card-modern::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--color-primary);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+  }
+
+  .match-card-modern:hover::before {
+      opacity: 1;
+  }
+
+  [data-bs-theme="dark"] .match-card-modern {
+      background: rgba(255, 255, 255, 0.02);
+  }
     </style>
 {% endblock %}

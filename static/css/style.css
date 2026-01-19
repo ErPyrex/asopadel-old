@@ -406,29 +406,39 @@ a:hover {
     background-color: var(--bg-card) !important;
 }
 
-/* Tag Filters */
-.tag-filter {
+/* Tag Filters Modernized */
+.tag-filter-modern {
     border: 1px solid var(--color-border);
-    background: var(--bg-card);
-    padding: 6px 16px;
+    background: transparent;
+    padding: 8px 18px;
     border-radius: 50px;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--color-text);
-    transition: all 0.2s ease;
+    color: var(--color-text-muted);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    white-space: nowrap;
 }
 
-.tag-filter.active {
-    background: var(--color-dark);
-    color: var(--color-white);
-    border-color: var(--color-dark);
-}
-
-.tag-filter:hover:not(.active) {
+.tag-filter-modern:hover {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    box-shadow: var(--btn-shadow-hover), inset 0 0 0 1px var(--color-primary);
-    background: var(--bg-card);
+    background: rgba(14, 165, 233, 0.05);
+}
+
+.tag-filter-modern.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+}
+
+[data-bs-theme="dark"] .tag-filter-modern {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-bs-theme="dark"] .tag-filter-modern:hover {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Match Score */

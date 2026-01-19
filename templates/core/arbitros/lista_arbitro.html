@@ -1,65 +1,146 @@
 {% extends 'base.html' %}
-{% block title %}Lista de Árbitros{% endblock %}
+{% load static %}
+{% block title %}Gestión de Árbitros - ASOPADEL{% endblock %}
 {% block content %}
-  <div class="container">
-    <h2 class="text-center mb-4">Árbitros Registrados</h2>
-    <div class="d-flex justify-content-between mb-4">
-      <form method="get" class="d-flex">
-        <input type="text"
-               name="q"
-               placeholder="Buscar por nombre..."
-               value="{{ query }}"
-               class="form-control me-2">
-        <button type="submit" class="btn btn-primary">Buscar</button>
-      </form>
-      <a href="{% url 'core:admin_create_arbitro' %}" class="btn btn-success">Crear Árbitro</a>
+    <div class="container-fluid px-lg-5 py-4">
+        <!-- Header de Sección -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+            <div>
+                <h1 class="fw-extrabold display-5 mb-1 d-flex align-items-center">
+                    <i class="ti ti-gavel text-primary me-3"></i>Árbitros
+                </h1>
+                <p class="text-muted fs-5 mb-0">Gestiona el cuerpo arbitral de los torneos.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{% url 'core:admin_create_arbitro' %}"
+                   class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm hover-lift">
+                    <i class="ti ti-plus me-2"></i>Registrar Árbitro
+                </a>
+            </div>
+        </div>
+        <!-- Barra de Búsqueda y Filtros -->
+        <div class="row mb-4">
+            <div class="col-md-6 col-lg-4">
+                <form method="get" class="modern-search-wrapper">
+                    <div class="input-group modern-input-group shadow-sm">
+                        <span class="input-group-text border-0 bg-transparent ps-3">
+                            <i class="ti ti-search text-primary"></i>
+                        </span>
+                        <input type="text"
+                               name="q"
+                               value="{{ query }}"
+                               class="form-control border-0 bg-transparent py-2"
+                               placeholder="Buscar por nombre o cédula...">
+                        <button type="submit" class="btn btn-primary rounded-pill m-1 px-3">Buscar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Tabla de Árbitros Premium -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden ranking-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light border-bottom">
+                        <tr class="text-muted small text-uppercase">
+                            <th class="ps-4 py-3">Árbitro</th>
+                            <th class="py-3">Cédula</th>
+                            <th class="py-3">Email</th>
+                            <th class="text-end pe-4 py-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for arbitro in arbitros %}
+                            <tr class="transition-hover">
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3 py-2">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 d-flex align-items-center justify-content-center"
+                                             style="width: 42px;
+                                                    height: 42px">
+                                            <i class="ti ti-user fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold h6 mb-0">{{ arbitro.get_full_name }}</div>
+                                            <small class="text-muted">Árbitro Federado</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border rounded-pill px-3">{{ arbitro.cedula }}</span>
+                                </td>
+                                <td class="text-muted">{{ arbitro.email }}</td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{% url 'core:admin_edit_arbitro' arbitro.id %}"
+                                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                            <i class="ti ti-edit me-1"></i>Editar
+                                        </a>
+                                        <a href="{% url 'core:admin_delete_arbitro' arbitro.id %}"
+                                           class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                            <i class="ti ti-trash me-1"></i>Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <div class="mb-3">
+                                        <i class="ti ti-users-off fs-display-1 opacity-25"></i>
+                                    </div>
+                                    <h5 class="fw-bold">No se encontraron árbitros</h5>
+                                    <p class="mb-0">Prueba con otro término de búsqueda o registra uno nuevo.</p>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Paginación Premium -->
+        {% if arbitros.paginator.num_pages > 1 %}
+            <div class="mt-5">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center gap-2">
+                        {% if arbitros.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-circle shadow-sm"
+                                   href="?q={{ query }}&page={{ arbitros.previous_page_number }}">
+                                    <i class="ti ti-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="page-item active">
+                            <span class="page-link border-0 rounded-circle shadow-sm px-3">{{ arbitros.number }}</span>
+                        </li>
+                        {% if arbitros.has_next %}
+                            <li class="page-item">
+                                <a class="page-link border-0 rounded-circle shadow-sm"
+                                   href="?q={{ query }}&page={{ arbitros.next_page_number }}">
+                                    <i class="ti ti-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
     </div>
-    <div class="card shadow-lg">
-      <div class="card-body">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Cédula</th>
-              <th>Nombre completo</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for arbitro in arbitros %}
-              <tr>
-                <td>{{ arbitro.cedula }}</td>
-                <td>{{ arbitro.first_name }} {{ arbitro.last_name }}</td>
-                <td>{{ arbitro.email }}</td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="3" class="text-center">No hay árbitros registrados.</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="d-flex justify-content-center mt-4">
-      <nav>
-        <ul class="pagination">
-          {% if arbitros.has_previous %}
-            <li class="page-item">
-              <a class="page-link"
-                 href="?q={{ query }}&page={{ arbitros.previous_page_number }}">Anterior</a>
-            </li>
-          {% endif %}
-          <li class="page-item disabled">
-            <a class="page-link" href="#">Página {{ arbitros.number }} de {{ arbitros.paginator.num_pages }}</a>
-          </li>
-          {% if arbitros.has_next %}
-            <li class="page-item">
-              <a class="page-link"
-                 href="?q={{ query }}&page={{ arbitros.next_page_number }}">Siguiente</a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
-  </div>
+    <style>
+    .modern-input-group {
+        background: var(--bg-card);
+        border: 1px solid var(--color-border);
+        border-radius: 50px;
+        transition: all 0.2s ease;
+    }
+    .modern-input-group:focus-within {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    }
+    .transition-hover {
+        transition: all 0.2s ease;
+    }
+    .transition-hover:hover {
+        background-color: var(--color-light) !important;
+    }
+    </style>
 {% endblock %}
