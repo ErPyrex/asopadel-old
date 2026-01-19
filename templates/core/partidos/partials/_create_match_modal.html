@@ -1,0 +1,269 @@
+<!-- Modal Crear Partido (Reutilizable) -->
+<div class="modal fade"
+     id="createMatchModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+             style="background: #0f172a">
+            <!-- Header Moderno con Gradiente -->
+            <div class="modal-header py-3 border-0"
+                 style="background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                         style="width: 36px;
+                                height: 36px">
+                        <i class="ti ti-calendar-plus fs-5"></i>
+                    </div>
+                    Agendar Nuevo Partido
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5" style="background: #0f172a;">
+                <form action="{% url 'core:admin_create_match' %}"
+                      method="POST"
+                      id="createMatchForm">
+                    {% csrf_token %}
+                    <!-- Tipo de Partido -->
+                    <div class="mb-4">
+                        <div class="form-check form-switch d-flex align-items-center gap-3 p-3 rounded-3"
+                             style="background: rgba(255,255,255,0.03);
+                                    border: 1px solid rgba(255,255,255,0.08)">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   role="switch"
+                                   id="modal_es_casual"
+                                   name="es_casual"
+                                   style="width: 3rem;
+                                          height: 1.5rem">
+                            <label class="form-check-label text-white fw-bold" for="modal_es_casual">
+                                <i class="ti ti-ball-tennis me-2 text-primary"></i>Partido Casual / Amistoso
+                            </label>
+                        </div>
+                        <small class="text-muted d-block mt-2 ps-2">Marque si el partido no pertenece a ningún torneo oficial.</small>
+                    </div>
+                    <!-- Torneo -->
+                    <div class="mb-4" id="torneoFieldContainer">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">Torneo</label>
+                        <div class="input-group modern-input-group-modal">
+                            <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-trophy text-primary"></i></span>
+                            <select name="torneo"
+                                    id="modal_torneo"
+                                    class="form-select border-0 py-2 bg-transparent text-white">
+                                <option value="">Seleccione un Torneo</option>
+                                {% for t in torneos_modal %}<option value="{{ t.id }}">{{ t.nombre }}</option>{% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <!-- Cancha -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cancha</label>
+                            <div class="input-group modern-input-group-modal">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-map-pin text-primary"></i></span>
+                                <select name="cancha"
+                                        class="form-select border-0 py-2 bg-transparent text-white"
+                                        required>
+                                    <option value="">Seleccione una cancha</option>
+                                    {% for c in canchas %}<option value="{{ c.id }}">{{ c.nombre }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Fecha -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Fecha del Partido</label>
+                            <div class="input-group modern-input-group-modal">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-calendar text-primary"></i></span>
+                                <input type="date"
+                                       name="fecha"
+                                       class="form-control border-0 py-2 bg-transparent text-white"
+                                       required>
+                            </div>
+                        </div>
+                        <!-- Hora -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario</label>
+                            <div class="input-group modern-input-group-modal">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
+                                <select name="hora"
+                                        class="form-select border-0 py-2 bg-transparent text-white"
+                                        required>
+                                    {% for valor, etiqueta in horarios %}<option value="{{ valor }}">{{ etiqueta }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Árbitro -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Árbitro (Opcional)</label>
+                            <div class="input-group modern-input-group-modal">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user-check text-primary"></i></span>
+                                <select name="arbitro"
+                                        class="form-select border-0 py-2 bg-transparent text-white">
+                                    <option value="">Sin árbitro asignado</option>
+                                    {% for a in arbitros %}<option value="{{ a.id }}">{{ a.first_name }} {{ a.last_name }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Separador Visual -->
+                    <div class="my-4 py-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="flex-grow-1"
+                                 style="height: 1px;
+                                        background: rgba(255,255,255,0.1)"></div>
+                            <span class="text-muted small text-uppercase fw-bold"><i class="ti ti-users me-2"></i>Equipos</span>
+                            <div class="flex-grow-1"
+                                 style="height: 1px;
+                                        background: rgba(255,255,255,0.1)"></div>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <!-- Equipo 1 -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3"
+                                 style="background: rgba(14, 165, 233, 0.08);
+                                        border: 1px solid rgba(14, 165, 233, 0.2)">
+                                <h6 class="fw-bold text-primary mb-3">
+                                    <i class="ti ti-shield me-2"></i>Equipo 1
+                                </h6>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Jugador 1 *</label>
+                                    <select name="equipo1_jugador1"
+                                            class="form-select form-select-sm bg-dark border-0 text-white"
+                                            required>
+                                        <option value="">Seleccione jugador</option>
+                                        {% for j in jugadores %}
+                                            <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label text-muted small">Jugador 2 (Dobles)</label>
+                                    <select name="equipo1_jugador2"
+                                            class="form-select form-select-sm bg-dark border-0 text-white">
+                                        <option value="">Sin segundo jugador</option>
+                                        {% for j in jugadores %}
+                                            <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Equipo 2 -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3"
+                                 style="background: rgba(239, 68, 68, 0.08);
+                                        border: 1px solid rgba(239, 68, 68, 0.2)">
+                                <h6 class="fw-bold text-danger mb-3">
+                                    <i class="ti ti-shield me-2"></i>Equipo 2
+                                </h6>
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small">Jugador 1 *</label>
+                                    <select name="equipo2_jugador1"
+                                            class="form-select form-select-sm bg-dark border-0 text-white"
+                                            required>
+                                        <option value="">Seleccione jugador</option>
+                                        {% for j in jugadores %}
+                                            <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label text-muted small">Jugador 2 (Dobles)</label>
+                                    <select name="equipo2_jugador2"
+                                            class="form-select form-select-sm bg-dark border-0 text-white">
+                                        <option value="">Sin segundo jugador</option>
+                                        {% for j in jugadores %}
+                                            <option value="{{ j.id }}">{{ j.first_name }} {{ j.last_name }} ({{ j.cedula }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botones de Acción -->
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="submit"
+                                class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
+                                style="background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+                                       color: white">
+                            <i class="ti ti-calendar-check me-2"></i>Agendar Partido
+                        </button>
+                        <button type="button"
+                                class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+/* Estilos del Modal */
+.modern-input-group-modal {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+.modern-input-group-modal:focus-within {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.15);
+}
+.modern-input-group-modal .form-control,
+.modern-input-group-modal .form-select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: white !important;
+}
+.modern-input-group-modal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+.modern-input-group-modal .form-select option {
+    background: #1e293b;
+    color: white;
+}
+#createMatchModal .form-select-sm {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+}
+#createMatchModal .form-select-sm option {
+    background: #1e293b;
+    color: white;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejo del modal de crear partido
+    const casualCheckbox = document.getElementById('modal_es_casual');
+    const torneoContainer = document.getElementById('torneoFieldContainer');
+    const torneoSelect = document.getElementById('modal_torneo');
+    
+    if (casualCheckbox && torneoContainer) {
+        casualCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                torneoContainer.style.opacity = '0.4';
+                torneoContainer.style.pointerEvents = 'none';
+                torneoSelect.required = false;
+                torneoSelect.value = '';
+            } else {
+                torneoContainer.style.opacity = '1';
+                torneoContainer.style.pointerEvents = 'auto';
+                torneoSelect.required = true;
+            }
+        });
+    }
+    
+    // Set minimum date to today for create modal
+    const fechaInput = document.querySelector('#createMatchModal input[name="fecha"]');
+    if (fechaInput) {
+        const today = new Date().toISOString().split('T')[0];
+        fechaInput.setAttribute('min', today);
+    }
+});
+</script>
