@@ -11,7 +11,9 @@
     --color-text-muted: #64748B;
     --color-light: #F8FAFC;
     --color-white: #FFFFFF;
-    --color-border: #E2E8F0;
+    --color-border: #0c0a0a;
+    --color-divider: #201f1f;
+
 
     /* Variables de UI semánticas */
     --ui-icon-bg: rgba(14, 165, 233, 0.12);
@@ -54,6 +56,7 @@
 
     --ui-icon-bg: rgba(56, 189, 248, 0.18);
     /* Más visible en dark mode */
+    --color-divider: rgba(255, 255, 255, 0.2);
 }
 
 /* Reset y Base */
@@ -61,6 +64,27 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+hr,
+.dropdown-divider {
+    border: 0;
+    border-top: 1px solid var(--color-border) !important;
+    opacity: 1 !important;
+    margin: 1rem 0;
+}
+
+/* Forzar color de bordes de Bootstrap para que usen nuestra variable negra */
+.border,
+.border-top,
+.border-bottom,
+.border-start,
+.border-end {
+    border-color: var(--color-border) !important;
+}
+
+.modern-input-group {
+    border-color: var(--color-border) !important;
 }
 
 body {
