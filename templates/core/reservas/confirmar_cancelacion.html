@@ -18,7 +18,7 @@
                                 <p class="mb-1 fs-5">
                                     <strong>{{ reserva.fecha|date:"l d F, Y" }}</strong>
                                 </p>
-                                <p class="mb-0">{{ reserva.hora_inicio|time:"H:i" }} a {{ reserva.hora_fin|time:"H:i" }}</p>
+                                <p class="mb-0">{{ reserva.hora_inicio|time:"h:i A" }} a {{ reserva.hora_fin|time:"h:i A" }}</p>
                             </div>
                         </div>
                         <form method="POST">

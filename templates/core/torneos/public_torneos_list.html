@@ -1,8 +1,221 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Torneos disponibles{% endblock %}
 {% block content %}
-    <h2>
-        <i class="ti ti-calendar-event me-2"></i>Torneos disponibles
-    </h2>
-    <p>Aquí se mostrarán los torneos activos, con filtros y tabla visual.</p>
+    <div class="container-fluid px-lg-5 py-4">
+        <!-- Header de la sección -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+            <div>
+                <h1 class="display-5 fw-bold mb-2">
+                    <i class="ti ti-trophy me-2 text-primary"></i>Torneos <span class="text-primary">Disponibles</span>
+                </h1>
+                <p class="text-muted fs-5 mb-0">Descubre todos los torneos de pádel y encuentra tu próximo desafío.</p>
+            </div>
+        </div>
+
+        <!-- Filtros por Estado (Cards Clickeables) -->
+        <div class="row g-3 mb-5">
+            <!-- Todos -->
+            <div class="col-6 col-md">
+                <a href="?estado=" class="text-decoration-none">
+                    <div class="card stat-card border-0 rounded-4 h-100 shadow-sm {% if not estado_filtro %}stat-card-active border-primary{% endif %}">
+                        <div class="card-body text-center py-4">
+                            <div class="stat-icon bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="ti ti-trophy fs-4 text-primary"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">{{ stats.total }}</h3>
+                            <p class="text-muted small mb-0">Todos</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Próximos -->
+            <div class="col-6 col-md">
+                <a href="?estado=proximo" class="text-decoration-none">
+                    <div class="card stat-card border-0 rounded-4 h-100 shadow-sm {% if estado_filtro == 'proximo' %}stat-card-active border-warning{% endif %}">
+                        <div class="card-body text-center py-4">
+                            <div class="stat-icon bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="ti ti-calendar-event fs-4 text-warning"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">{{ stats.proximos }}</h3>
+                            <p class="text-muted small mb-0">Próximos</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- En Curso -->
+            <div class="col-6 col-md">
+                <a href="?estado=en_curso" class="text-decoration-none">
+                    <div class="card stat-card border-0 rounded-4 h-100 shadow-sm {% if estado_filtro == 'en_curso' %}stat-card-active border-success{% endif %}">
+                        <div class="card-body text-center py-4">
+                            <div class="stat-icon bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="ti ti-player-play fs-4 text-success"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">{{ stats.en_curso }}</h3>
+                            <p class="text-muted small mb-0">En Curso</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Finalizados -->
+            <div class="col-6 col-md">
+                <a href="?estado=finalizado" class="text-decoration-none">
+                    <div class="card stat-card border-0 rounded-4 h-100 shadow-sm {% if estado_filtro == 'finalizado' %}stat-card-active border-info{% endif %}">
+                        <div class="card-body text-center py-4">
+                            <div class="stat-icon bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="ti ti-circle-check fs-4 text-info"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">{{ stats.finalizados }}</h3>
+                            <p class="text-muted small mb-0">Finalizados</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Cancelados -->
+            <div class="col-6 col-md">
+                <a href="?estado=cancelado" class="text-decoration-none">
+                    <div class="card stat-card border-0 rounded-4 h-100 shadow-sm {% if estado_filtro == 'cancelado' %}stat-card-active border-secondary{% endif %}">
+                        <div class="card-body text-center py-4">
+                            <div class="stat-icon bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+                                <i class="ti ti-ban fs-4 text-secondary"></i>
+                            </div>
+                            <h3 class="fw-bold mb-0">{{ stats.cancelados }}</h3>
+                            <p class="text-muted small mb-0">Cancelados</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Cuadrícula de Torneos -->
+        <div class="row g-4">
+            {% for torneo in torneos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden ranking-card transition-hover {% if torneo.cancelado %}opacity-75{% endif %}">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-3">
+                                    <i class="ti ti-trophy fs-2 text-primary"></i>
+                                </div>
+                                <div class="text-end">
+                                    {% if torneo.cancelado %}
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">
+                                            <i class="ti ti-ban me-1"></i>Cancelado
+                                        </span>
+                                    {% elif torneo.estado_display == "proximo" %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2">
+                                            <i class="ti ti-calendar-event me-1"></i>Próximo
+                                        </span>
+                                    {% elif torneo.estado_display == "en_curso" %}
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                                            <i class="ti ti-player-play me-1"></i>En Curso
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">
+                                            <i class="ti ti-circle-check me-1"></i>Finalizado
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <h4 class="fw-bold mb-1">{{ torneo.nombre }}</h4>
+                            <p class="text-muted small mb-3">
+                                <span class="badge bg-light text-dark border rounded-pill">{{ torneo.categoria|default:"Sin Categoría" }}</span>
+                            </p>
+                            
+                            <!-- Descripción -->
+                            <p class="text-muted small mb-3 torneo-descripcion">
+                                {{ torneo.descripcion|truncatechars:100 }}
+                            </p>
+                            
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <div class="bg-light rounded-3 p-2 text-center">
+                                        <span class="d-block text-muted tiny text-uppercase fw-bold">Fecha Inicio</span>
+                                        <span class="fw-bold small">{{ torneo.fecha_inicio|date:"d M, Y"|default:torneo.fecha_inicio }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="bg-light rounded-3 p-2 text-center">
+                                        <span class="d-block text-muted tiny text-uppercase fw-bold">Fecha Fin</span>
+                                        <span class="fw-bold small">{{ torneo.fecha_fin|date:"d M, Y"|default:torneo.fecha_fin }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Info adicional -->
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="ti ti-users me-1"></i>
+                                    <span>{{ torneo.jugadores_inscritos.count }} inscritos</span>
+                                </div>
+                                {% if torneo.premios %}
+                                <div class="d-flex align-items-center text-muted small">
+                                    <i class="ti ti-gift me-1 text-warning"></i>
+                                    <span>Con premios</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="mb-4">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                            <i class="ti ti-trophy-off" style="font-size: 4rem; color: var(--bs-primary); opacity: 0.5;"></i>
+                        </div>
+                    </div>
+                    <h3 class="text-muted fw-bold">No hay torneos disponibles</h3>
+                    <p class="text-muted">Próximamente se anunciarán nuevos torneos. ¡Mantente atento!</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <style>
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, .175) !important;
+    }
+    .hover-lift:hover { transform: translateY(-2px); }
+    .tiny { font-size: 0.65rem; }
+    .fs-display-1 { font-size: 5rem; }
+    
+    .torneo-descripcion {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    .stat-card-active {
+        border-width: 2px !important;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        transform: translateY(-2px);
+    }
+    
+    [data-bs-theme="dark"] .bg-light { 
+        background: rgba(255, 255, 255, 0.05) !important; 
+        color: #fff !important; 
+    }
+    [data-bs-theme="dark"] .text-dark { 
+        color: #fff !important; 
+    }
+    [data-bs-theme="dark"] .border {
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    </style>
 {% endblock %}

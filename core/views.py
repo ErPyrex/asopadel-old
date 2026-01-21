@@ -97,9 +97,51 @@ def dashboard_by_role(request):
 # 🌐 Vistas públicas
 # ====================================================================================
 def public_tournament_list(request):
-    torneos = Torneo.objects.all()
+    today = timezone.now().date()
+    torneos = Torneo.objects.all().select_related("categoria").prefetch_related("jugadores_inscritos")
+    
+    # Filtrar por estado
+    estado_filtro = request.GET.get("estado", "")
+    
+    # Calculamos estadísticas antes de filtrar por estado
+    stats = {
+        "total": 0,
+        "proximos": 0,
+        "en_curso": 0,
+        "finalizados": 0,
+        "cancelados": 0,
+    }
+    
+    # Agregar estado_display a cada torneo y calcular estadísticas
+    torneos_con_estado = []
+    for torneo in torneos:
+        stats["total"] += 1
+        if torneo.cancelado:
+            torneo.estado_display = "cancelado"
+            stats["cancelados"] += 1
+        elif torneo.fecha_inicio > today:
+            torneo.estado_display = "proximo"
+            stats["proximos"] += 1
+        elif torneo.fecha_inicio <= today <= torneo.fecha_fin:
+            torneo.estado_display = "en_curso"
+            stats["en_curso"] += 1
+        else:
+            torneo.estado_display = "finalizado"
+            stats["finalizados"] += 1
+        torneos_con_estado.append(torneo)
+    
+    # Ahora aplicamos el filtro de estado
+    if estado_filtro:
+        torneos_con_estado = [t for t in torneos_con_estado if t.estado_display == estado_filtro]
+    
     return render(
-        request, "core/torneos/public_torneos_list.html", {"torneos": torneos}
+        request, 
+        "core/torneos/public_torneos_list.html", 
+        {
+            "torneos": torneos_con_estado,
+            "estado_filtro": estado_filtro,
+            "stats": stats,
+        }
     )
 
 
@@ -1166,12 +1208,12 @@ def home(request):
             .first()
         )
 
-    # Obtener últimos partidos
+    # Obtener últimos partidos (máximo 3 para la vista principal)
     partidos = (
         Partido.objects.all()
         .select_related("torneo", "cancha")
         .prefetch_related("equipo1", "equipo2")
-        .order_by("-fecha", "-hora")[:10]
+        .order_by("-fecha", "-hora")[:3]
     )
 
     context = {

@@ -576,6 +576,35 @@ class PartidoResultForm(forms.ModelForm):
 
 
 class ReservaCanchaForm(forms.ModelForm):
+    HORARIOS = [
+        ("08:00", "08:00 AM"), ("08:30", "08:30 AM"),
+        ("09:00", "09:00 AM"), ("09:30", "09:30 AM"),
+        ("10:00", "10:00 AM"), ("10:30", "10:30 AM"),
+        ("11:00", "11:00 AM"), ("11:30", "11:30 AM"),
+        ("12:00", "12:00 PM"), ("12:30", "12:30 PM"),
+        ("13:00", "1:00 PM"), ("13:30", "1:30 PM"),
+        ("14:00", "2:00 PM"), ("14:30", "2:30 PM"),
+        ("15:00", "3:00 PM"), ("15:30", "3:30 PM"),
+        ("16:00", "4:00 PM"), ("16:30", "4:30 PM"),
+        ("17:00", "5:00 PM"), ("17:30", "5:30 PM"),
+        ("18:00", "6:00 PM"), ("18:30", "6:30 PM"),
+        ("19:00", "7:00 PM"), ("19:30", "7:30 PM"),
+        ("20:00", "8:00 PM"), ("20:30", "8:30 PM"),
+        ("21:00", "9:00 PM"), ("21:30", "9:30 PM"),
+        ("22:00", "10:00 PM"),
+    ]
+
+    hora_inicio = forms.ChoiceField(
+        choices=HORARIOS[:-1], # Excluir 10pm como inicio
+        label="Hora de Inicio",
+        widget=forms.Select(attrs={"class": "form-select bg-light border-0 py-2", "id": "id_hora_inicio"})
+    )
+    hora_fin = forms.ChoiceField(
+        choices=HORARIOS[1:], # Excluir 8am como fin
+        label="Hora de Fin",
+        widget=forms.Select(attrs={"class": "form-select bg-light border-0 py-2", "id": "id_hora_fin"})
+    )
+
     class Meta:
         model = ReservaCancha
         fields = ["cancha", "fecha", "hora_inicio", "hora_fin"]
@@ -588,20 +617,6 @@ class ReservaCanchaForm(forms.ModelForm):
                     "type": "date",
                     "class": "form-control bg-light border-0 py-2",
                     "id": "id_fecha",
-                }
-            ),
-            "hora_inicio": forms.TimeInput(
-                attrs={
-                    "type": "time",
-                    "class": "form-control bg-light border-0 py-2",
-                    "id": "id_hora_inicio",
-                }
-            ),
-            "hora_fin": forms.TimeInput(
-                attrs={
-                    "type": "time",
-                    "class": "form-control bg-light border-0 py-2",
-                    "id": "id_hora_fin",
                 }
             ),
         }
@@ -625,50 +640,54 @@ class ReservaCanchaForm(forms.ModelForm):
             )
         return fecha
 
-    def clean_hora_inicio(self):
-        hora_inicio = self.cleaned_data.get("hora_inicio")
-        return hora_inicio
-
     def clean(self):
         cleaned_data = super().clean()
-        hora_inicio = cleaned_data.get("hora_inicio")
-        hora_fin = cleaned_data.get("hora_fin")
+        hora_inicio_str = cleaned_data.get("hora_inicio")
+        hora_fin_str = cleaned_data.get("hora_fin")
         cancha = cleaned_data.get("cancha")
         fecha = cleaned_data.get("fecha")
 
-        if hora_inicio and hora_fin:
-            if hora_fin <= hora_inicio:
-                raise forms.ValidationError("La hora de fin debe ser posterior a la de inicio")
-
-            # Duración
+        if hora_inicio_str and hora_fin_str and fecha:
             import datetime
             from django.utils import timezone
             now = timezone.now()
 
-            # Validación de tiempo pasado (si es hoy)
+            hora_inicio = datetime.datetime.strptime(hora_inicio_str, "%H:%M").time()
+            hora_fin = datetime.datetime.strptime(hora_fin_str, "%H:%M").time()
+
+            if hora_fin <= hora_inicio:
+                self.add_error("hora_fin", "La hora de fin debe ser posterior a la de inicio.")
+                return cleaned_data
+
+            # 1. Validar que pertenezcan al mismo bloque de 2 horas
+            # Bloques: 8-10, 10-12, 12-14, 14-16, 16-18, 18-20, 20-22
+            h_in = hora_inicio.hour
+            h_out = hora_fin.hour
+            if hora_fin.minute > 0:
+                h_out_adj = h_out + 1
+            else:
+                h_out_adj = h_out
+
+            # Encontrar el bloque de inicio (ej: si empieza a las 8 o 9, el bloque es 8)
+            bloque_inicio = (h_in // 2) * 2
+            # El bloque debe terminar en bloque_inicio + 2
+            bloque_limite_fin = bloque_inicio + 2
+
+            # Validar que la hora de fin no exceda el bloque de 2 horas
+            # Nota: Si h_out es el límite exacto (ej: 10:00), es válido.
+            if h_out > bloque_limite_fin or (h_out == bloque_limite_fin and hora_fin.minute > 0):
+                raise forms.ValidationError(
+                    f"Las reservas deben realizarse dentro de los bloques fijos de 2 horas "
+                    f"(ej: 08:00-10:00, 10:00-12:00). Tu selección cruza o excede un bloque."
+                )
+
+            # 2. Validación de tiempo pasado (si es hoy)
             if fecha == now.date() and hora_inicio < now.time():
                 raise forms.ValidationError("No puedes reservar una hora que ya ha pasado.")
 
-            dummy_date = datetime.date.today()
-            dt_inicio = datetime.datetime.combine(dummy_date, hora_inicio)
-            dt_fin = datetime.datetime.combine(dummy_date, hora_fin)
-            duracion = (dt_fin - dt_inicio).total_seconds() / 3600
-
-            if duracion < 1:
-                raise forms.ValidationError("La reserva debe ser de al menos 1 hora")
-            if duracion > 4:
-                raise forms.ValidationError("La reserva no puede exceder las 4 horas")
-
-            # Validación de Horario de la Cancha
-            if cancha:
-                if hora_inicio < cancha.horario_apertura or hora_fin > cancha.horario_cierre:
-                    raise forms.ValidationError(
-                        f"La cancha {cancha.nombre} solo opera de {cancha.horario_apertura.strftime('%H:%M')} a {cancha.horario_cierre.strftime('%H:%M')}"
-                    )
-
-            # Conflictos de Solapamiento
+            # 3. Conflictos de Solapamiento
             if cancha and fecha:
-                # 1. Verificar otras reservas
+                # Verificar otras reservas
                 reservas = ReservaCancha.objects.filter(
                     cancha=cancha, fecha=fecha
                 ).exclude(estado="cancelada")
@@ -682,7 +701,7 @@ class ReservaCanchaForm(forms.ModelForm):
                             f"Conflicto: Ya existe una reserva de {r.hora_inicio.strftime('%H:%M')} a {r.hora_fin.strftime('%H:%M')}"
                         )
 
-                # 2. Verificar partidos programados (asumimos 2 horas de duración)
+                # Verificar partidos programados
                 from competitions.models import Partido
                 partidos = Partido.objects.filter(
                     cancha=cancha, fecha=fecha
@@ -690,6 +709,7 @@ class ReservaCanchaForm(forms.ModelForm):
 
                 for p in partidos:
                     p_inicio = p.hora
+                    dummy_date = datetime.date.today()
                     p_dt_inicio = datetime.datetime.combine(dummy_date, p_inicio)
                     p_dt_fin = p_dt_inicio + datetime.timedelta(hours=2)
                     p_fin = p_dt_fin.time()
@@ -699,7 +719,18 @@ class ReservaCanchaForm(forms.ModelForm):
                             f"Conflicto: Hay un partido programado de {p_inicio.strftime('%H:%M')} a {p_fin.strftime('%H:%M')}"
                         )
 
+            cleaned_data["hora_inicio"] = hora_inicio
+            cleaned_data["hora_fin"] = hora_fin
+
         return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.hora_inicio = self.cleaned_data["hora_inicio"]
+        instance.hora_fin = self.cleaned_data["hora_fin"]
+        if commit:
+            instance.save()
+        return instance
 
 
 # core/forms.py  crear formularios de registro para árbitros y jugadores

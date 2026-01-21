@@ -150,7 +150,8 @@
     border-radius: 32px;
     border: 1px solid var(--border-aso);
     box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.35);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: visible;
     backdrop-filter: var(--glass-effect);
     animation: fadeInUp 0.8s ease-out;
   }
@@ -158,6 +159,7 @@
   .table-premium {
     margin-bottom: 0 !important;
     border-collapse: separate !important;
+    min-width: 1000px;
   }
 
   .table-premium thead th {
@@ -165,10 +167,11 @@
     color: var(--text-muted) !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    font-size: 0.75rem !important;
-    letter-spacing: 2px !important;
-    padding: 1.75rem 1.5rem !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 1.5px !important;
+    padding: 1rem 0.75rem !important;
     border: none !important;
+    white-space: nowrap;
   }
 
   [data-bs-theme="light"] .table-premium thead th {
@@ -176,7 +179,7 @@
   }
 
   .table-premium tbody td {
-    padding: 1.75rem 1.5rem !important;
+    padding: 1rem 0.75rem !important;
     vertical-align: middle !important;
     border-bottom: 1px solid var(--border-aso) !important;
     transition: all 0.3s ease !important;
@@ -385,6 +388,22 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  /* Header text azul oscuro en modo claro para mejor visibilidad */
+  [data-bs-theme="light"] .premium-header h1 {
+    color: #1e40af !important;
+  }
+
+  /* Icono del modal crear partido negro en modo claro */
+  [data-bs-theme="light"] #createMatchModal .modal-header .ti-calendar-plus {
+    color: #000000 !important;
+  }
+
+  /* Switch de partido casual con fondo azul cuando está activado en modo oscuro */
+  [data-bs-theme="dark"] #modal_es_casual:checked {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
   }
     </style>
 {% endblock %}

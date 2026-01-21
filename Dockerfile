@@ -29,7 +29,7 @@ COPY . /app/
 RUN chmod +x /app/entrypoint.sh /app/build.sh
 
 # Entrypoint will handle migrations and starting the server
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
 # Default port for the app
 EXPOSE 8000

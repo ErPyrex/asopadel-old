@@ -17,7 +17,8 @@
                         data-bs-target="#allReservationsModal">
                     <i class="ti ti-calendar-event me-2"></i>Ver Todas las Reservaciones
                 </button>
-                <button class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"
+                <button type="button"
+                        class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm"
                         data-bs-toggle="modal"
                         data-bs-target="#createCourtModal">
                     <i class="ti ti-plus me-2"></i>Registrar Nueva Cancha
@@ -78,7 +79,7 @@
                                 <div class="col-7">
                                     <div class="bg-light rounded-3 p-2 text-center h-100 d-flex flex-column justify-content-center">
                                         <span class="d-block text-muted tiny text-uppercase fw-bold">Horario</span>
-                                        <span class="fw-bold small">{{ cancha.horario_apertura|time:"H:i" }} - {{ cancha.horario_cierre|time:"H:i" }}</span>
+                                        <span class="fw-bold small">{{ cancha.horario_apertura|time:"h:i A" }} - {{ cancha.horario_cierre|time:"h:i A" }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -187,22 +188,74 @@
                                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apertura</label>
                                             <div class="input-group modern-input-group">
                                                 <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
-                                                <input type="time"
-                                                       name="horario_apertura"
-                                                       class="form-control border-0 py-2 bg-transparent"
-                                                       value="{{ cancha.horario_apertura|time:'H:i' }}"
-                                                       required>
+                                                <select name="horario_apertura" class="form-select border-0 py-2 bg-transparent" required>
+                                                    <option value="08:00" {% if cancha.horario_apertura|time:'H:i' == '08:00' %}selected{% endif %}>08:00 AM</option>
+                                                    <option value="08:30" {% if cancha.horario_apertura|time:'H:i' == '08:30' %}selected{% endif %}>08:30 AM</option>
+                                                    <option value="09:00" {% if cancha.horario_apertura|time:'H:i' == '09:00' %}selected{% endif %}>09:00 AM</option>
+                                                    <option value="09:30" {% if cancha.horario_apertura|time:'H:i' == '09:30' %}selected{% endif %}>09:30 AM</option>
+                                                    <option value="10:00" {% if cancha.horario_apertura|time:'H:i' == '10:00' %}selected{% endif %}>10:00 AM</option>
+                                                    <option value="10:30" {% if cancha.horario_apertura|time:'H:i' == '10:30' %}selected{% endif %}>10:30 AM</option>
+                                                    <option value="11:00" {% if cancha.horario_apertura|time:'H:i' == '11:00' %}selected{% endif %}>11:00 AM</option>
+                                                    <option value="11:30" {% if cancha.horario_apertura|time:'H:i' == '11:30' %}selected{% endif %}>11:30 AM</option>
+                                                    <option value="12:00" {% if cancha.horario_apertura|time:'H:i' == '12:00' %}selected{% endif %}>12:00 PM</option>
+                                                    <option value="12:30" {% if cancha.horario_apertura|time:'H:i' == '12:30' %}selected{% endif %}>12:30 PM</option>
+                                                    <option value="13:00" {% if cancha.horario_apertura|time:'H:i' == '13:00' %}selected{% endif %}>01:00 PM</option>
+                                                    <option value="13:30" {% if cancha.horario_apertura|time:'H:i' == '13:30' %}selected{% endif %}>01:30 PM</option>
+                                                    <option value="14:00" {% if cancha.horario_apertura|time:'H:i' == '14:00' %}selected{% endif %}>02:00 PM</option>
+                                                    <option value="14:30" {% if cancha.horario_apertura|time:'H:i' == '14:30' %}selected{% endif %}>02:30 PM</option>
+                                                    <option value="15:00" {% if cancha.horario_apertura|time:'H:i' == '15:00' %}selected{% endif %}>03:00 PM</option>
+                                                    <option value="15:30" {% if cancha.horario_apertura|time:'H:i' == '15:30' %}selected{% endif %}>03:30 PM</option>
+                                                    <option value="16:00" {% if cancha.horario_apertura|time:'H:i' == '16:00' %}selected{% endif %}>04:00 PM</option>
+                                                    <option value="16:30" {% if cancha.horario_apertura|time:'H:i' == '16:30' %}selected{% endif %}>04:30 PM</option>
+                                                    <option value="17:00" {% if cancha.horario_apertura|time:'H:i' == '17:00' %}selected{% endif %}>05:00 PM</option>
+                                                    <option value="17:30" {% if cancha.horario_apertura|time:'H:i' == '17:30' %}selected{% endif %}>05:30 PM</option>
+                                                    <option value="18:00" {% if cancha.horario_apertura|time:'H:i' == '18:00' %}selected{% endif %}>06:00 PM</option>
+                                                    <option value="18:30" {% if cancha.horario_apertura|time:'H:i' == '18:30' %}selected{% endif %}>06:30 PM</option>
+                                                    <option value="19:00" {% if cancha.horario_apertura|time:'H:i' == '19:00' %}selected{% endif %}>07:00 PM</option>
+                                                    <option value="19:30" {% if cancha.horario_apertura|time:'H:i' == '19:30' %}selected{% endif %}>07:30 PM</option>
+                                                    <option value="20:00" {% if cancha.horario_apertura|time:'H:i' == '20:00' %}selected{% endif %}>08:00 PM</option>
+                                                    <option value="20:30" {% if cancha.horario_apertura|time:'H:i' == '20:30' %}selected{% endif %}>08:30 PM</option>
+                                                    <option value="21:00" {% if cancha.horario_apertura|time:'H:i' == '21:00' %}selected{% endif %}>09:00 PM</option>
+                                                    <option value="21:30" {% if cancha.horario_apertura|time:'H:i' == '21:30' %}selected{% endif %}>09:30 PM</option>
+                                                    <option value="22:00" {% if cancha.horario_apertura|time:'H:i' == '22:00' %}selected{% endif %}>10:00 PM</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cierre</label>
                                             <div class="input-group modern-input-group">
                                                 <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock-pause text-primary"></i></span>
-                                                <input type="time"
-                                                       name="horario_cierre"
-                                                       class="form-control border-0 py-2 bg-transparent"
-                                                       value="{{ cancha.horario_cierre|time:'H:i' }}"
-                                                       required>
+                                                <select name="horario_cierre" class="form-select border-0 py-2 bg-transparent" required>
+                                                    <option value="08:00" {% if cancha.horario_cierre|time:'H:i' == '08:00' %}selected{% endif %}>08:00 AM</option>
+                                                    <option value="08:30" {% if cancha.horario_cierre|time:'H:i' == '08:30' %}selected{% endif %}>08:30 AM</option>
+                                                    <option value="09:00" {% if cancha.horario_cierre|time:'H:i' == '09:00' %}selected{% endif %}>09:00 AM</option>
+                                                    <option value="09:30" {% if cancha.horario_cierre|time:'H:i' == '09:30' %}selected{% endif %}>09:30 AM</option>
+                                                    <option value="10:00" {% if cancha.horario_cierre|time:'H:i' == '10:00' %}selected{% endif %}>10:00 AM</option>
+                                                    <option value="10:30" {% if cancha.horario_cierre|time:'H:i' == '10:30' %}selected{% endif %}>10:30 AM</option>
+                                                    <option value="11:00" {% if cancha.horario_cierre|time:'H:i' == '11:00' %}selected{% endif %}>11:00 AM</option>
+                                                    <option value="11:30" {% if cancha.horario_cierre|time:'H:i' == '11:30' %}selected{% endif %}>11:30 AM</option>
+                                                    <option value="12:00" {% if cancha.horario_cierre|time:'H:i' == '12:00' %}selected{% endif %}>12:00 PM</option>
+                                                    <option value="12:30" {% if cancha.horario_cierre|time:'H:i' == '12:30' %}selected{% endif %}>12:30 PM</option>
+                                                    <option value="13:00" {% if cancha.horario_cierre|time:'H:i' == '13:00' %}selected{% endif %}>01:00 PM</option>
+                                                    <option value="13:30" {% if cancha.horario_cierre|time:'H:i' == '13:30' %}selected{% endif %}>01:30 PM</option>
+                                                    <option value="14:00" {% if cancha.horario_cierre|time:'H:i' == '14:00' %}selected{% endif %}>02:00 PM</option>
+                                                    <option value="14:30" {% if cancha.horario_cierre|time:'H:i' == '14:30' %}selected{% endif %}>02:30 PM</option>
+                                                    <option value="15:00" {% if cancha.horario_cierre|time:'H:i' == '15:00' %}selected{% endif %}>03:00 PM</option>
+                                                    <option value="15:30" {% if cancha.horario_cierre|time:'H:i' == '15:30' %}selected{% endif %}>03:30 PM</option>
+                                                    <option value="16:00" {% if cancha.horario_cierre|time:'H:i' == '16:00' %}selected{% endif %}>04:00 PM</option>
+                                                    <option value="16:30" {% if cancha.horario_cierre|time:'H:i' == '16:30' %}selected{% endif %}>04:30 PM</option>
+                                                    <option value="17:00" {% if cancha.horario_cierre|time:'H:i' == '17:00' %}selected{% endif %}>05:00 PM</option>
+                                                    <option value="17:30" {% if cancha.horario_cierre|time:'H:i' == '17:30' %}selected{% endif %}>05:30 PM</option>
+                                                    <option value="18:00" {% if cancha.horario_cierre|time:'H:i' == '18:00' %}selected{% endif %}>06:00 PM</option>
+                                                    <option value="18:30" {% if cancha.horario_cierre|time:'H:i' == '18:30' %}selected{% endif %}>06:30 PM</option>
+                                                    <option value="19:00" {% if cancha.horario_cierre|time:'H:i' == '19:00' %}selected{% endif %}>07:00 PM</option>
+                                                    <option value="19:30" {% if cancha.horario_cierre|time:'H:i' == '19:30' %}selected{% endif %}>07:30 PM</option>
+                                                    <option value="20:00" {% if cancha.horario_cierre|time:'H:i' == '20:00' %}selected{% endif %}>08:00 PM</option>
+                                                    <option value="20:30" {% if cancha.horario_cierre|time:'H:i' == '20:30' %}selected{% endif %}>08:30 PM</option>
+                                                    <option value="21:00" {% if cancha.horario_cierre|time:'H:i' == '21:00' %}selected{% endif %}>09:00 PM</option>
+                                                    <option value="21:30" {% if cancha.horario_cierre|time:'H:i' == '21:30' %}selected{% endif %}>09:30 PM</option>
+                                                    <option value="22:00" {% if cancha.horario_cierre|time:'H:i' == '22:00' %}selected{% endif %}>10:00 PM</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <!-- Descripción -->
@@ -319,7 +372,7 @@
          id="allReservationsModal"
          tabindex="-1"
          aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-primary py-3 border-0">
                     <h5 class="modal-title fw-bold text-white d-flex align-items-center">
@@ -368,9 +421,9 @@
                                             </td>
                                             <td class="fw-medium">{{ reserva.fecha|date:"d M, Y" }}</td>
                                             <td>
-                                                <span class="text-primary fw-bold">{{ reserva.hora_inicio|time:"H:i" }}</span>
+                                                <span class="text-primary fw-bold">{{ reserva.hora_inicio|time:"h:i A" }}</span>
                                                 <span class="text-muted opacity-50 mx-1">-</span>
-                                                <span class="text-primary fw-bold">{{ reserva.hora_fin|time:"H:i" }}</span>
+                                                <span class="text-primary fw-bold">{{ reserva.hora_fin|time:"h:i A" }}</span>
                                             </td>
                                             <td>
                                                 {% if reserva.estado == 'confirmada' %}
@@ -418,8 +471,9 @@
                 </div>
             </div>
         </div>
-        <!-- Modal para Editar Reserva Individual -->
-        <div class="modal fade"
+    </div>
+    <!-- Modal para Editar Reserva Individual -->
+    <div class="modal fade"
              id="editReservationModal"
              tabindex="-1"
              aria-hidden="true"
@@ -595,8 +649,23 @@
     .hover-lift { transition: transform 0.2s ease; }
     .hover-lift:hover { transform: translateY(-3px); }
 
+
     .tiny { font-size: 0.65rem; }
     .fs-display-1 { font-size: 5rem; }
+    
+    /* Icono del modal de historial negro en modo claro */
+    [data-bs-theme="light"] #allReservationsModal .modal-header .ti-calendar-event {
+        color: #000000 !important;
+    }
+
+    /* Botón eliminar con borde rojo */
+    .btn-outline-danger {
+        border-color: var(--bs-danger) !important;
+    }
+    .btn-outline-danger:hover {
+        background-color: var(--bs-danger) !important;
+        color: white !important;
+    }
         </style>
         <script>
     document.querySelectorAll('.filter-btn').forEach(btn => {

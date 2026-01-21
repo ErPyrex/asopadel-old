@@ -12,10 +12,12 @@
                 <p class="text-muted fs-5 mb-0">Gestiona el cuerpo arbitral de los torneos.</p>
             </div>
             <div class="d-flex gap-2">
-                <a href="{% url 'core:admin_create_arbitro' %}"
-                   class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm hover-lift">
+                <button type="button"
+                        class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow-sm hover-lift"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createArbitroModal">
                     <i class="ti ti-plus me-2"></i>Registrar Árbitro
-                </a>
+                </button>
             </div>
         </div>
         <!-- Barra de Búsqueda y Filtros -->
@@ -70,14 +72,25 @@
                                 <td class="text-muted">{{ arbitro.email }}</td>
                                 <td class="text-end pe-4">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <a href="{% url 'core:admin_edit_arbitro' arbitro.id %}"
-                                           class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editArbitroModal"
+                                                data-nombre="{{ arbitro.first_name }}"
+                                                data-apellido="{{ arbitro.last_name }}"
+                                                data-email="{{ arbitro.email }}"
+                                                data-cedula="{{ arbitro.cedula }}"
+                                                data-url="{% url 'core:admin_edit_arbitro' arbitro.id %}">
                                             <i class="ti ti-edit me-1"></i>Editar
-                                        </a>
-                                        <a href="{% url 'core:admin_delete_arbitro' arbitro.id %}"
-                                           class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                        </button>
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#deleteArbitroModal"
+                                                data-arbitro-name="{{ arbitro.get_full_name }}"
+                                                data-delete-url="{% url 'core:admin_delete_arbitro' arbitro.id %}">
                                             <i class="ti ti-trash me-1"></i>Eliminar
-                                        </a>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -141,6 +154,138 @@
     }
     .transition-hover:hover {
         background-color: var(--color-light) !important;
+    }
+    /* Botón eliminar con borde rojo */
+    .btn-outline-danger {
+        border-color: var(--bs-danger) !important;
+    }
+    .btn-outline-danger:hover {
+        background-color: var(--bs-danger) !important;
+        color: white !important;
+    }
+    </style>
+    
+    <!-- Modal Eliminar Árbitro -->
+    <div class="modal fade"
+         id="deleteArbitroModal"
+         tabindex="-1"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header bg-danger py-3 border-0">
+                    <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                        <i class="ti ti-trash fs-4 me-2"></i>Eliminar Árbitro
+                    </h5>
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 bg-card">
+                    <p class="text-muted mb-1">¿Estás seguro que deseas eliminar este árbitro?</p>
+                    <p class="text-danger fw-bold small mb-4">
+                        <i class="ti ti-alert-triangle me-1"></i>Esta acción no se puede deshacer.
+                    </p>
+                    
+                    <p class="text-muted mb-2">Escribe <span class="copy-name-badge" id="arbitroNameToCopy" title="Clic para copiar"><span id="modalArbitroNameDisplay"></span> <i class="ti ti-copy"></i></span> para confirmar.</p>
+                    
+                    <input type="text" 
+                           class="form-control py-3 mb-4" 
+                           id="confirmArbitroNameInput"
+                           placeholder="Ingresa el nombre del árbitro">
+                    
+                    <form id="deleteArbitroForm" method="POST" action="">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <button type="submit"
+                                    id="confirmDeleteArbitroBtn"
+                                    class="btn btn-danger rounded-pill fw-bold flex-fill"
+                                    disabled>
+                                <i class="ti ti-trash me-1"></i>Eliminar Árbitro
+                            </button>
+                            <button type="button"
+                                    class="btn btn-outline-secondary rounded-pill fw-bold px-4"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% include 'core/arbitros/modals/modal_editar.html' %}
+    {% include 'core/arbitros/modals/modal_crear.html' %}
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteModal = document.getElementById('deleteArbitroModal');
+        let expectedArbitroName = '';
+        
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const arbitroName = button.getAttribute('data-arbitro-name');
+                const deleteUrl = button.getAttribute('data-delete-url');
+                
+                expectedArbitroName = arbitroName;
+                document.getElementById('modalArbitroNameDisplay').textContent = arbitroName;
+                document.getElementById('deleteArbitroForm').action = deleteUrl;
+                document.getElementById('confirmArbitroNameInput').value = '';
+                document.getElementById('confirmDeleteArbitroBtn').disabled = true;
+            });
+            
+            // Validar input de confirmación
+            const confirmInput = document.getElementById('confirmArbitroNameInput');
+            const confirmBtn = document.getElementById('confirmDeleteArbitroBtn');
+            
+            confirmInput.addEventListener('input', function() {
+                confirmBtn.disabled = this.value.trim() !== expectedArbitroName.trim();
+            });
+            
+            // Copiar nombre al portapapeles
+            document.getElementById('arbitroNameToCopy').addEventListener('click', function() {
+                const textToCopy = document.getElementById('modalArbitroNameDisplay').textContent;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Feedback visual temporal
+                    const icon = this.querySelector('i');
+                    icon.className = 'ti ti-check';
+                    setTimeout(() => {
+                        icon.className = 'ti ti-copy';
+                    }, 1500);
+                });
+            });
+        }
+    });
+    </script>
+    
+    <style>
+    /* Badge para copiar nombre */
+    .copy-name-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--bs-body-color);
+        transition: all 0.2s ease;
+    }
+    .copy-name-badge:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+    .copy-name-badge i {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+    [data-bs-theme="light"] .copy-name-badge {
+        background: rgba(0, 0, 0, 0.05);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+    [data-bs-theme="light"] .copy-name-badge:hover {
+        background: rgba(0, 0, 0, 0.08);
     }
     </style>
 {% endblock %}

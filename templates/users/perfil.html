@@ -17,8 +17,8 @@
   /* Ajuste para tema claro si aplica */
   [data-bs-theme="light"] #profile-main-card {
     background: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #94a3b8 !important; /* Borde más oscuro y visible */
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1) !important; /* Sombra un poco más marcada */
   }
 
   .perfil-header-gradient {
@@ -27,6 +27,7 @@
     position: relative !important;
     width: 100% !important;
   }
+
 
   /* Contenedor del Avatar - TOTALMENTE CENTRADO */
   .avatar-center-wrapper {
@@ -131,8 +132,21 @@
 
   [data-bs-theme="light"] .perfil-input {
     background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-    color: #1e293b !important;
+    border: 1px solid #94a3b8 !important; /* Borde oscuro visible (Slate 400) */
+    color: #0f172a !important; /* Texto casi negro (Slate 900) */
+  }
+
+  /* MEJORA DE LEGIBILIDAD MODO CLARO */
+  [data-bs-theme="light"] .perfil-label {
+    color: #334155 !important; /* Gris oscuro para etiquetas */
+  }
+
+  [data-bs-theme="light"] #userNameLabel {
+    color: #0f172a !important; /* Casi negro para el nombre */
+  }
+
+  [data-bs-theme="light"] p.text-muted {
+    color: #475569 !important; /* Gris medio para subtítulos */
   }
 
   .perfil-input:focus {
@@ -173,6 +187,16 @@
     border-radius: 10px !important;
     font-weight: 600 !important;
     padding: 0.4rem 1rem !important;
+  }
+
+  [data-bs-theme="light"] .btn-outline-edit {
+    color: #0061ff !important; /* Azul legible en modo claro */
+    border-color: #0061ff !important;
+  }
+
+  [data-bs-theme="light"] .btn-outline-edit:hover {
+    background: #0061ff !important;
+    color: #ffffff !important;
   }
 
   /* Modales */

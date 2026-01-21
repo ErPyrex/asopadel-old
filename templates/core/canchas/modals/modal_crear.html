@@ -84,20 +84,76 @@
                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario Apertura</label>
                             <div class="input-group modern-input-group">
                                 <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock text-primary"></i></span>
-                                <input type="time"
-                                       name="court-horario_apertura"
-                                       class="form-control border-0 py-2 bg-transparent"
-                                       required>
+                                <select name="court-horario_apertura" class="form-select border-0 py-2 bg-transparent" required>
+                                    <option value="" selected disabled>Seleccionar hora</option>
+                                    <option value="08:00">08:00 AM</option>
+                                    <option value="08:30">08:30 AM</option>
+                                    <option value="09:00">09:00 AM</option>
+                                    <option value="09:30">09:30 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="10:30">10:30 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="11:30">11:30 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="12:30">12:30 PM</option>
+                                    <option value="13:00">01:00 PM</option>
+                                    <option value="13:30">01:30 PM</option>
+                                    <option value="14:00">02:00 PM</option>
+                                    <option value="14:30">02:30 PM</option>
+                                    <option value="15:00">03:00 PM</option>
+                                    <option value="15:30">03:30 PM</option>
+                                    <option value="16:00">04:00 PM</option>
+                                    <option value="16:30">04:30 PM</option>
+                                    <option value="17:00">05:00 PM</option>
+                                    <option value="17:30">05:30 PM</option>
+                                    <option value="18:00">06:00 PM</option>
+                                    <option value="18:30">06:30 PM</option>
+                                    <option value="19:00">07:00 PM</option>
+                                    <option value="19:30">07:30 PM</option>
+                                    <option value="20:00">08:00 PM</option>
+                                    <option value="20:30">08:30 PM</option>
+                                    <option value="21:00">09:00 PM</option>
+                                    <option value="21:30">09:30 PM</option>
+                                    <option value="22:00">10:00 PM</option>
+                                </select>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-bold text-muted small text-uppercase mb-2">Horario Cierre</label>
                             <div class="input-group modern-input-group">
                                 <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-clock-pause text-primary"></i></span>
-                                <input type="time"
-                                       name="court-horario_cierre"
-                                       class="form-control border-0 py-2 bg-transparent"
-                                       required>
+                                <select name="court-horario_cierre" class="form-select border-0 py-2 bg-transparent" required>
+                                    <option value="" selected disabled>Seleccionar hora</option>
+                                    <option value="08:00">08:00 AM</option>
+                                    <option value="08:30">08:30 AM</option>
+                                    <option value="09:00">09:00 AM</option>
+                                    <option value="09:30">09:30 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="10:30">10:30 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="11:30">11:30 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="12:30">12:30 PM</option>
+                                    <option value="13:00">01:00 PM</option>
+                                    <option value="13:30">01:30 PM</option>
+                                    <option value="14:00">02:00 PM</option>
+                                    <option value="14:30">02:30 PM</option>
+                                    <option value="15:00">03:00 PM</option>
+                                    <option value="15:30">03:30 PM</option>
+                                    <option value="16:00">04:00 PM</option>
+                                    <option value="16:30">04:30 PM</option>
+                                    <option value="17:00">05:00 PM</option>
+                                    <option value="17:30">05:30 PM</option>
+                                    <option value="18:00">06:00 PM</option>
+                                    <option value="18:30">06:30 PM</option>
+                                    <option value="19:00">07:00 PM</option>
+                                    <option value="19:30">07:30 PM</option>
+                                    <option value="20:00">08:00 PM</option>
+                                    <option value="20:30">08:30 PM</option>
+                                    <option value="21:00">09:00 PM</option>
+                                    <option value="21:30">09:30 PM</option>
+                                    <option value="22:00">10:00 PM</option>
+                                </select>
                             </div>
                         </div>
                         <!-- Descripción -->
@@ -160,6 +216,11 @@
 /* Los estilos base se comparten desde lista_canchas.html o se definen aquí si es necesario */
 .bg-card { background: #ffffff; }
 [data-bs-theme="dark"] .bg-card { background: #1a1d21; }
+
+/* Icono negro en modo claro para mejor contraste */
+[data-bs-theme="light"] #createCourtModal .modal-header i {
+    color: #000000 !important;
+}
 
 .modern-input-group {
     background: var(--bs-gray-100);
