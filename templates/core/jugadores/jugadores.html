@@ -179,31 +179,36 @@
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="modal-header bg-danger py-3 border-0">
                     <h5 class="modal-title fw-bold text-white d-flex align-items-center">
-                        <i class="ti ti-alert-triangle fs-4 me-2"></i>Confirmar Eliminación
+                        <i class="ti ti-trash fs-4 me-2"></i>Eliminar Jugador
                     </h5>
                     <button type="button"
                             class="btn-close btn-close-white"
                             data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body p-4 p-md-5 text-center bg-card">
-                    <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
-                         style="width: 80px;
-                                height: 80px">
-                        <i class="ti ti-trash text-danger" style="font-size: 2.5rem;"></i>
-                    </div>
-                    <h4 class="fw-bold mb-3">¿Estás seguro?</h4>
-                    <p class="text-muted mb-4">
-                        Esta acción eliminará permanentemente al jugador <strong id="modalPlayerName" class="text-dark"></strong> y no podrá deshacerse.
+                <div class="modal-body p-4 bg-card">
+                    <p class="text-muted mb-1">¿Estás seguro que deseas eliminar este jugador?</p>
+                    <p class="text-danger fw-bold small mb-4">
+                        <i class="ti ti-alert-triangle me-1"></i>Esta acción no se puede deshacer.
                     </p>
+                    
+                    <p class="text-muted mb-2">Escribe <span class="copy-name-badge" id="playerNameToCopy" title="Clic para copiar"><span id="modalPlayerNameDisplay"></span> <i class="ti ti-copy"></i></span> para confirmar.</p>
+                    
+                    <input type="text" 
+                           class="form-control py-3 mb-4" 
+                           id="confirmPlayerNameInput"
+                           placeholder="Ingresa el nombre del jugador">
+                    
                     <form id="deletePlayerForm" method="POST" action="">
                         {% csrf_token %}
-                        <div class="d-grid gap-2">
+                        <div class="d-flex gap-2">
                             <button type="submit"
-                                    class="btn btn-danger btn-lg rounded-pill fw-bold py-3 shadow-sm hover-lift">
-                                Eliminar permanentemente
+                                    id="confirmDeletePlayerBtn"
+                                    class="btn btn-danger rounded-pill fw-bold flex-fill"
+                                    disabled>
+                                <i class="ti ti-trash me-1"></i>Eliminar Jugador
                             </button>
                             <button type="button"
-                                    class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                    class="btn btn-outline-secondary rounded-pill fw-bold px-4"
                                     data-bs-dismiss="modal">Cancelar</button>
                         </div>
                     </form>
@@ -216,14 +221,40 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const deletePlayerModal = document.getElementById('deletePlayerModal');
+        let expectedPlayerName = '';
+        
         if (deletePlayerModal) {
             deletePlayerModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
                 const playerName = button.getAttribute('data-player-name');
                 const deleteUrl = button.getAttribute('data-delete-url');
                 
-                deletePlayerModal.querySelector('#modalPlayerName').textContent = playerName;
-                deletePlayerModal.querySelector('#deletePlayerForm').action = deleteUrl;
+                expectedPlayerName = playerName;
+                document.getElementById('modalPlayerNameDisplay').textContent = playerName;
+                document.getElementById('deletePlayerForm').action = deleteUrl;
+                document.getElementById('confirmPlayerNameInput').value = '';
+                document.getElementById('confirmDeletePlayerBtn').disabled = true;
+            });
+            
+            // Validar input de confirmación
+            const confirmInput = document.getElementById('confirmPlayerNameInput');
+            const confirmBtn = document.getElementById('confirmDeletePlayerBtn');
+            
+            confirmInput.addEventListener('input', function() {
+                confirmBtn.disabled = this.value.trim() !== expectedPlayerName.trim();
+            });
+            
+            // Copiar nombre al portapapeles
+            document.getElementById('playerNameToCopy').addEventListener('click', function() {
+                const textToCopy = document.getElementById('modalPlayerNameDisplay').textContent;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Feedback visual temporal
+                    const icon = this.querySelector('i');
+                    icon.className = 'ti ti-check';
+                    setTimeout(() => {
+                        icon.className = 'ti ti-copy';
+                    }, 1500);
+                });
             });
         }
     });
@@ -252,6 +283,35 @@
     .btn-outline-danger:hover {
         background-color: var(--bs-danger) !important;
         color: white !important;
+    }
+    /* Badge para copiar nombre */
+    .copy-name-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--bs-body-color);
+        transition: all 0.2s ease;
+    }
+    .copy-name-badge:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.25);
+    }
+    .copy-name-badge i {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+    [data-bs-theme="light"] .copy-name-badge {
+        background: rgba(0, 0, 0, 0.05);
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+    [data-bs-theme="light"] .copy-name-badge:hover {
+        background: rgba(0, 0, 0, 0.08);
     }
     </style>
 {% endblock %}
