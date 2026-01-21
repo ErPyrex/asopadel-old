@@ -261,31 +261,92 @@
     border-color: var(--aso-primary);
   }
 
-  /* Action Buttons Group Refined */
+  /* Action Buttons - Compact Modern Design */
   .action-btn {
-    width: 44px;
-    height: 44px;
+    width: 32px;
+    height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 8px;
+    transition: all 0.25s ease;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.03);
     color: var(--text-muted);
-    backdrop-filter: blur(4px);
+    font-size: 0.9rem;
   }
   
   .action-btn:hover {
-    transform: translateY(-4px) scale(1.1);
+    transform: translateY(-2px);
     color: white;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.2);
-    z-index: 5;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.15);
   }
 
-  .btn-view:hover { background: rgba(14, 165, 233, 0.2) !important; color: #0ea5e9 !important; border-color: #0ea5e9 !important; }
-  .btn-edit:hover { background: rgba(245, 158, 11, 0.2) !important; color: #f59e0b !important; border-color: #f59e0b !important; }
+  .btn-view:hover { background: rgba(14, 165, 233, 0.15) !important; color: #0ea5e9 !important; }
+  .btn-edit:hover { background: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; }
+  .btn-result:hover { background: rgba(16, 185, 129, 0.15) !important; color: #10b981 !important; }
+  .btn-cancel:hover { background: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
+  .btn-history:hover { background: rgba(168, 85, 247, 0.15) !important; color: #a855f7 !important; }
+
+  /* Actions Wrapper */
+  .actions-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+  }
+
+  /* Dropdown Actions Menu */
+  .actions-dropdown {
+    position: relative;
+  }
+
+  .actions-dropdown .dropdown-toggle::after {
+    display: none;
+  }
+
+  .actions-dropdown .dropdown-menu {
+    min-width: 160px;
+    padding: 0.5rem;
+    background: var(--card-bg-modern);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+  }
+
+  .actions-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+
+  .actions-dropdown .dropdown-item:hover {
+    background: rgba(var(--aso-primary-rgb), 0.1);
+    color: var(--aso-primary);
+  }
+
+  .actions-dropdown .dropdown-item i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+  }
+
+  .dropdown-item-result { color: #10b981 !important; }
+  .dropdown-item-result:hover { background: rgba(16, 185, 129, 0.1) !important; }
+  
+  .dropdown-item-cancel { color: #ef4444 !important; }
+  .dropdown-item-cancel:hover { background: rgba(239, 68, 68, 0.1) !important; }
+
+  .dropdown-item-edit-result { color: #f59e0b !important; }
+  .dropdown-item-edit-result:hover { background: rgba(245, 158, 11, 0.1) !important; }
   
   /* Modern Competitors Layout - Vertical */
   .competitors-v2 {
@@ -554,76 +615,88 @@
                                         <div class="text-muted fw-bold">-- : --</div>
                                     {% endif %}
                                 </td>
-                                <td class="text-end pe-4">
-                                    <div class="d-flex justify-content-end gap-3">
-                                        <!-- Ver detalle (abre modal) -->
+                                <td class="text-end pe-3">
+                                    <div class="actions-wrapper">
+                                        <!-- Ver detalle -->
                                         <button type="button"
                                                 class="action-btn btn-view"
-                                                title="Ver detalles del encuentro"
+                                                title="Ver detalles"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#detailModal{{ partido.id }}">
-                                            <i class="ti ti-list-details"></i>
+                                            <i class="ti ti-eye"></i>
                                         </button>
-                                        {% if request.user.is_staff or request.user.is_superuser %}
-                                            <!-- Editar (Programación) -->
+                                        {% if request.user.is_staff or request.user.is_superuser or request.user.es_admin_aso %}
+                                            <!-- Editar -->
                                             <button type="button"
                                                     class="action-btn btn-edit"
-                                                    title="Editar programación"
+                                                    title="Editar"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#editModal{{ partido.id }}">
                                                 <i class="ti ti-pencil"></i>
                                             </button>
-                                            {% if partido.estado == 'pendiente' or partido.estado == 'confirmado' %}
-                                                <!-- Registrar resultado -->
-                                                <button type="button"
-                                                        class="action-btn"
-                                                        title="Registrar Resultado"
-                                                        style="background: rgba(16, 185, 129, 0.08);
-                                                               color: #10b981;
-                                                               border-color: rgba(16, 185, 129, 0.15)"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#resultModal{{ partido.id }}">
-                                                    <i class="ti ti-pennant"></i>
+                                            <!-- Dropdown para más acciones -->
+                                            <div class="actions-dropdown dropdown">
+                                                <button class="action-btn dropdown-toggle" 
+                                                        type="button" 
+                                                        data-bs-toggle="dropdown" 
+                                                        aria-expanded="false"
+                                                        title="Más acciones">
+                                                    <i class="ti ti-dots-vertical"></i>
                                                 </button>
-                                                <!-- Cancelar partido -->
-                                                <button type="button"
-                                                        class="action-btn"
-                                                        title="Cancelar Partido"
-                                                        style="background: rgba(239, 68, 68, 0.08);
-                                                               color: #ef4444;
-                                                               border-color: rgba(239, 68, 68, 0.15)"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#cancelModal{{ partido.id }}">
-                                                    <i class="ti ti-circle-x"></i>
-                                                </button>
-                                            {% elif partido.estado == 'finalizado' %}
-                                                <!-- Editar resultado: admins siempre, árbitros max 2 ediciones -->
-                                                {% if request.user.is_staff or request.user.is_superuser or partido.ediciones_resultado < 2 %}
-                                                    <button type="button"
-                                                            class="action-btn"
-                                                            title="Editar Resultado{% if not request.user.is_staff and not request.user.is_superuser %} ({{ 2|add:partido.ediciones_resultado|default:2 }} restantes){% endif %}"
-                                                            style="background: rgba(245, 158, 11, 0.08);
-                                                                   color: #f59e0b;
-                                                                   border-color: rgba(245, 158, 11, 0.15)"
-                                                            data-bs-toggle="modal"
-                                                            data-bs-target="#editResultModal{{ partido.id }}">
-                                                        <i class="ti ti-history"></i>
-                                                    </button>
-                                                {% else %}
-                                                    <!-- Árbitro sin ediciones restantes -->
-                                                    <span class="action-btn"
-                                                          title="Sin correcciones disponibles"
-                                                          style="background: rgba(100, 100, 100, 0.1);
-                                                                 color: #64748b;
-                                                                 cursor: not-allowed">
-                                                        <i class="ti ti-lock"></i>
-                                                    </span>
-                                                {% endif %}
-                                            {% endif %}
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    {% if partido.estado == 'pendiente' or partido.estado == 'confirmado' %}
+                                                        <li>
+                                                            <button type="button" 
+                                                                    class="dropdown-item dropdown-item-result"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#resultModal{{ partido.id }}">
+                                                                <i class="ti ti-pennant"></i> Registrar Resultado
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button type="button" 
+                                                                    class="dropdown-item dropdown-item-cancel"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#cancelModal{{ partido.id }}">
+                                                                <i class="ti ti-circle-x"></i> Cancelar Partido
+                                                            </button>
+                                                        </li>
+                                                    {% elif partido.estado == 'finalizado' %}
+                                                        {% if request.user.is_staff or request.user.is_superuser or request.user.es_admin_aso or partido.ediciones_resultado < 2 %}
+                                                            <li>
+                                                                <button type="button" 
+                                                                        class="dropdown-item dropdown-item-edit-result"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#editResultModal{{ partido.id }}">
+                                                                    <i class="ti ti-history"></i> Editar Resultado
+                                                                </button>
+                                                            </li>
+                                                        {% else %}
+                                                            <li>
+                                                                <span class="dropdown-item text-muted" style="cursor: not-allowed;">
+                                                                    <i class="ti ti-lock"></i> Sin correcciones
+                                                                </span>
+                                                            </li>
+                                                        {% endif %}
+                                                    {% elif partido.estado == 'cancelado' %}
+                                                        <li>
+                                                            <span class="dropdown-item text-muted">
+                                                                <i class="ti ti-info-circle"></i> Partido cancelado
+                                                            </span>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </td>
                             </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Modales de Partidos (Fuera de la tabla para evitar problemas de visualización) -->
+            {% for partido in partidos %}
                             <!-- Modal Ver Detalles del Partido -->
                             <div class="modal fade"
                                  id="detailModal{{ partido.id }}"
@@ -816,7 +889,7 @@
                                         <!-- Footer -->
                                         <div class="modal-footer border-0 py-3 px-4"
                                              style="background: rgba(0,0,0,0.2)">
-                                            {% if request.user.is_staff or request.user.is_superuser %}
+                                            {% if request.user.is_staff or request.user.is_superuser or request.user.es_admin_aso %}
                                                 <button type="button"
                                                         class="btn btn-warning px-4 py-2"
                                                         data-bs-dismiss="modal"
@@ -1321,9 +1394,6 @@
                                 </div>
                             </div>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         {% else %}
             <div class="empty-state">
                 <div class="empty-icon-container">
