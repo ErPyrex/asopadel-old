@@ -89,6 +89,28 @@ class Command(BaseCommand):
             arbitros.append(arbitro)
         self.stdout.write(self.style.SUCCESS(f'   Creados {len(arbitros)} árbitros'))
 
+        # 3.5 Crear Admins normales (no superusuarios)
+        self.stdout.write('👤 Creando administradores...')
+        admins_data = [
+            ('V11111111', 'Admin', 'Prueba', 'admin.prueba@asopadel.com', '04141111111'),
+            ('V22222222', 'Gestor', 'ASOPADEL', 'gestor@asopadel.com', '04142222222'),
+        ]
+        admins = []
+        for cedula, nombre, apellido, email, telefono in admins_data:
+            admin_user = Usuario.objects.create_user(
+                cedula=cedula,
+                password='admin2024',
+                first_name=nombre,
+                last_name=apellido,
+                email=email,
+                telefono=telefono,
+                es_admin_aso=True,
+                es_arbitro=False,
+                es_jugador=False
+            )
+            admins.append(admin_user)
+        self.stdout.write(self.style.SUCCESS(f'   Creados {len(admins)} administradores'))
+
         # 4. Crear Jugadores
         self.stdout.write('🎾 Creando jugadores...')
         jugadores_data = [
@@ -301,6 +323,7 @@ class Command(BaseCommand):
         self.stdout.write('')
         self.stdout.write(f'📁 Categorías: {Categoria.objects.count()}')
         self.stdout.write(f'🏟️  Canchas: {Cancha.objects.count()}')
+        self.stdout.write(f'👤 Administradores: {Usuario.objects.filter(es_admin_aso=True).count()}')
         self.stdout.write(f'⚖️  Árbitros: {Usuario.objects.filter(es_arbitro=True).count()}')
         self.stdout.write(f'🎾 Jugadores: {Usuario.objects.filter(es_jugador=True).count()}')
         self.stdout.write(f'🏆 Torneos: {Torneo.objects.count()}')
@@ -308,5 +331,6 @@ class Command(BaseCommand):
         self.stdout.write(f'📰 Noticias: {Noticia.objects.count()}')
         self.stdout.write('')
         self.stdout.write(self.style.WARNING('📌 Credenciales de prueba:'))
+        self.stdout.write('   Administradores: contraseña "admin2024"')
         self.stdout.write('   Árbitros: contraseña "asopadel2024"')
         self.stdout.write('   Jugadores: contraseña "jugador2024"')
