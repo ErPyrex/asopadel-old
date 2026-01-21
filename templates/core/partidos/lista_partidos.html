@@ -386,6 +386,22 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
+  /* Header text azul oscuro en modo claro para mejor visibilidad */
+  [data-bs-theme="light"] .premium-header h1 {
+    color: #1e40af !important;
+  }
+
+  /* Icono del modal crear partido negro en modo claro */
+  [data-bs-theme="light"] #createMatchModal .modal-header .ti-calendar-plus {
+    color: #000000 !important;
+  }
+
+  /* Switch de partido casual con fondo azul cuando está activado en modo oscuro */
+  [data-bs-theme="dark"] #modal_es_casual:checked {
+    background-color: #0ea5e9 !important;
+    border-color: #0ea5e9 !important;
+  }
     </style>
 {% endblock %}
 {% block content %}

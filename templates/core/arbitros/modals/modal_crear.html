@@ -1,21 +1,21 @@
-<!-- Modal Registrar Jugador -->
+<!-- Modal Registrar Árbitro -->
 <div class="modal fade"
-     id="createPlayerModal"
+     id="createArbitroModal"
      tabindex="-1"
      aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
              style="background: var(--card-bg, #0f172a)">
-            <!-- Header -->
+            <!-- Header Azul -->
             <div class="modal-header py-3 border-0"
-                 style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                 style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)">
                 <h5 class="modal-title fw-bold text-white d-flex align-items-center">
                     <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
                          style="width: 36px;
                                 height: 36px">
-                        <i class="ti ti-user-plus fs-5"></i>
+                        <i class="ti ti-gavel fs-5"></i>
                     </div>
-                    Registrar Nuevo Jugador
+                    Registrar Nuevo Árbitro
                 </h5>
                 <button type="button"
                         class="btn-close btn-close-white"
@@ -24,21 +24,21 @@
             </div>
             <div class="modal-body p-4 p-md-5"
                  style="background: var(--card-bg, #0f172a)">
-                <form action="{% url 'core:admin_create_player' %}"
+                <form action="{% url 'core:admin_create_arbitro' %}"
                       method="POST"
-                      id="createPlayerForm">
+                      id="createArbitroForm">
                     {% csrf_token %}
                     <!-- Datos Personales -->
                     <div class="mb-4">
                         <div class="d-flex align-items-center gap-2 mb-3">
-                            <i class="ti ti-id-badge text-success"></i>
+                            <i class="ti ti-id-badge text-primary"></i>
                             <span class="text-muted small text-uppercase fw-bold">Datos Personales</span>
                         </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-muted small text-uppercase mb-2">Cédula *</label>
                                 <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-id text-success"></i></span>
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-id text-primary"></i></span>
                                     <input type="text"
                                            name="cedula"
                                            class="form-control border-0 py-2 bg-transparent"
@@ -51,7 +51,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-muted small text-uppercase mb-2">Email *</label>
                                 <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-mail text-success"></i></span>
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-mail text-primary"></i></span>
                                     <input type="email"
                                            name="email"
                                            class="form-control border-0 py-2 bg-transparent"
@@ -62,7 +62,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre *</label>
                                 <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-success"></i></span>
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-primary"></i></span>
                                     <input type="text"
                                            name="first_name"
                                            class="form-control border-0 py-2 bg-transparent"
@@ -74,7 +74,7 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apellido *</label>
                                 <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-success"></i></span>
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-primary"></i></span>
                                     <input type="text"
                                            name="last_name"
                                            class="form-control border-0 py-2 bg-transparent"
@@ -83,20 +83,10 @@
                                            required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Teléfono</label>
-                                <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-phone text-success"></i></span>
-                                    <input type="tel"
-                                           name="telefono"
-                                           class="form-control border-0 py-2 bg-transparent"
-                                           placeholder="Ej: 0414-1234567">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
+                            <div class="col-12">
                                 <label class="form-label fw-bold text-muted small text-uppercase mb-2">Contraseña *</label>
                                 <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-lock text-success"></i></span>
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-lock text-primary"></i></span>
                                     <input type="password"
                                            name="password"
                                            class="form-control border-0 py-2 bg-transparent"
@@ -109,46 +99,13 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Datos de Jugador -->
-                    <div class="mb-4">
-                        <div class="d-flex align-items-center gap-2 mb-3">
-                            <i class="ti ti-trophy text-success"></i>
-                            <span class="text-muted small text-uppercase fw-bold">Datos de Jugador</span>
-                        </div>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Categoría</label>
-                                <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-category text-success"></i></span>
-                                    <select name="categoria_jugador"
-                                            class="form-select border-0 py-2 bg-transparent">
-                                        <option value="">Sin categoría</option>
-                                        <option value="juvenil">Juvenil</option>
-                                        <option value="adulto">Adulto</option>
-                                        <option value="senior">Senior</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold text-muted small text-uppercase mb-2">Ranking Inicial</label>
-                                <div class="input-group modern-input-group">
-                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-chart-line text-success"></i></span>
-                                    <input type="number"
-                                           name="ranking"
-                                           class="form-control border-0 py-2 bg-transparent"
-                                           value="0"
-                                           min="0">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <!-- Botones -->
                     <div class="d-grid gap-3 mt-5">
                         <button type="submit"
                                 class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
-                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
                                        color: white">
-                            <i class="ti ti-user-check me-2"></i>Registrar Jugador
+                            <i class="ti ti-user-check me-2"></i>Registrar Árbitro
                         </button>
                         <button type="button"
                                 class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
@@ -159,49 +116,43 @@
         </div>
     </div>
 </div>
+
 <style>
     /* Icono negro en modo claro para mejor contraste */
-    [data-bs-theme="light"] #createPlayerModal .modal-header i {
+    [data-bs-theme="light"] #createArbitroModal .modal-header i {
         color: #000000 !important;
     }
 
-    #createPlayerModal .modern-input-group {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    transition: all 0.2s ease;
-}
-#createPlayerModal .modern-input-group:focus-within {
-    background: #ffffff;
-    border-color: #10b981;
-    box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
-}
-#createPlayerModal .modern-input-group .form-control,
-#createPlayerModal .modern-input-group .form-select {
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    color: #ffffff;
-    transition: color 0.2s ease;
-}
-/* Cuando el input está enfocado, texto negro */
-#createPlayerModal .modern-input-group:focus-within .form-control,
-#createPlayerModal .modern-input-group:focus-within .form-select {
-    color: #000000 !important;
-}
-/* Iconos también cambian a verde cuando está enfocado */
-#createPlayerModal .modern-input-group:focus-within .input-group-text i {
-    color: #10b981 !important;
-}
-#createPlayerModal .modern-input-group .form-select option {
-    background: #1e293b;
-}
-/* Placeholders blancos en modo oscuro */
-#createPlayerModal .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
-}
-/* Placeholders oscuros cuando el input está enfocado */
-#createPlayerModal .modern-input-group:focus-within .form-control::placeholder {
-    color: rgba(0, 0, 0, 0.4) !important;
-}
+    #createArbitroModal .modern-input-group {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+    }
+    #createArbitroModal .modern-input-group:focus-within {
+        background: #ffffff;
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.15);
+    }
+    #createArbitroModal .modern-input-group .form-control,
+    #createArbitroModal .modern-input-group .form-select {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        color: #ffffff;
+        transition: color 0.2s ease;
+    }
+    /* Cuando el input está enfocado, texto negro */
+    #createArbitroModal .modern-input-group:focus-within .form-control,
+    #createArbitroModal .modern-input-group:focus-within .form-select {
+        color: #000000 !important;
+    }
+    /* Iconos también cambian a azul cuando está enfocado */
+    #createArbitroModal .modern-input-group:focus-within .input-group-text i {
+        color: #0ea5e9 !important;
+    }
+    /* Placeholders blancos en modo oscuro */
+    #createArbitroModal .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.5) !important;
+    }
 </style>

@@ -1,0 +1,260 @@
+<!-- Modal Editar Árbitro -->
+<div class="modal fade"
+     id="editArbitroModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+             style="background: var(--card-bg, #0f172a)">
+            <!-- Header Azul -->
+            <div class="modal-header py-3 border-0"
+                 style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <div class="bg-white bg-opacity-25 rounded-circle p-2 me-3 d-flex align-items-center justify-content-center"
+                         style="width: 36px;
+                                height: 36px">
+                        <i class="ti ti-gavel fs-5"></i>
+                    </div>
+                    Editar Árbitro
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4 p-md-5 bg-card">
+                <form id="editArbitroForm" method="POST" action="">
+                    {% csrf_token %}
+                    <!-- Info del Árbitro -->
+                    <div class="mb-4 p-3 rounded-3"
+                         style="background: rgba(14, 165, 233, 0.08);
+                                border: 1px solid rgba(14, 165, 233, 0.2)">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center text-white fw-bold"
+                                 style="width: 48px;
+                                        height: 48px;
+                                        font-size: 1rem"
+                                 id="editArbitroAvatar">--</div>
+                            <div>
+                                <div class="text-white fw-bold" id="editArbitroDisplayName">Nombre</div>
+                                <div class="text-muted small">
+                                    Cédula: <span id="editArbitroCedula">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-4">
+                        <i class="ti ti-info-circle me-1"></i>
+                        Solo modifica los campos que deseas actualizar.
+                    </p>
+                    <!-- Campos Editables -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Nombre</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-primary"></i></span>
+                                <input type="text"
+                                       name="first_name"
+                                       id="editFirstName"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Apellido</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-user text-primary"></i></span>
+                                <input type="text"
+                                       name="last_name"
+                                       id="editLastName"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{2,50}"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">Email</label>
+                            <div class="input-group edit-input-group">
+                                <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-mail text-primary"></i></span>
+                                <input type="email"
+                                       name="email"
+                                       id="editEmail"
+                                       class="form-control border-0 py-2 bg-transparent"
+                                       required>
+                            </div>
+                        </div>
+
+                        <!-- Cambio de Contraseña (Opcional) -->
+                        <div class="col-12 mt-4">
+                            <div class="p-3 rounded-3"
+                                 style="background: rgba(239, 68, 68, 0.08);
+                                        border: 1px solid rgba(239, 68, 68, 0.2)">
+                                <label class="form-label fw-bold text-danger small text-uppercase mb-2">
+                                    <i class="ti ti-lock me-1"></i>Nueva Contraseña (Opcional)
+                                </label>
+                                <div class="input-group edit-input-group">
+                                    <span class="input-group-text border-0 ps-3 bg-transparent"><i class="ti ti-key text-danger"></i></span>
+                                    <input type="password"
+                                           name="password"
+                                           id="editPassword"
+                                           class="form-control border-0 py-2 bg-transparent"
+                                           placeholder="Dejar vacío para mantener la actual">
+                                </div>
+                                <small class="text-muted d-block mt-2">Mínimo 8 caracteres, mayúscula, minúscula y número.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Botones -->
+                    <div class="d-grid gap-3 mt-5">
+                        <button type="button"
+                                id="btnConfirmEditArbitro"
+                                class="btn btn-lg rounded-pill fw-bold py-3 shadow-sm"
+                                style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+                                       color: white">
+                            <i class="ti ti-device-floppy me-2"></i>Guardar Cambios
+                        </button>
+                        <button type="button"
+                                class="btn btn-link text-muted fw-bold text-decoration-none shadow-none"
+                                data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmación -->
+<div class="modal fade"
+     id="confirmEditArbitroModal"
+     tabindex="-1"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
+             style="background: var(--card-bg, #0f172a)">
+            <div class="modal-header py-3 border-0 bg-primary">
+                <h5 class="modal-title fw-bold text-white d-flex align-items-center">
+                    <i class="ti ti-alert-circle me-2"></i>Confirmar Cambios
+                </h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4 text-center bg-card">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4"
+                     style="width: 80px;
+                            height: 80px">
+                    <i class="ti ti-user-check text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h5 class="text-white fw-bold mb-2">¿Guardar los cambios?</h5>
+                <p class="text-muted mb-0">
+                    Se actualizará la información del árbitro <strong id="confirmArbitroName" class="text-white">-</strong>.
+                </p>
+            </div>
+            <div class="modal-footer border-0 p-4 d-flex gap-3 justify-content-center bg-card">
+                <button type="button"
+                        class="btn btn-outline-secondary px-4 rounded-pill"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <button type="button"
+                        id="btnSubmitEditArbitro"
+                        class="btn btn-primary px-4 rounded-pill fw-bold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Icono del header negro en modo claro */
+[data-bs-theme="light"] #editArbitroModal .modal-header .ti-gavel {
+    color: #000000 !important;
+}
+
+#editArbitroModal .edit-input-group {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+#editArbitroModal .edit-input-group:focus-within {
+    background: #ffffff;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.15);
+}
+#editArbitroModal .edit-input-group .form-control,
+#editArbitroModal .edit-input-group .form-select {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #ffffff;
+    transition: color 0.2s ease;
+}
+/* Cuando el input está enfocado, texto negro */
+#editArbitroModal .edit-input-group:focus-within .form-control,
+#editArbitroModal .edit-input-group:focus-within .form-select {
+    color: #000000 !important;
+}
+/* Iconos también cambian a azul cuando está enfocado */
+#editArbitroModal .edit-input-group:focus-within .input-group-text i {
+    color: #0ea5e9 !important;
+}
+#editArbitroModal .bg-card {
+    background: var(--card-bg, #0f172a);
+}
+/* Placeholders blancos en modo oscuro */
+#editArbitroModal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+/* Placeholders oscuros cuando el input está enfocado */
+#editArbitroModal .edit-input-group:focus-within .form-control::placeholder {
+    color: rgba(0, 0, 0, 0.4) !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editModal = document.getElementById('editArbitroModal');
+    const confirmModal = document.getElementById('confirmEditArbitroModal');
+    const form = document.getElementById('editArbitroForm');
+    const btnConfirm = document.getElementById('btnConfirmEditArbitro');
+    const btnSubmit = document.getElementById('btnSubmitEditArbitro');
+
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            
+            // Datos
+            const nombre = button.dataset.nombre;
+            const apellido = button.dataset.apellido;
+            const email = button.dataset.email;
+            const cedula = button.dataset.cedula;
+            const url = button.dataset.url;
+            
+            // Set values
+            const fullName = nombre + ' ' + apellido;
+            document.getElementById('editArbitroDisplayName').textContent = fullName;
+            document.getElementById('editArbitroCedula').textContent = cedula;
+            document.getElementById('editArbitroAvatar').textContent = (nombre[0] + apellido[0]).toUpperCase();
+            document.getElementById('confirmArbitroName').textContent = fullName;
+            
+            document.getElementById('editFirstName').value = nombre;
+            document.getElementById('editLastName').value = apellido;
+            document.getElementById('editEmail').value = email;
+            
+            form.action = url;
+        });
+    }
+
+    if (btnConfirm) {
+        btnConfirm.addEventListener('click', function() {
+            bootstrap.Modal.getInstance(editModal).hide();
+            setTimeout(() => new bootstrap.Modal(confirmModal).show(), 300);
+        });
+    }
+
+    if (btnSubmit) {
+        btnSubmit.addEventListener('click', function() {
+            form.submit();
+        });
+    }
+});
+</script>

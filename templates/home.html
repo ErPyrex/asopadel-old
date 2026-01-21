@@ -186,12 +186,7 @@
                              aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                                 <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                                    <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
-                                        <button type="button"
-                                                class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
+
                                     <div class="modal-body p-0">
                                         {% if noticia.imagen %}
                                             <div class="modal-hero-wrapper-home">
@@ -279,12 +274,7 @@
                             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                                 <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden"
                                      style="background: var(--card-bg, #0f172a)">
-                                    <div class="modal-header border-0 pb-0 position-absolute top-0 end-0 z-3">
-                                        <button type="button"
-                                                class="btn-close btn-close-white bg-dark rounded-circle p-2 opacity-75 shadow-none"
-                                                data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                    </div>
+
                                     <div class="modal-body p-0">
                                         <!-- Hero del Torneo -->
                                         <div class="p-4 p-md-5 bg-primary text-white position-relative overflow-hidden">
@@ -375,7 +365,7 @@
                                                         </h5>
                                                         <div class="p-3 mb-4 rounded-4 border border-warning border-opacity-25 bg-warning bg-opacity-10">
                                                             <div class="d-flex justify-content-between small fw-bold text-warning mb-2">
-                                                                <span>{{ proximo_partido_torneo.fecha|date:"d M" }} • {{ proximo_partido_torneo.hora|time:"H:i" }}</span>
+                                                                <span>{{ proximo_partido_torneo.fecha|date:"d M" }} • {{ proximo_partido_torneo.hora|time:"h:i A" }}</span>
                                                                 <span>{{ proximo_partido_torneo.cancha.nombre|default:"Por definir" }}</span>
                                                             </div>
                                                             <div class="d-flex justify-content-between align-items-center">
@@ -419,7 +409,7 @@
                                                                  data-match-marcador="{{ partido.marcador|default:'0-0' }}">
                                                                 <div class="d-flex justify-content-between small text-muted mb-2">
                                                                     <span><i class="ti ti-calendar-event me-1"></i>{{ partido.fecha|date:"d M" }}</span>
-                                                                    <span><i class="ti ti-clock me-1"></i>{{ partido.hora|time:"H:i" }}</span>
+                                                                    <span><i class="ti ti-clock me-1"></i>{{ partido.hora|time:"h:i A" }}</span>
                                                                 </div>
                                                                 <div class="d-flex justify-content-between align-items-center font-monospace">
                                                                     <div class="flex-grow-1 text-truncate pe-2 fw-bold small text-white">

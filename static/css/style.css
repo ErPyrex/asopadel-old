@@ -11,8 +11,13 @@
     --color-text-muted: #64748B;
     --color-light: #F8FAFC;
     --color-white: #FFFFFF;
-    --color-border: #0c0a0a;
+    --color-border: #94a3b8;
     --color-divider: #201f1f;
+
+    /* FullCalendar - Modo Claro */
+    --fc-border-color: #94a3b8;
+    --fc-page-bg-color: #ffffff;
+    --fc-neutral-bg-color: #f8fafc;
 
 
     /* Variables de UI semánticas */
@@ -21,7 +26,7 @@
 
     --bg-body: linear-gradient(180deg, #F1F5F9 0%, #F8FAFC 100%);
     --bg-card: #FFFFFF;
-    --bg-navbar: #FFFFFF;
+    --bg-navbar: #D6D2CE;
     --color-heading: #0F172A;
 
     --gradient-primary: linear-gradient(135deg, #0EA5E9 0%, #6366F1 100%);
@@ -57,6 +62,11 @@
     --ui-icon-bg: rgba(56, 189, 248, 0.18);
     /* Más visible en dark mode */
     --color-divider: rgba(255, 255, 255, 0.2);
+    
+    /* FullCalendar - Restaurar bordes sutiles en oscuro */
+    --fc-border-color: #374151; /* Slate 700 */
+    --fc-page-bg-color: #0F172A;
+    --fc-neutral-bg-color: #1E293B;
 }
 
 /* Reset y Base */
@@ -64,6 +74,35 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+/* Forzar cursor de mano en elementos interactivos */
+button,
+a,
+input[type="button"],
+input[type="submit"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"],
+select,
+label,
+.btn,
+.clickable,
+[onclick],
+[role="button"],
+[data-bs-toggle],
+[data-bs-target] {
+    cursor: pointer !important;
+}
+
+/* Forzar cursor explícitamente en el icono del calendario (Chrome/Edge) */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer !important;
 }
 
 hr,
@@ -128,7 +167,7 @@ a:hover {
     z-index: 1050;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    background: rgba(var(--bg-navbar-rgb, 255, 255, 255), 0.85) !important;
+    background: var(--bg-navbar) !important;
 }
 
 [data-bs-theme="dark"] .navbar {
@@ -360,7 +399,12 @@ a:hover {
     border-top: 1px solid var(--color-border);
     padding: 3rem 0;
     margin-top: 4rem;
-    color: var(--color-text-muted);
+    color: #000000; /* Negro sólido en modo claro */
+}
+
+[data-bs-theme="dark"] .footer,
+.dark-mode .footer {
+    color: var(--color-text-muted); /* Restaurar legibilidad en modo oscuro */
 }
 
 /* Utils */
@@ -520,6 +564,29 @@ a:hover {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
     outline: none;
+}
+
+/* Mejora de visibilidad al escribir en modo oscuro (Login, Registro, Administración, etc.) */
+.dark-mode .form-control:focus,
+[data-bs-theme="dark"] .form-control:focus,
+.dark-mode .form-select:focus,
+[data-bs-theme="dark"] .form-select:focus,
+.dark-mode input:focus,
+[data-bs-theme="dark"] input:focus,
+.dark-mode textarea:focus,
+[data-bs-theme="dark"] textarea:focus,
+.dark-mode .modern-input-group:focus-within,
+[data-bs-theme="dark"] .modern-input-group:focus-within {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+/* Asegurar que el texto dentro de modern-input-group sea negro al hacer focus */
+.dark-mode .modern-input-group:focus-within .form-control,
+[data-bs-theme="dark"] .modern-input-group:focus-within .form-control,
+.dark-mode .modern-input-group:focus-within .form-select,
+[data-bs-theme="dark"] .modern-input-group:focus-within .form-select {
+    color: #000000 !important;
 }
 
 /* Global Text contrast fixes for Dark Mode */
@@ -1077,4 +1144,26 @@ a:hover {
 
 .letter-spacing-1 {
     letter-spacing: 1px;
+}
+
+/* --- FullCalendar & Tables Border Override --- */
+/* Forzar color de bordes en modo claro para consistencia con inputs (#94a3b8) */
+[data-bs-theme="light"] .fc,
+[data-bs-theme="light"] .fc-theme-standard td,
+[data-bs-theme="light"] .fc-theme-standard th,
+[data-bs-theme="light"] .fc-theme-standard .fc-scrollgrid,
+[data-bs-theme="light"] .table-bordered,
+[data-bs-theme="light"] .table-bordered > :not(caption) > * > *,
+[data-bs-theme="light"] .table-group-divider {
+    border-color: #94a3b8 !important;
+}
+
+/* En modo oscuro, mantener bordes sutiles */
+[data-bs-theme="dark"] .fc,
+[data-bs-theme="dark"] .fc-theme-standard td,
+[data-bs-theme="dark"] .fc-theme-standard th,
+[data-bs-theme="dark"] .fc-theme-standard .fc-scrollgrid,
+[data-bs-theme="dark"] .table-bordered,
+[data-bs-theme="dark"] .table-bordered > :not(caption) > * > * {
+    border-color: #374151 !important;
 }

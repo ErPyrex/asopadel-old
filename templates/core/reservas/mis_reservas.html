@@ -68,12 +68,12 @@
                                             <div class="d-flex align-items-center justify-content-center gap-3">
                                                 <div class="text-center">
                                                     <small class="text-muted d-block tiny fw-bold text-uppercase">Inicio</small>
-                                                    <span class="fs-4 fw-bold">{{ reserva.hora_inicio|time:"H:i" }}</span>
+                                                    <span class="fs-4 fw-bold">{{ reserva.hora_inicio|time:"h:i A" }}</span>
                                                 </div>
                                                 <div class="text-muted opacity-25 fs-2">|</div>
                                                 <div class="text-center">
                                                     <small class="text-muted d-block tiny fw-bold text-uppercase">Fin</small>
-                                                    <span class="fs-4 fw-bold">{{ reserva.hora_fin|time:"H:i" }}</span>
+                                                    <span class="fs-4 fw-bold">{{ reserva.hora_fin|time:"h:i A" }}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -142,7 +142,7 @@
                                             </td>
                                             <td class="py-4">
                                                 <span class="badge bg-light text-dark fw-bold border p-2 rounded-3">
-                                                    {{ reserva.hora_inicio|time:"H:i" }} - {{ reserva.hora_fin|time:"H:i" }}
+                                                    {{ reserva.hora_inicio|time:"h:i A" }} - {{ reserva.hora_fin|time:"h:i A" }}
                                                 </span>
                                             </td>
                                             <td class="py-4 text-muted small">

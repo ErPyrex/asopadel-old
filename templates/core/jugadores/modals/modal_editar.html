@@ -206,6 +206,11 @@
     </div>
 </div>
 <style>
+/* Icono del header negro en modo claro */
+[data-bs-theme="light"] #editPlayerModal .modal-header .ti-user-edit {
+    color: #000000 !important;
+}
+
 #editPlayerModal .edit-input-group {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -213,7 +218,7 @@
     transition: all 0.2s ease;
 }
 #editPlayerModal .edit-input-group:focus-within {
-    background: rgba(255, 255, 255, 0.06);
+    background: #ffffff;
     border-color: #f59e0b;
     box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.15);
 }
@@ -222,9 +227,29 @@
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
+    color: #ffffff;
+    transition: color 0.2s ease;
+}
+/* Cuando el input está enfocado, texto negro */
+#editPlayerModal .edit-input-group:focus-within .form-control,
+#editPlayerModal .edit-input-group:focus-within .form-select {
+    color: #000000 !important;
+}
+/* Iconos también cambian a negro cuando está enfocado */
+#editPlayerModal .edit-input-group:focus-within .input-group-text i {
+    color: #f59e0b !important;
 }
 #editPlayerModal .edit-input-group .form-select option {
     background: #1e293b;
+    color: #ffffff;
+}
+/* Placeholders blancos en modo oscuro */
+#editPlayerModal .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+/* Placeholders oscuros cuando el input está enfocado */
+#editPlayerModal .edit-input-group:focus-within .form-control::placeholder {
+    color: rgba(0, 0, 0, 0.4) !important;
 }
 </style>
 <script>
